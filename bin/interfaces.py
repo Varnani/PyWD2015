@@ -338,5 +338,6 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
         self.spotconfigsave_btn.clicked.connect(partial(methods.SaveSpotConfiguration, self))
         self.spotconfigload_btn.clicked.connect(partial(methods.LoadSpotConfiguration, self))
 
+
 if __name__ == "__main__":
     pass

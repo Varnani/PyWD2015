@@ -16,5 +16,6 @@ def run():
     gui.show()  # show the mainwindow
     sys.exit(app.exec_())  # enter app loop
 
+
 if __name__ == "__main__":
     run()
