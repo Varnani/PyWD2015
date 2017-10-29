@@ -6,24 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>760</width>
-    <height>330</height>
+    <width>780</width>
+    <height>345</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>760</width>
-    <height>330</height>
+    <width>780</width>
+    <height>345</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>760</width>
-    <height>330</height>
+    <width>780</width>
+    <height>345</height>
    </size>
   </property>
   <property name="windowTitle">
-   <string>pywd</string>
+   <string>PyWD2015</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -31,8 +31,8 @@
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>741</width>
-      <height>271</height>
+      <width>761</width>
+      <height>281</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -790,9 +790,9 @@
      <widget class="QPushButton" name="loadwidget_btn">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>610</x>
         <y>10</y>
-        <width>111</width>
+        <width>131</width>
         <height>31</height>
        </rect>
       </property>
@@ -803,9 +803,9 @@
      <widget class="QPushButton" name="spotconfigure_btn">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>610</x>
         <y>50</y>
-        <width>111</width>
+        <width>131</width>
         <height>31</height>
        </rect>
       </property>
@@ -816,20 +816,20 @@
      <widget class="QComboBox" name="maglite_combobox">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>10</y>
-        <width>81</width>
+        <width>91</width>
         <height>22</height>
        </rect>
       </property>
       <item>
        <property name="text">
-        <string>Magnitude</string>
+        <string>Flux</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Flux</string>
+        <string>Magnitude</string>
        </property>
       </item>
      </widget>
@@ -838,7 +838,7 @@
        <rect>
         <x>170</x>
         <y>10</y>
-        <width>51</width>
+        <width>71</width>
         <height>21</height>
        </rect>
       </property>
@@ -857,7 +857,7 @@
      <widget class="QLabel" name="label_90">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>230</x>
         <y>80</y>
         <width>41</width>
         <height>21</height>
@@ -873,7 +873,7 @@
      <widget class="QDoubleSpinBox" name="gr1_spinbox">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>350</x>
         <y>40</y>
         <width>62</width>
         <height>22</height>
@@ -895,7 +895,7 @@
      <widget class="QDoubleSpinBox" name="alb2_spinbox">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>270</x>
         <y>80</y>
         <width>41</width>
         <height>22</height>
@@ -919,7 +919,7 @@
        <rect>
         <x>590</x>
         <y>80</y>
-        <width>21</width>
+        <width>31</width>
         <height>21</height>
        </rect>
       </property>
@@ -971,7 +971,7 @@
      <widget class="QDoubleSpinBox" name="gr2_spinbox">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>350</x>
         <y>80</y>
         <width>62</width>
         <height>22</height>
@@ -1022,7 +1022,7 @@
      <widget class="QLabel" name="label_93">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>320</x>
         <y>40</y>
         <width>31</width>
         <height>21</height>
@@ -1101,7 +1101,7 @@
        <rect>
         <x>60</x>
         <y>80</y>
-        <width>121</width>
+        <width>151</width>
         <height>22</height>
        </rect>
       </property>
@@ -1121,7 +1121,7 @@
        <rect>
         <x>590</x>
         <y>40</y>
-        <width>21</width>
+        <width>31</width>
         <height>21</height>
        </rect>
       </property>
@@ -1169,7 +1169,7 @@
        <rect>
         <x>20</x>
         <y>210</y>
-        <width>21</width>
+        <width>31</width>
         <height>21</height>
        </rect>
       </property>
@@ -1183,7 +1183,7 @@
      <widget class="QDoubleSpinBox" name="alb1_spinbox">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>270</x>
         <y>40</y>
         <width>41</width>
         <height>22</height>
@@ -1318,7 +1318,7 @@
      <widget class="QLabel" name="label_99">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>320</x>
         <y>80</y>
         <width>31</width>
         <height>21</height>
@@ -1397,7 +1397,7 @@
        <rect>
         <x>20</x>
         <y>160</y>
-        <width>21</width>
+        <width>31</width>
         <height>21</height>
        </rect>
       </property>
@@ -1411,7 +1411,7 @@
      <widget class="QSpinBox" name="n1l_spinbox_2">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>620</x>
         <y>40</y>
         <width>42</width>
         <height>20</height>
@@ -1424,7 +1424,7 @@
      <widget class="QLabel" name="label_102">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>230</x>
         <y>40</y>
         <width>41</width>
         <height>21</height>
@@ -1494,7 +1494,7 @@
      <widget class="QSpinBox" name="n2l_spinbox_2">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>620</x>
         <y>80</y>
         <width>42</width>
         <height>20</height>
@@ -1509,7 +1509,7 @@
        <rect>
         <x>60</x>
         <y>40</y>
-        <width>121</width>
+        <width>151</width>
         <height>22</height>
        </rect>
       </property>
@@ -1571,7 +1571,7 @@
        <rect>
         <x>440</x>
         <y>130</y>
-        <width>121</width>
+        <width>151</width>
         <height>21</height>
        </rect>
       </property>
@@ -1794,7 +1794,7 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>241</width>
+        <width>251</width>
         <height>21</height>
        </rect>
       </property>
@@ -2729,7 +2729,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="pshift_chk">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>380</x>
         <y>80</y>
         <width>70</width>
         <height>17</height>
@@ -2742,7 +2742,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="f2_chk">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>310</x>
         <y>80</y>
         <width>70</width>
         <height>17</height>
@@ -2781,7 +2781,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="s1rad_chk">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>140</y>
         <width>70</width>
         <height>17</height>
@@ -2794,7 +2794,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="perr0_chk">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>80</y>
         <width>70</width>
         <height>17</height>
@@ -2807,7 +2807,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="alb2_chk">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>380</x>
         <y>110</y>
         <width>70</width>
         <height>17</height>
@@ -2822,7 +2822,7 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>80</x>
         <y>140</y>
-        <width>70</width>
+        <width>81</width>
         <height>17</height>
        </rect>
       </property>
@@ -2833,7 +2833,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="g1_chk">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>110</y>
         <width>70</width>
         <height>17</height>
@@ -2859,7 +2859,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="g2_chk">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>110</y>
         <width>70</width>
         <height>17</height>
@@ -2872,7 +2872,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="q_chk">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>590</x>
         <y>110</y>
         <width>70</width>
         <height>17</height>
@@ -2885,9 +2885,9 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="s1temp_chk">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>140</y>
-        <width>70</width>
+        <width>81</width>
         <height>17</height>
        </rect>
       </property>
@@ -2898,9 +2898,9 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="s2long_chk">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>380</x>
         <y>140</y>
-        <width>70</width>
+        <width>81</width>
         <height>17</height>
        </rect>
       </property>
@@ -2911,7 +2911,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="dpdt_chk">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>50</y>
         <width>70</width>
         <height>17</height>
@@ -2924,7 +2924,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="tc3b_chk">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>310</x>
         <y>170</y>
         <width>70</width>
         <height>17</height>
@@ -2937,7 +2937,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="pot1_chk">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>460</x>
         <y>110</y>
         <width>70</width>
         <height>17</height>
@@ -2950,7 +2950,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="l2_chk">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>200</y>
         <width>70</width>
         <height>17</height>
@@ -2963,7 +2963,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="l1_chk">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>200</y>
         <width>70</width>
         <height>17</height>
@@ -2976,7 +2976,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="el3_chk">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>450</x>
         <y>200</y>
         <width>70</width>
         <height>17</height>
@@ -2992,7 +2992,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="pot2_chk">
       <property name="geometry">
        <rect>
-        <x>500</x>
+        <x>530</x>
         <y>110</y>
         <width>70</width>
         <height>17</height>
@@ -3005,7 +3005,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="vgam_chk">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>460</x>
         <y>80</y>
         <width>70</width>
         <height>17</height>
@@ -3031,7 +3031,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="s2lat_chk">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>310</x>
         <y>140</y>
         <width>70</width>
         <height>17</height>
@@ -3044,7 +3044,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="alb1_chk">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>310</x>
         <y>110</y>
         <width>70</width>
         <height>17</height>
@@ -3057,7 +3057,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="x1_chk">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>310</x>
         <y>200</y>
         <width>70</width>
         <height>17</height>
@@ -3096,9 +3096,9 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="s2temp_chk">
       <property name="geometry">
        <rect>
-        <x>500</x>
+        <x>530</x>
         <y>140</y>
-        <width>70</width>
+        <width>81</width>
         <height>17</height>
        </rect>
       </property>
@@ -3122,7 +3122,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="incl_chk">
       <property name="geometry">
        <rect>
-        <x>500</x>
+        <x>530</x>
         <y>80</y>
         <width>70</width>
         <height>17</height>
@@ -3135,7 +3135,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="f1_chk">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>80</y>
         <width>70</width>
         <height>17</height>
@@ -3148,7 +3148,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="perr3b_chk">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>380</x>
         <y>170</y>
         <width>70</width>
         <height>17</height>
@@ -3174,7 +3174,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="x2_chk">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>380</x>
         <y>200</y>
         <width>70</width>
         <height>17</height>
@@ -3200,7 +3200,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="e3b_chk">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>170</y>
         <width>70</width>
         <height>17</height>
@@ -3226,7 +3226,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="s2rad_chk">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>460</x>
         <y>140</y>
         <width>70</width>
         <height>17</height>
@@ -3239,7 +3239,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="xinc3b_chk">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>160</x>
         <y>170</y>
         <width>70</width>
         <height>17</height>
@@ -3252,7 +3252,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QCheckBox" name="dperdt_chk">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>230</x>
         <y>50</y>
         <width>70</width>
         <height>17</height>
@@ -3340,7 +3340,7 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>140</x>
         <y>50</y>
-        <width>61</width>
+        <width>71</width>
         <height>21</height>
        </rect>
       </property>
@@ -3399,9 +3399,9 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QComboBox" name="theme_combobox">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>120</x>
         <y>80</y>
-        <width>121</width>
+        <width>131</width>
         <height>22</height>
        </rect>
       </property>
@@ -3411,7 +3411,7 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>20</x>
         <y>80</y>
-        <width>81</width>
+        <width>101</width>
         <height>21</height>
        </rect>
       </property>
@@ -3425,7 +3425,7 @@ the triple system barycenter, in the adopted time system</string>
         <x>410</x>
         <y>10</y>
         <width>20</width>
-        <height>225</height>
+        <height>231</height>
        </rect>
       </property>
       <property name="orientation">
@@ -3450,7 +3450,7 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>430</x>
         <y>30</y>
-        <width>291</width>
+        <width>321</width>
         <height>21</height>
        </rect>
       </property>
@@ -3463,12 +3463,12 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>430</x>
         <y>50</y>
-        <width>291</width>
+        <width>321</width>
         <height>61</height>
        </rect>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PyWD2015 (or pywd for short) is a graphical user interface for generating dcin.active files for Wilson - Devinney's DC program for eclipsing binary modeling, targeting specifically 2015 version.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PyWD2015 (or pywd for short) is a graphical user interface for generating dcin.active files for Wilson - Devinney's DC program for eclipsing binary modeling, targeting specifically the 2015 version.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="textFormat">
        <enum>Qt::RichText</enum>
@@ -3488,12 +3488,12 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>540</x>
         <y>120</y>
-        <width>181</width>
+        <width>211</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
-       <string>github.com/example</string>
+       <string>github.com/Varnani/PyWD2015</string>
       </property>
       <property name="readOnly">
        <bool>true</bool>
@@ -3504,7 +3504,7 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>540</x>
         <y>150</y>
-        <width>181</width>
+        <width>211</width>
         <height>20</height>
        </rect>
       </property>
@@ -3538,7 +3538,7 @@ the triple system barycenter, in the adopted time system</string>
        </rect>
       </property>
       <property name="text">
-       <string>Homepage for WD:</string>
+       <string>WD Homepage:</string>
       </property>
      </widget>
     </widget>
@@ -3548,7 +3548,7 @@ the triple system barycenter, in the adopted time system</string>
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>121</width>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -3565,7 +3565,7 @@ the triple system barycenter, in the adopted time system</string>
    <widget class="QComboBox" name="mode_combobox">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>160</x>
       <y>10</y>
       <width>91</width>
       <height>22</height>
@@ -3618,7 +3618,7 @@ the triple system barycenter, in the adopted time system</string>
    <widget class="QPushButton" name="whatsthis_btn">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>740</x>
       <y>10</y>
       <width>31</width>
       <height>31</height>
@@ -3640,7 +3640,7 @@ the triple system barycenter, in the adopted time system</string>
    <widget class="QPushButton" name="export_btn">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>590</x>
       <y>10</y>
       <width>141</width>
       <height>31</height>

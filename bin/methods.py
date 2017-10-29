@@ -365,7 +365,7 @@ def addLightCurve(LoadWidget):
             # add new elements
             # label
             label = QtGui.QLabel(LoadWidget)  # load element
-            label.setGeometry(60, 140 + shiftAmount, 71, 21)  # set geometry
+            label.setGeometry(50, 140 + shiftAmount, 80, 21)  # set geometry
             label.setText("Light Curve " + str(LoadWidget.lcCount))  # set text
             label.setObjectName("lclabel" + str(LoadWidget.lcCount))  # set object name
             LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(label)  # store element in the element list
@@ -455,7 +455,7 @@ def removeLightCurve(LoadWidget, buttonRow):
 
 def resizeLoadWidget(LoadWidget):
     shiftAmount = LoadWidget.lcCount * 40
-    LoadWidget.nlc_label.setText("Number of Light Curves: " + str(LoadWidget.lcCount))  # update nlc label
+    LoadWidget.nlc_label.setText("Light curve count: " + str(LoadWidget.lcCount))  # update nlc label
 
     # resize the widget
     LoadWidget.setMaximumHeight(shiftAmount + 215)
@@ -574,7 +574,7 @@ def formatDels(ipt):
     if 10 <= float(ipt):
         a = str(float(ipt) / float(pow(10, (len(ipt) - 1))))
         if len(a) > 3 or len(ipt) > 10:
-            msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with "\
+            msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with " \
                   + "maximum number of 8 trailing zeroes, ex. 120000"
             raise IndexError(msg)
         else:
@@ -592,44 +592,121 @@ def exportDc(MainWindow):
     if filePath != "" and returnCode != 0:
         with open(filePath, 'w') as dcin:
             try:
-                    line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
-                        formatDels(MainWindow.del_s1lat_ipt.text()),
-                        formatDels(MainWindow.del_s1lng_ipt.text()),
-                        formatDels(MainWindow.del_s1agrad_ipt.text()),
-                        formatDels(MainWindow.del_s1tmpf_ipt.text()),
-                        formatDels(MainWindow.del_s2lat_ipt.text()),
-                        formatDels(MainWindow.del_s2lng_ipt.text()),
-                        formatDels(MainWindow.del_s2agrad_ipt.text()),
-                        formatDels(MainWindow.del_s2tmpf_ipt.text())
-                    )
-                    line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
-                        formatDels(MainWindow.del_a_ipt.text()),
-                        formatDels(MainWindow.del_e_ipt.text()),
-                        formatDels(MainWindow.del_perr0_ipt.text()),
-                        formatDels(MainWindow.del_f1_ipt.text()),
-                        formatDels(MainWindow.del_f2_ipt.text()),
-                        formatDels(MainWindow.del_pshift_ipt.text()),
-                        formatDels(MainWindow.del_i_ipt.text()),
-                        formatDels(MainWindow.del_g1_ipt.text()),
-                        formatDels(MainWindow.del_g2_ipt.text()),
-                        formatDels(MainWindow.del_t1_ipt.text()),
-                        formatDels(MainWindow.del_t2_ipt.text())
-                    )
-                    line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
-                        formatDels(MainWindow.del_alb1_ipt.text()),
-                        formatDels(MainWindow.del_alb2_ipt.text()),
-                        formatDels(MainWindow.del_pot1_ipt.text()),
-                        formatDels(MainWindow.del_pot2_ipt.text()),
-                        formatDels(MainWindow.del_q_ipt.text()),
-                        formatDels(MainWindow.del_l1_ipt.text()),
-                        formatDels(MainWindow.del_l2_ipt.text()),
-                        formatDels(MainWindow.del_x1_ipt.text()),
-                        formatDels(MainWindow.del_x2_ipt.text())
-                    )
-                    # write lines into file
-                    dcin.write(line1)
-                    dcin.write(line2)
-                    dcin.write(line3)
+                line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
+                    formatDels(MainWindow.del_s1lat_ipt.text()),
+                    formatDels(MainWindow.del_s1lng_ipt.text()),
+                    formatDels(MainWindow.del_s1agrad_ipt.text()),
+                    formatDels(MainWindow.del_s1tmpf_ipt.text()),
+                    formatDels(MainWindow.del_s2lat_ipt.text()),
+                    formatDels(MainWindow.del_s2lng_ipt.text()),
+                    formatDels(MainWindow.del_s2agrad_ipt.text()),
+                    formatDels(MainWindow.del_s2tmpf_ipt.text())
+                )
+                line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
+                    formatDels(MainWindow.del_a_ipt.text()),
+                    formatDels(MainWindow.del_e_ipt.text()),
+                    formatDels(MainWindow.del_perr0_ipt.text()),
+                    formatDels(MainWindow.del_f1_ipt.text()),
+                    formatDels(MainWindow.del_f2_ipt.text()),
+                    formatDels(MainWindow.del_pshift_ipt.text()),
+                    formatDels(MainWindow.del_i_ipt.text()),
+                    formatDels(MainWindow.del_g1_ipt.text()),
+                    formatDels(MainWindow.del_g2_ipt.text()),
+                    formatDels(MainWindow.del_t1_ipt.text()),
+                    formatDels(MainWindow.del_t2_ipt.text())
+                )
+                line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
+                    formatDels(MainWindow.del_alb1_ipt.text()),
+                    formatDels(MainWindow.del_alb2_ipt.text()),
+                    formatDels(MainWindow.del_pot1_ipt.text()),
+                    formatDels(MainWindow.del_pot2_ipt.text()),
+                    formatDels(MainWindow.del_q_ipt.text()),
+                    formatDels(MainWindow.del_l1_ipt.text()),
+                    formatDels(MainWindow.del_l2_ipt.text()),
+                    formatDels(MainWindow.del_x1_ipt.text()),
+                    formatDels(MainWindow.del_x2_ipt.text())
+                )
+
+                def _formatKeeps(keep):
+                    if keep.isChecked():
+                        return "0"
+                    else:
+                        return "1"
+
+                block1 = "{0}{1}{2}{3}".format(
+                    _formatKeeps(MainWindow.s1lat_chk),
+                    _formatKeeps(MainWindow.s1long_chk),
+                    _formatKeeps(MainWindow.s1rad_chk),
+                    _formatKeeps(MainWindow.s1temp_chk),
+                )
+                block2 = "{0}{1}{2}{3}".format(
+                    _formatKeeps(MainWindow.s2lat_chk),
+                    _formatKeeps(MainWindow.s2long_chk),
+                    _formatKeeps(MainWindow.s2rad_chk),
+                    _formatKeeps(MainWindow.s2temp_chk)
+                )
+                block3 = "{0}{1}{2}{3}{4}{5}{6}".format(
+                    _formatKeeps(MainWindow.a_chk),
+                    _formatKeeps(MainWindow.e_chk),
+                    _formatKeeps(MainWindow.perr0_chk),
+                    _formatKeeps(MainWindow.f1_chk),
+                    _formatKeeps(MainWindow.f2_chk),
+                    _formatKeeps(MainWindow.pshift_chk),
+                    _formatKeeps(MainWindow.vgam_chk)
+                )
+                block4 = "{0}{1}{2}{3}{4}".format(
+                    _formatKeeps(MainWindow.incl_chk),
+                    _formatKeeps(MainWindow.g1_chk),
+                    _formatKeeps(MainWindow.g2_chk),
+                    _formatKeeps(MainWindow.t1_chk),
+                    _formatKeeps(MainWindow.t2_chk)
+                )
+                block5 = "{0}{1}{2}{3}{4}".format(
+                    _formatKeeps(MainWindow.alb1_chk),
+                    _formatKeeps(MainWindow.alb2_chk),
+                    _formatKeeps(MainWindow.pot1_chk),
+                    _formatKeeps(MainWindow.pot2_chk),
+                    _formatKeeps(MainWindow.q_chk)
+                )
+                block6 = "{0}{1}{2}{3}{4}".format(
+                    _formatKeeps(MainWindow.jd0_chk),
+                    _formatKeeps(MainWindow.p0_chk),
+                    _formatKeeps(MainWindow.dpdt_chk),
+                    _formatKeeps(MainWindow.dperdt_chk),
+                    _formatKeeps(MainWindow.a3b_chk),
+                )
+                block7 = "{0}{1}{2}{3}{4}".format(
+                    _formatKeeps(MainWindow.p3b_chk),
+                    _formatKeeps(MainWindow.xinc3b_chk),
+                    _formatKeeps(MainWindow.e3b_chk),
+                    _formatKeeps(MainWindow.perr3b_chk),
+                    _formatKeeps(MainWindow.tc3b_chk),
+                )
+                block8 = "11111"  # unused block
+                block9 = "{0}{1}{2}{3}{4}".format(
+                    _formatKeeps(MainWindow.logd_chk),
+                    _formatKeeps(MainWindow.desextinc_chk),
+                    "1",  # will implement later
+                    "1",
+                    "1",
+                )
+                block10 = "11111"  # will implement later
+                block11 = "11111"  # unused block
+                block12 = "{0}{1}{2}{3}{4}".format(
+                    _formatKeeps(MainWindow.l1_chk),
+                    _formatKeeps(MainWindow.l2_chk),
+                    _formatKeeps(MainWindow.x1_chk),
+                    _formatKeeps(MainWindow.x2_chk),
+                    _formatKeeps(MainWindow.el3_chk)
+                )
+                line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
+                        " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
+                        " " + block11 + " " + block12 + " 01 1.000d-05 1.000"
+                # write lines into file
+                dcin.write(line1)
+                dcin.write(line2)
+                dcin.write(line3)
+                dcin.write(line4)
             except ValueError as ex:
                 msg = QtGui.QMessageBox()
                 msg.setWindowTitle("pywd - ValueError")

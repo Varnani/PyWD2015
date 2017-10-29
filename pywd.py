@@ -5,7 +5,6 @@ import platform
 
 
 def run():
-    sys.dont_write_bytecode = True
     if platform.system() is "Windows":  # a quick hack to get app icon show up on taskbar in windows
         import ctypes
         appid = u"pywd"
