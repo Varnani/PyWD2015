@@ -701,12 +701,43 @@ def exportDc(MainWindow):
                 )
                 line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
                         " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
-                        " " + block11 + " " + block12 + " 01 1.000d-05 1.000"
+                        " " + block11 + " " + block12 + " 01 1.000d-05 1.000\n"
+                spot1 = "  0  0"
+                spot2 = "  0  0"
+                if len(MainWindow.SpotConfigureWidget.star1ElementList) != 0:
+                    i = 1
+                    for radioButtonAList in MainWindow.SpotConfigureWidget.star1ElementList:
+                        if radioButtonAList[1].isChecked():
+                            spot1 = "  1  {0}".format(i)
+                            break
+                        i += 1
+                    i = 1
+                    for radioButtonBList in MainWindow.SpotConfigureWidget.star1ElementList:
+                        if radioButtonBList[2].isChecked():
+                            spot2 = "  1  {0}".format(i)
+                            break
+                        i += 1
+                if len(MainWindow.SpotConfigureWidget.star2ElementList) != 0:
+                    i = 1
+                    for radioButtonAList in MainWindow.SpotConfigureWidget.star2ElementList:
+                        if radioButtonAList[1].isChecked():
+                            spot1 = "  2  {0}".format(i)
+                            break
+                        i += 1
+                    i = 1
+                    for radioButtonBList in MainWindow.SpotConfigureWidget.star2ElementList:
+                        if radioButtonBList[2].isChecked():
+                            spot2 = "  2  {0}".format(i)
+                            break
+                        i += 1
+                line5 = spot1 + spot2 + "\n"
+
                 # write lines into file
                 dcin.write(line1)
                 dcin.write(line2)
                 dcin.write(line3)
                 dcin.write(line4)
+                dcin.write(line5)
             except ValueError as ex:
                 msg = QtGui.QMessageBox()
                 msg.setWindowTitle("pywd - ValueError")
@@ -715,7 +746,7 @@ def exportDc(MainWindow):
             except IndexError as ex:
                 msg = QtGui.QMessageBox()
                 msg.setWindowTitle("pywd - Wrong Input")
-                msg.setText(ex.args[0])
+                msg.setText(ex.message)  # most exceptions store their first arguments in (exception).message field
                 msg.exec_()
             except:
                 msg = QtGui.QMessageBox()

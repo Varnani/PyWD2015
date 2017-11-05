@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'interfaces/wd_spotconfigurewidget.ui'
+# Form implementation generated from reading ui file 'spotconfigurewidget.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -29,7 +29,7 @@ class Ui_SpotConfigureWidget(object):
         SpotConfigureWidget.setMinimumSize(QtCore.QSize(920, 200))
         SpotConfigureWidget.setMaximumSize(QtCore.QSize(920, 200))
         self.label = QtGui.QLabel(SpotConfigureWidget)
-        self.label.setGeometry(QtCore.QRect(410, 100, 111, 21))
+        self.label.setGeometry(QtCore.QRect(403, 100, 121, 21))
         font = QtGui.QFont()
         font.setPointSize(8)
         self.label.setFont(font)
@@ -65,10 +65,10 @@ class Ui_SpotConfigureWidget(object):
         self.line_3.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_3.setObjectName(_fromUtf8("line_3"))
         self.spotconfigsave_btn = QtGui.QPushButton(SpotConfigureWidget)
-        self.spotconfigsave_btn.setGeometry(QtCore.QRect(760, 20, 150, 30))
+        self.spotconfigsave_btn.setGeometry(QtCore.QRect(749, 20, 161, 30))
         self.spotconfigsave_btn.setObjectName(_fromUtf8("spotconfigsave_btn"))
         self.spotconfigload_btn = QtGui.QPushButton(SpotConfigureWidget)
-        self.spotconfigload_btn.setGeometry(QtCore.QRect(760, 60, 150, 30))
+        self.spotconfigload_btn.setGeometry(QtCore.QRect(749, 60, 161, 30))
         self.spotconfigload_btn.setObjectName(_fromUtf8("spotconfigload_btn"))
         self.label_2 = QtGui.QLabel(SpotConfigureWidget)
         self.label_2.setGeometry(QtCore.QRect(10, 100, 41, 21))
@@ -107,11 +107,11 @@ class Ui_SpotConfigureWidget(object):
         self.addspot2_btn.setGeometry(QtCore.QRect(469, 160, 442, 25))
         self.addspot2_btn.setObjectName(_fromUtf8("addspot2_btn"))
         self.spotconfigsave_label = QtGui.QLabel(SpotConfigureWidget)
-        self.spotconfigsave_label.setGeometry(QtCore.QRect(20, 20, 731, 30))
+        self.spotconfigsave_label.setGeometry(QtCore.QRect(20, 20, 721, 30))
         self.spotconfigsave_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.spotconfigsave_label.setObjectName(_fromUtf8("spotconfigsave_label"))
         self.spotconfigload_label = QtGui.QLabel(SpotConfigureWidget)
-        self.spotconfigload_label.setGeometry(QtCore.QRect(20, 60, 731, 30))
+        self.spotconfigload_label.setGeometry(QtCore.QRect(20, 60, 721, 30))
         self.spotconfigload_label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.spotconfigload_label.setObjectName(_fromUtf8("spotconfigload_label"))
         self.addspot1_btn = QtGui.QPushButton(SpotConfigureWidget)
