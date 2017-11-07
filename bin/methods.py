@@ -537,52 +537,6 @@ def loadVelocityCurve(vcNumber, LoadWidget):
                 LoadWidget.vc2load_btn.setText("Remove")
 
 
-def formatDels(ipt):
-    error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
-    ipt = str(ipt)  # convert to string from QString
-    float(ipt)  # sanity check first
-    if float(ipt) < 0:
-        msg = "Del's must be larger than 0: " + ipt
-        raise IndexError(msg)
-    if ipt == "0":
-        return "+0.0d-0"
-    if 0 < float(ipt) < 0.1:
-        if len(ipt) > 12:
-            msg = error + "\nMake sure your input is larger than 1x10^-8"
-            raise IndexError(msg)
-        else:
-            a = ipt[2:]  # trim '0.'
-            i = 1
-            for char in a:
-                if char is "0":
-                    i += 1
-            b = "+" + str(float(ipt) * pow(10, i)) + "d-" + str(i)
-            if len(b) > 7:
-                msg = error + "\nMake sure your input's non-zero fractional part consist of 2 digits, ex. 0.00056"
-                raise IndexError(msg)
-            else:
-                return b
-    if 0.1 <= float(ipt) < 10:
-        if len(ipt) is 1:
-            ipt = ipt + ".0"
-        a = "+" + ipt + "d-0"
-        if len(a) > 7:
-            msg = error + "\nMake sure your input is made of 1 integer and 1 fractional part, ex. 8.3"
-            raise IndexError(msg)
-        else:
-            return a
-    if 10 <= float(ipt):
-        a = str(float(ipt) / float(pow(10, (len(ipt) - 1))))
-        if len(a) > 3 or len(ipt) > 10:
-            msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with " \
-                  + "maximum number of 8 trailing zeroes, ex. 120000"
-            raise IndexError(msg)
-        else:
-            if len(a) == 1:
-                a = a + ".0"
-            return "+" + a + "d+" + str(len(ipt) - 1)
-
-
 def exportDc(MainWindow):
     dialog = QtGui.QFileDialog(MainWindow)
     dialog.setAcceptMode(1)
@@ -592,40 +546,51 @@ def exportDc(MainWindow):
     if filePath != "" and returnCode != 0:
         with open(filePath, 'w') as dcin:
             try:
-                line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
-                    formatDels(MainWindow.del_s1lat_ipt.text()),
-                    formatDels(MainWindow.del_s1lng_ipt.text()),
-                    formatDels(MainWindow.del_s1agrad_ipt.text()),
-                    formatDels(MainWindow.del_s1tmpf_ipt.text()),
-                    formatDels(MainWindow.del_s2lat_ipt.text()),
-                    formatDels(MainWindow.del_s2lng_ipt.text()),
-                    formatDels(MainWindow.del_s2agrad_ipt.text()),
-                    formatDels(MainWindow.del_s2tmpf_ipt.text())
-                )
-                line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
-                    formatDels(MainWindow.del_a_ipt.text()),
-                    formatDels(MainWindow.del_e_ipt.text()),
-                    formatDels(MainWindow.del_perr0_ipt.text()),
-                    formatDels(MainWindow.del_f1_ipt.text()),
-                    formatDels(MainWindow.del_f2_ipt.text()),
-                    formatDels(MainWindow.del_pshift_ipt.text()),
-                    formatDels(MainWindow.del_i_ipt.text()),
-                    formatDels(MainWindow.del_g1_ipt.text()),
-                    formatDels(MainWindow.del_g2_ipt.text()),
-                    formatDels(MainWindow.del_t1_ipt.text()),
-                    formatDels(MainWindow.del_t2_ipt.text())
-                )
-                line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
-                    formatDels(MainWindow.del_alb1_ipt.text()),
-                    formatDels(MainWindow.del_alb2_ipt.text()),
-                    formatDels(MainWindow.del_pot1_ipt.text()),
-                    formatDels(MainWindow.del_pot2_ipt.text()),
-                    formatDels(MainWindow.del_q_ipt.text()),
-                    formatDels(MainWindow.del_l1_ipt.text()),
-                    formatDels(MainWindow.del_l2_ipt.text()),
-                    formatDels(MainWindow.del_x1_ipt.text()),
-                    formatDels(MainWindow.del_x2_ipt.text())
-                )
+                def _formatDels(ipt):
+                    error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
+                    ipt = str(ipt)  # convert to string from QString
+                    float(ipt)  # sanity check first
+                    if float(ipt) < 0:
+                        msg = "Del's must be larger than 0: " + ipt
+                        raise IndexError(msg)
+                    if ipt == "0":
+                        return "+0.0d-0"
+                    if 0 < float(ipt) < 0.1:
+                        if len(ipt) > 12:
+                            msg = error + "\nMake sure your input is larger than 1x10^-8"
+                            raise IndexError(msg)
+                        else:
+                            a = ipt[2:]  # trim '0.'
+                            i = 1
+                            for char in a:
+                                if char is "0":
+                                    i += 1
+                            b = "+" + str(float(ipt) * pow(10, i)) + "d-" + str(i)
+                            if len(b) > 7:
+                                msg = error + "\nMake sure your input's non-zero fractional " \
+                                              "part consist of 2 digits, ex. 0.00056"
+                                raise IndexError(msg)
+                            else:
+                                return b
+                    if 0.1 <= float(ipt) < 10:
+                        if len(ipt) is 1:
+                            ipt = ipt + ".0"
+                        a = "+" + ipt + "d-0"
+                        if len(a) > 7:
+                            msg = error + "\nMake sure your input is made of 1 integer and 1 fractional part, ex. 8.3"
+                            raise IndexError(msg)
+                        else:
+                            return a
+                    if 10 <= float(ipt):
+                        a = str(float(ipt) / float(pow(10, (len(ipt) - 1))))
+                        if len(a) > 3 or len(ipt) > 10:
+                            msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with " \
+                                  + "maximum number of 8 trailing zeroes, ex. 120000"
+                            raise IndexError(msg)
+                        else:
+                            if len(a) == 1:
+                                a = a + ".0"
+                            return "+" + a + "d+" + str(len(ipt) - 1)
 
                 def _formatKeeps(keep):
                     if keep.isChecked():
@@ -633,6 +598,44 @@ def exportDc(MainWindow):
                     else:
                         return "1"
 
+                def _formatInput(ipt, width, precision, precisionFormat):
+                    pass  # TODO implement this internal function
+
+
+                line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
+                    _formatDels(MainWindow.del_s1lat_ipt.text()),
+                    _formatDels(MainWindow.del_s1lng_ipt.text()),
+                    _formatDels(MainWindow.del_s1agrad_ipt.text()),
+                    _formatDels(MainWindow.del_s1tmpf_ipt.text()),
+                    _formatDels(MainWindow.del_s2lat_ipt.text()),
+                    _formatDels(MainWindow.del_s2lng_ipt.text()),
+                    _formatDels(MainWindow.del_s2agrad_ipt.text()),
+                    _formatDels(MainWindow.del_s2tmpf_ipt.text())
+                )
+                line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
+                    _formatDels(MainWindow.del_a_ipt.text()),
+                    _formatDels(MainWindow.del_e_ipt.text()),
+                    _formatDels(MainWindow.del_perr0_ipt.text()),
+                    _formatDels(MainWindow.del_f1_ipt.text()),
+                    _formatDels(MainWindow.del_f2_ipt.text()),
+                    _formatDels(MainWindow.del_pshift_ipt.text()),
+                    _formatDels(MainWindow.del_i_ipt.text()),
+                    _formatDels(MainWindow.del_g1_ipt.text()),
+                    _formatDels(MainWindow.del_g2_ipt.text()),
+                    _formatDels(MainWindow.del_t1_ipt.text()),
+                    _formatDels(MainWindow.del_t2_ipt.text())
+                )
+                line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
+                    _formatDels(MainWindow.del_alb1_ipt.text()),
+                    _formatDels(MainWindow.del_alb2_ipt.text()),
+                    _formatDels(MainWindow.del_pot1_ipt.text()),
+                    _formatDels(MainWindow.del_pot2_ipt.text()),
+                    _formatDels(MainWindow.del_q_ipt.text()),
+                    _formatDels(MainWindow.del_l1_ipt.text()),
+                    _formatDels(MainWindow.del_l2_ipt.text()),
+                    _formatDels(MainWindow.del_x1_ipt.text()),
+                    _formatDels(MainWindow.del_x2_ipt.text())
+                )
                 block1 = "{0}{1}{2}{3}".format(
                     _formatKeeps(MainWindow.s1lat_chk),
                     _formatKeeps(MainWindow.s1long_chk),
