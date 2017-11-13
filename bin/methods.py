@@ -598,8 +598,18 @@ def exportDc(MainWindow):
                     else:
                         return "1"
 
-                def _formatInput(ipt, width, precision, precisionFormat):
-                    pass  # TODO implement this internal function
+                def _formatInput(ipt, width, precision):
+                    f_ipt = float(ipt)
+                    if f_ipt == float(0):
+                        return (" " * (width - 3)) + "0.0"
+                    if f_ipt > float(0) or f_ipt < float(0):
+                        output = " " + "{:>{width}.{precision}f}".format(f_ipt, width=width-1, precision=precision)
+                        if len(output) > (width):
+                            raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
+                                             "\nMake sure your input's integer " +
+                                             "part is maximum {0} characters long".format((width - precision - 2)))
+                        else:
+                            return output
 
 
                 line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
