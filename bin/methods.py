@@ -544,228 +544,291 @@ def exportDc(MainWindow):
     returnCode = dialog.exec_()
     filePath = (dialog.selectedFiles())[0]
     if filePath != "" and returnCode != 0:
-        with open(filePath, 'w') as dcin:
-            try:
-                def _formatDels(ipt):
-                    error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
-                    ipt = str(ipt)  # convert to string from QString
-                    float(ipt)  # sanity check first
-                    if float(ipt) < 0:
-                        msg = "Del's must be larger than 0: " + ipt
+        try:
+            def _formatDels(ipt):
+                error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
+                ipt = str(ipt)  # convert to string from QString
+                float(ipt)  # sanity check first
+                if float(ipt) < 0:
+                    msg = "Del's must be larger than 0: " + ipt
+                    raise IndexError(msg)
+                if ipt == "0":
+                    return "+0.0d-0"
+                if 0 < float(ipt) < 0.1:
+                    if len(ipt) > 12:
+                        msg = error + "\nMake sure your input is larger than 1x10^-8"
                         raise IndexError(msg)
-                    if ipt == "0":
-                        return "+0.0d-0"
-                    if 0 < float(ipt) < 0.1:
-                        if len(ipt) > 12:
-                            msg = error + "\nMake sure your input is larger than 1x10^-8"
-                            raise IndexError(msg)
-                        else:
-                            a = ipt[2:]  # trim '0.'
-                            i = 1
-                            for char in a:
-                                if char is "0":
-                                    i += 1
-                            b = "+" + str(float(ipt) * pow(10, i)) + "d-" + str(i)
-                            if len(b) > 7:
-                                msg = error + "\nMake sure your input's non-zero fractional " \
-                                              "part consist of 2 digits, ex. 0.00056"
-                                raise IndexError(msg)
-                            else:
-                                return b
-                    if 0.1 <= float(ipt) < 10:
-                        if len(ipt) is 1:
-                            ipt = ipt + ".0"
-                        a = "+" + ipt + "d-0"
-                        if len(a) > 7:
-                            msg = error + "\nMake sure your input is made of 1 integer and 1 fractional part, ex. 8.3"
-                            raise IndexError(msg)
-                        else:
-                            return a
-                    if 10 <= float(ipt):
-                        a = str(float(ipt) / float(pow(10, (len(ipt) - 1))))
-                        if len(a) > 3 or len(ipt) > 10:
-                            msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with " \
-                                  + "maximum number of 8 trailing zeroes, ex. 120000"
-                            raise IndexError(msg)
-                        else:
-                            if len(a) == 1:
-                                a = a + ".0"
-                            return "+" + a + "d+" + str(len(ipt) - 1)
-
-                def _formatKeeps(keep):
-                    if keep.isChecked():
-                        return "0"
                     else:
-                        return "1"
-
-                def _formatInput(ipt, width, precision):
-                    f_ipt = float(ipt)
-                    if f_ipt == float(0):
-                        return (" " * (width - 3)) + "0.0"
-                    if f_ipt > float(0) or f_ipt < float(0):
-                        output = " " + "{:>{width}.{precision}f}".format(f_ipt, width=width-1, precision=precision)
-                        if len(output) > (width):
-                            raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
-                                             "\nMake sure your input's integer " +
-                                             "part is maximum {0} characters long".format((width - precision - 2)))
+                        a = ipt[2:]  # trim '0.'
+                        i = 1
+                        for char in a:
+                            if char is "0":
+                                i += 1
+                        b = "+" + str(float(ipt) * pow(10, i)) + "d-" + str(i)
+                        if len(b) > 7:
+                            msg = error + "\nMake sure your input's non-zero fractional " \
+                                          "part consist of 2 digits, ex. 0.00056"
+                            raise IndexError(msg)
                         else:
-                            return output
+                            return b
+                if 0.1 <= float(ipt) < 10:
+                    if len(ipt) is 1:
+                        ipt = ipt + ".0"
+                    a = "+" + ipt + "d-0"
+                    if len(a) > 7:
+                        msg = error + "\nMake sure your input is made of 1 integer and 1 fractional part, ex. 8.3"
+                        raise IndexError(msg)
+                    else:
+                        return a
+                if 10 <= float(ipt):
+                    a = str(float(ipt) / float(pow(10, (len(ipt) - 1))))
+                    if len(a) > 3 or len(ipt) > 10:
+                        msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with " \
+                              + "maximum number of 8 trailing zeroes, ex. 120000"
+                        raise IndexError(msg)
+                    else:
+                        if len(a) == 1:
+                            a = a + ".0"
+                        return "+" + a + "d+" + str(len(ipt) - 1)
 
+            def _formatKeeps(keep):
+                if keep.isChecked():
+                    return "0"
+                else:
+                    return "1"
 
-                line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
-                    _formatDels(MainWindow.del_s1lat_ipt.text()),
-                    _formatDels(MainWindow.del_s1lng_ipt.text()),
-                    _formatDels(MainWindow.del_s1agrad_ipt.text()),
-                    _formatDels(MainWindow.del_s1tmpf_ipt.text()),
-                    _formatDels(MainWindow.del_s2lat_ipt.text()),
-                    _formatDels(MainWindow.del_s2lng_ipt.text()),
-                    _formatDels(MainWindow.del_s2agrad_ipt.text()),
-                    _formatDels(MainWindow.del_s2tmpf_ipt.text())
-                )
-                line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
-                    _formatDels(MainWindow.del_a_ipt.text()),
-                    _formatDels(MainWindow.del_e_ipt.text()),
-                    _formatDels(MainWindow.del_perr0_ipt.text()),
-                    _formatDels(MainWindow.del_f1_ipt.text()),
-                    _formatDels(MainWindow.del_f2_ipt.text()),
-                    _formatDels(MainWindow.del_pshift_ipt.text()),
-                    _formatDels(MainWindow.del_i_ipt.text()),
-                    _formatDels(MainWindow.del_g1_ipt.text()),
-                    _formatDels(MainWindow.del_g2_ipt.text()),
-                    _formatDels(MainWindow.del_t1_ipt.text()),
-                    _formatDels(MainWindow.del_t2_ipt.text())
-                )
-                line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
-                    _formatDels(MainWindow.del_alb1_ipt.text()),
-                    _formatDels(MainWindow.del_alb2_ipt.text()),
-                    _formatDels(MainWindow.del_pot1_ipt.text()),
-                    _formatDels(MainWindow.del_pot2_ipt.text()),
-                    _formatDels(MainWindow.del_q_ipt.text()),
-                    _formatDels(MainWindow.del_l1_ipt.text()),
-                    _formatDels(MainWindow.del_l2_ipt.text()),
-                    _formatDels(MainWindow.del_x1_ipt.text()),
-                    _formatDels(MainWindow.del_x2_ipt.text())
-                )
-                block1 = "{0}{1}{2}{3}".format(
-                    _formatKeeps(MainWindow.s1lat_chk),
-                    _formatKeeps(MainWindow.s1long_chk),
-                    _formatKeeps(MainWindow.s1rad_chk),
-                    _formatKeeps(MainWindow.s1temp_chk),
-                )
-                block2 = "{0}{1}{2}{3}".format(
-                    _formatKeeps(MainWindow.s2lat_chk),
-                    _formatKeeps(MainWindow.s2long_chk),
-                    _formatKeeps(MainWindow.s2rad_chk),
-                    _formatKeeps(MainWindow.s2temp_chk)
-                )
-                block3 = "{0}{1}{2}{3}{4}{5}{6}".format(
-                    _formatKeeps(MainWindow.a_chk),
-                    _formatKeeps(MainWindow.e_chk),
-                    _formatKeeps(MainWindow.perr0_chk),
-                    _formatKeeps(MainWindow.f1_chk),
-                    _formatKeeps(MainWindow.f2_chk),
-                    _formatKeeps(MainWindow.pshift_chk),
-                    _formatKeeps(MainWindow.vgam_chk)
-                )
-                block4 = "{0}{1}{2}{3}{4}".format(
-                    _formatKeeps(MainWindow.incl_chk),
-                    _formatKeeps(MainWindow.g1_chk),
-                    _formatKeeps(MainWindow.g2_chk),
-                    _formatKeeps(MainWindow.t1_chk),
-                    _formatKeeps(MainWindow.t2_chk)
-                )
-                block5 = "{0}{1}{2}{3}{4}".format(
-                    _formatKeeps(MainWindow.alb1_chk),
-                    _formatKeeps(MainWindow.alb2_chk),
-                    _formatKeeps(MainWindow.pot1_chk),
-                    _formatKeeps(MainWindow.pot2_chk),
-                    _formatKeeps(MainWindow.q_chk)
-                )
-                block6 = "{0}{1}{2}{3}{4}".format(
-                    _formatKeeps(MainWindow.jd0_chk),
-                    _formatKeeps(MainWindow.p0_chk),
-                    _formatKeeps(MainWindow.dpdt_chk),
-                    _formatKeeps(MainWindow.dperdt_chk),
-                    _formatKeeps(MainWindow.a3b_chk),
-                )
-                block7 = "{0}{1}{2}{3}{4}".format(
-                    _formatKeeps(MainWindow.p3b_chk),
-                    _formatKeeps(MainWindow.xinc3b_chk),
-                    _formatKeeps(MainWindow.e3b_chk),
-                    _formatKeeps(MainWindow.perr3b_chk),
-                    _formatKeeps(MainWindow.tc3b_chk),
-                )
-                block8 = "11111"  # unused block
-                block9 = "{0}{1}{2}{3}{4}".format(
-                    _formatKeeps(MainWindow.logd_chk),
-                    _formatKeeps(MainWindow.desextinc_chk),
-                    "1",  # will implement later
-                    "1",
-                    "1",
-                )
-                block10 = "11111"  # will implement later
-                block11 = "11111"  # unused block
-                block12 = "{0}{1}{2}{3}{4}".format(
-                    _formatKeeps(MainWindow.l1_chk),
-                    _formatKeeps(MainWindow.l2_chk),
-                    _formatKeeps(MainWindow.x1_chk),
-                    _formatKeeps(MainWindow.x2_chk),
-                    _formatKeeps(MainWindow.el3_chk)
-                )
-                line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
-                        " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
-                        " " + block11 + " " + block12 + " 01 1.000d-05 1.000\n"
-                spot1 = "  0  0"
-                spot2 = "  0  0"
-                if len(MainWindow.SpotConfigureWidget.star1ElementList) != 0:
-                    i = 1
-                    for radioButtonAList in MainWindow.SpotConfigureWidget.star1ElementList:
-                        if radioButtonAList[1].isChecked():
-                            spot1 = "  1  {0}".format(i)
-                            break
-                        i += 1
-                    i = 1
-                    for radioButtonBList in MainWindow.SpotConfigureWidget.star1ElementList:
-                        if radioButtonBList[2].isChecked():
-                            spot2 = "  1  {0}".format(i)
-                            break
-                        i += 1
-                if len(MainWindow.SpotConfigureWidget.star2ElementList) != 0:
-                    i = 1
-                    for radioButtonAList in MainWindow.SpotConfigureWidget.star2ElementList:
-                        if radioButtonAList[1].isChecked():
-                            spot1 = "  2  {0}".format(i)
-                            break
-                        i += 1
-                    i = 1
-                    for radioButtonBList in MainWindow.SpotConfigureWidget.star2ElementList:
-                        if radioButtonBList[2].isChecked():
-                            spot2 = "  2  {0}".format(i)
-                            break
-                        i += 1
-                line5 = spot1 + spot2 + "\n"
+            def _formatInput(ipt, width, precision):
+                ipt = str(ipt)
+                f_ipt = float(ipt)
+                if f_ipt == float(0):
+                    return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
+                if f_ipt > float(0) or f_ipt < float(0):
+                    output = " " + "{:>{width}.{precision}f}".format(f_ipt, width=width - 1, precision=precision)
+                    if len(output) > (width):
+                        raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
+                                         "\nMake sure your input's integer " +
+                                         "part is maximum {0} characters long".format((width - precision - 2)))
+                    else:
+                        return output
 
-                # write lines into file
+            def _evalCheckBox(checkBox):
+                if checkBox.isChecked():
+                    return "1"
+                else:
+                    return "0"
+
+            line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
+                _formatDels(MainWindow.del_s1lat_ipt.text()),
+                _formatDels(MainWindow.del_s1lng_ipt.text()),
+                _formatDels(MainWindow.del_s1agrad_ipt.text()),
+                _formatDels(MainWindow.del_s1tmpf_ipt.text()),
+                _formatDels(MainWindow.del_s2lat_ipt.text()),
+                _formatDels(MainWindow.del_s2lng_ipt.text()),
+                _formatDels(MainWindow.del_s2agrad_ipt.text()),
+                _formatDels(MainWindow.del_s2tmpf_ipt.text())
+            )
+            line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
+                _formatDels(MainWindow.del_a_ipt.text()),
+                _formatDels(MainWindow.del_e_ipt.text()),
+                _formatDels(MainWindow.del_perr0_ipt.text()),
+                _formatDels(MainWindow.del_f1_ipt.text()),
+                _formatDels(MainWindow.del_f2_ipt.text()),
+                _formatDels(MainWindow.del_pshift_ipt.text()),
+                _formatDels(MainWindow.del_i_ipt.text()),
+                _formatDels(MainWindow.del_g1_ipt.text()),
+                _formatDels(MainWindow.del_g2_ipt.text()),
+                _formatDels(MainWindow.del_t1_ipt.text()),
+                _formatDels(MainWindow.del_t2_ipt.text())
+            )
+            line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
+                _formatDels(MainWindow.del_alb1_ipt.text()),
+                _formatDels(MainWindow.del_alb2_ipt.text()),
+                _formatDels(MainWindow.del_pot1_ipt.text()),
+                _formatDels(MainWindow.del_pot2_ipt.text()),
+                _formatDels(MainWindow.del_q_ipt.text()),
+                _formatDels(MainWindow.del_l1_ipt.text()),
+                _formatDels(MainWindow.del_l2_ipt.text()),
+                _formatDels(MainWindow.del_x1_ipt.text()),
+                _formatDels(MainWindow.del_x2_ipt.text())
+            )
+            block1 = "{0}{1}{2}{3}".format(
+                _formatKeeps(MainWindow.s1lat_chk),
+                _formatKeeps(MainWindow.s1long_chk),
+                _formatKeeps(MainWindow.s1rad_chk),
+                _formatKeeps(MainWindow.s1temp_chk),
+            )
+            block2 = "{0}{1}{2}{3}".format(
+                _formatKeeps(MainWindow.s2lat_chk),
+                _formatKeeps(MainWindow.s2long_chk),
+                _formatKeeps(MainWindow.s2rad_chk),
+                _formatKeeps(MainWindow.s2temp_chk)
+            )
+            block3 = "{0}{1}{2}{3}{4}{5}{6}".format(
+                _formatKeeps(MainWindow.a_chk),
+                _formatKeeps(MainWindow.e_chk),
+                _formatKeeps(MainWindow.perr0_chk),
+                _formatKeeps(MainWindow.f1_chk),
+                _formatKeeps(MainWindow.f2_chk),
+                _formatKeeps(MainWindow.pshift_chk),
+                _formatKeeps(MainWindow.vgam_chk)
+            )
+            block4 = "{0}{1}{2}{3}{4}".format(
+                _formatKeeps(MainWindow.incl_chk),
+                _formatKeeps(MainWindow.g1_chk),
+                _formatKeeps(MainWindow.g2_chk),
+                _formatKeeps(MainWindow.t1_chk),
+                _formatKeeps(MainWindow.t2_chk)
+            )
+            block5 = "{0}{1}{2}{3}{4}".format(
+                _formatKeeps(MainWindow.alb1_chk),
+                _formatKeeps(MainWindow.alb2_chk),
+                _formatKeeps(MainWindow.pot1_chk),
+                _formatKeeps(MainWindow.pot2_chk),
+                _formatKeeps(MainWindow.q_chk)
+            )
+            block6 = "{0}{1}{2}{3}{4}".format(
+                _formatKeeps(MainWindow.jd0_chk),
+                _formatKeeps(MainWindow.p0_chk),
+                _formatKeeps(MainWindow.dpdt_chk),
+                _formatKeeps(MainWindow.dperdt_chk),
+                _formatKeeps(MainWindow.a3b_chk),
+            )
+            block7 = "{0}{1}{2}{3}{4}".format(
+                _formatKeeps(MainWindow.p3b_chk),
+                _formatKeeps(MainWindow.xinc3b_chk),
+                _formatKeeps(MainWindow.e3b_chk),
+                _formatKeeps(MainWindow.perr3b_chk),
+                _formatKeeps(MainWindow.tc3b_chk),
+            )
+            block8 = "11111"  # unused block
+            block9 = "{0}{1}{2}{3}{4}".format(
+                _formatKeeps(MainWindow.logd_chk),
+                _formatKeeps(MainWindow.desextinc_chk),
+                "1",  # will implement later
+                "1",
+                "1",
+            )
+            block10 = "11111"  # will implement later
+            block11 = "11111"  # unused block
+            block12 = "{0}{1}{2}{3}{4}".format(
+                _formatKeeps(MainWindow.l1_chk),
+                _formatKeeps(MainWindow.l2_chk),
+                _formatKeeps(MainWindow.x1_chk),
+                _formatKeeps(MainWindow.x2_chk),
+                _formatKeeps(MainWindow.el3_chk)
+            )
+            line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
+                    " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
+                    " " + block11 + " " + block12 + " 01 1.000d-05 1.000\n"
+            spot1 = "  0  0"
+            spot2 = "  0  0"
+            if len(MainWindow.SpotConfigureWidget.star1ElementList) != 0:
+                i = 1
+                for radioButtonAList in MainWindow.SpotConfigureWidget.star1ElementList:
+                    if radioButtonAList[1].isChecked():
+                        spot1 = "  1  {0}".format(i)
+                        break
+                    i += 1
+                i = 1
+                for radioButtonBList in MainWindow.SpotConfigureWidget.star1ElementList:
+                    if radioButtonBList[2].isChecked():
+                        spot2 = "  1  {0}".format(i)
+                        break
+                    i += 1
+            if len(MainWindow.SpotConfigureWidget.star2ElementList) != 0:
+                i = 1
+                for radioButtonAList in MainWindow.SpotConfigureWidget.star2ElementList:
+                    if radioButtonAList[1].isChecked():
+                        spot1 = "  2  {0}".format(i)
+                        break
+                    i += 1
+                i = 1
+                for radioButtonBList in MainWindow.SpotConfigureWidget.star2ElementList:
+                    if radioButtonBList[2].isChecked():
+                        spot2 = "  2  {0}".format(i)
+                        break
+                    i += 1
+            line5 = spot1 + spot2 + "\n"
+            ifvc1 = "0"
+            ifvc2 = "0"
+            if MainWindow.LoadWidget.vcPropertiesList[0] != 0:
+                ifvc1 = "1"
+            if MainWindow.LoadWidget.vcPropertiesList[1] != 0:
+                ifvc2 = "1"
+            isymDict = {
+                "Symmetrical": "1",
+                "Asymmetrical": "0"
+            }
+            line6 = ifvc1 + " " + ifvc2 + " " + str(MainWindow.LoadWidget.lcCount) \
+                    + " 0" + " 2" + " 0" + " " + \
+                    isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " " + \
+                    _evalCheckBox(MainWindow.ifder_chk) + " " + _evalCheckBox(MainWindow.iflcin_chk) \
+                    + " " + _evalCheckBox(MainWindow.ifoc_chk) + "\n"
+            ldDict = {
+                "Linear Cosine": "1",
+                "Logarithmic": "2",
+                "Square Root": "3"
+            }
+            ld1_sign = ""
+            ld2_sign = ""
+            if MainWindow.ld1_chk.isChecked():
+                ld1_sign = "+"
+            else:
+                ld1_sign = "-"
+
+            if MainWindow.ld2_chk.isChecked():
+                ld2_sign = "+"
+            else:
+                ld2_sign = "-"
+            nomaxDict = {
+                "Trapezoidal": "0",
+                "Triangular": "1"
+            }
+            magliteDict = {
+                "Flux": "0",
+                "Magnitude": "1"
+            }
+            ld1 = ld1_sign + ldDict[str(MainWindow.ld1_combobox.currentText())]
+            ld2 = ld2_sign + ldDict[str(MainWindow.ld2_combobox.currentText())]
+            line7 = str(MainWindow.nref_spinbox.value()) + " " + _evalCheckBox(MainWindow.mref_chk) + " " \
+                    + _evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv1_chk) + " " \
+                    + _evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv2_chk) + " " \
+                    + _evalCheckBox(MainWindow.icor1_chk) + " " + _evalCheckBox(MainWindow.icor2_chk) + " " \
+                    + _evalCheckBox(MainWindow.if3b_chk) \
+                    + " " + ld1 + " " + ld2 + " " \
+                    + _evalCheckBox(MainWindow.SpotConfigureWidget.kspev_chk) + " " \
+                    + _evalCheckBox(MainWindow.SpotConfigureWidget.kspot_chk) + " " \
+                    + nomaxDict[str(MainWindow.SpotConfigureWidget.nomax_combobox.currentText())] + " " \
+                    + _evalCheckBox(MainWindow.ifcgs_chk) + " " \
+                    + magliteDict[str(MainWindow.maglite_combobox.currentText())] + " " \
+                    + str(MainWindow.linkext_spinbox.value()) + " " \
+                    + _formatInput(MainWindow.desextinc_ipt.text(), 7, 4) + "\n"
+
+            # write lines into file
+            with open(filePath, 'w') as dcin:
                 dcin.write(line1)
                 dcin.write(line2)
                 dcin.write(line3)
                 dcin.write(line4)
                 dcin.write(line5)
-            except ValueError as ex:
-                msg = QtGui.QMessageBox()
-                msg.setWindowTitle("pywd - ValueError")
-                msg.setText("Can't cast your input into a numeric value;" + "\n" + ex.message)
-                msg.exec_()
-            except IndexError as ex:
-                msg = QtGui.QMessageBox()
-                msg.setWindowTitle("pywd - Wrong Input")
-                msg.setText(ex.message)  # most exceptions store their first arguments in (exception).message field
-                msg.exec_()
-            except:
-                msg = QtGui.QMessageBox()
-                msg.setWindowTitle("pywd - UnknownError")
-                msg.setText("Unknown exception is caught:\n" + str(sys.exc_info()))
-                msg.exec_()
+                dcin.write(line6)
+                dcin.write(line7)
+
+        except ValueError as ex:
+            msg = QtGui.QMessageBox()
+            msg.setWindowTitle("pywd - ValueError")
+            msg.setText("Can't cast your input into a numeric value;" + "\n" + ex.message)
+            msg.exec_()
+        except IndexError as ex:
+            msg = QtGui.QMessageBox()
+            msg.setWindowTitle("pywd - Wrong Input")
+            msg.setText(ex.message)  # most exceptions store their first arguments in (exception).message field
+            msg.exec_()
+        except:
+            msg = QtGui.QMessageBox()
+            msg.setWindowTitle("pywd - UnknownError")
+            msg.setText("Unknown exception is caught:\n" + str(sys.exc_info()))
+            msg.exec_()
 
 
 if __name__ == "__main__":

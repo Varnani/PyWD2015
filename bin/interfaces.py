@@ -63,6 +63,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         def _evalkeeps(keep):  # eval keeps for clearing
             if keep.isChecked():
                 keep.toggle()
+
         _evalkeeps(self.jd0_chk)
         _evalkeeps(self.p0_chk)
         _evalkeeps(self.dpdt_chk)
@@ -337,6 +338,7 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
         self.addspot2_btn.clicked.connect(partial(methods.addSpotRow, self, 2))
         self.spotconfigsave_btn.clicked.connect(partial(methods.SaveSpotConfiguration, self))
         self.spotconfigload_btn.clicked.connect(partial(methods.LoadSpotConfiguration, self))
+        self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
 
 
 if __name__ == "__main__":

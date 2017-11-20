@@ -917,7 +917,7 @@
      <widget class="QLabel" name="label_91">
       <property name="geometry">
        <rect>
-        <x>590</x>
+        <x>640</x>
         <y>80</y>
         <width>31</width>
         <height>21</height>
@@ -958,7 +958,7 @@
      <widget class="QSpinBox" name="n1_spinbox">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>580</x>
         <y>40</y>
         <width>42</width>
         <height>20</height>
@@ -993,7 +993,7 @@
      <widget class="QCheckBox" name="ld2_chk">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>180</x>
         <y>210</y>
         <width>16</width>
         <height>21</height>
@@ -1002,11 +1002,14 @@
       <property name="text">
        <string/>
       </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QLabel" name="label_92">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>560</x>
         <y>80</y>
         <width>21</width>
         <height>21</height>
@@ -1038,7 +1041,7 @@
      <widget class="QLabel" name="label_94">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>340</x>
         <y>190</y>
         <width>51</width>
         <height>16</height>
@@ -1054,7 +1057,7 @@
      <widget class="QLineEdit" name="xbol1_ipt">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>240</x>
         <y>160</y>
         <width>71</width>
         <height>20</height>
@@ -1070,7 +1073,7 @@
      <widget class="QLabel" name="label_95">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>560</x>
         <y>40</y>
         <width>21</width>
         <height>21</height>
@@ -1119,7 +1122,7 @@
      <widget class="QLabel" name="label_96">
       <property name="geometry">
        <rect>
-        <x>590</x>
+        <x>640</x>
         <y>40</y>
         <width>31</width>
         <height>21</height>
@@ -1135,7 +1138,7 @@
      <widget class="QLabel" name="label_97">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>240</x>
         <y>190</y>
         <width>51</width>
         <height>16</height>
@@ -1151,7 +1154,7 @@
      <widget class="QLineEdit" name="xbol2_ipt">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>240</x>
         <y>210</y>
         <width>71</width>
         <height>20</height>
@@ -1174,7 +1177,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Set limb darkening law for star 2. Check box to ignore input x, y coefficients and calculate new ones locally in terms of Teff, log g, and (M/H).</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set limb darkening law for star 2. &lt;span style=&quot; font-weight:600;&quot;&gt;Uncheck&lt;/span&gt; &amp;quot;Set Fixed&amp;quot; box to &lt;span style=&quot; font-weight:600;&quot;&gt;ignore&lt;/span&gt; input x, y coefficients in light curve and velocity curve input dialogs, and allow DC to calculate limb darkening coefficients internally (in terms of Teff, log g, and (M/H)).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>LD2</string>
@@ -1211,6 +1214,9 @@
         <height>20</height>
        </rect>
       </property>
+      <property name="maximum">
+       <number>9</number>
+      </property>
      </widget>
      <widget class="QCheckBox" name="mref_chk">
       <property name="geometry">
@@ -1231,7 +1237,7 @@
      <widget class="QLineEdit" name="ybol1_ipt">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>340</x>
         <y>160</y>
         <width>71</width>
         <height>20</height>
@@ -1260,7 +1266,7 @@
      <widget class="QLabel" name="label_98">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>240</x>
         <y>140</y>
         <width>51</width>
         <height>16</height>
@@ -1289,7 +1295,7 @@
      <widget class="QSpinBox" name="n2_spinbox">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>580</x>
         <y>80</y>
         <width>42</width>
         <height>20</height>
@@ -1366,7 +1372,7 @@
      <widget class="QLabel" name="label_101">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>340</x>
         <y>140</y>
         <width>51</width>
         <height>16</height>
@@ -1402,7 +1408,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Set limb darkening law for star 1. Check box to ignore input x, y coefficients and calculate new ones locally in terms of Teff, log g, and (M/H).</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set limb darkening law for star 1. &lt;span style=&quot; font-weight:600;&quot;&gt;Uncheck&lt;/span&gt; &amp;quot;Set Fixed&amp;quot; box to &lt;span style=&quot; font-weight:600;&quot;&gt;ignore&lt;/span&gt; input x, y coefficients in light curve and velocity curve input dialogs, and allow DC to calculate limb darkening coefficients internally (in terms of Teff, log g, and (M/H)).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>LD1</string>
@@ -1411,7 +1417,7 @@
      <widget class="QSpinBox" name="n1l_spinbox_2">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>670</x>
         <y>40</y>
         <width>42</width>
         <height>20</height>
@@ -1481,7 +1487,7 @@
      <widget class="QCheckBox" name="ld1_chk">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>180</x>
         <y>160</y>
         <width>16</width>
         <height>21</height>
@@ -1490,11 +1496,14 @@
       <property name="text">
        <string/>
       </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QSpinBox" name="n2l_spinbox_2">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>670</x>
         <y>80</y>
         <width>42</width>
         <height>20</height>
@@ -1527,7 +1536,7 @@
      <widget class="QLineEdit" name="ybol2_ipt">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>340</x>
         <y>210</y>
         <width>71</width>
         <height>20</height>
@@ -1545,7 +1554,7 @@
        <rect>
         <x>20</x>
         <y>130</y>
-        <width>81</width>
+        <width>91</width>
         <height>16</height>
        </rect>
       </property>
@@ -1556,7 +1565,7 @@
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>440</x>
+        <x>560</x>
         <y>20</y>
         <width>31</width>
         <height>16</height>
@@ -1577,6 +1586,55 @@
       </property>
       <property name="text">
        <string>Reflection Computation</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="isym_combobox">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>60</y>
+        <width>111</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Symmetrical</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Asymmetrical</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_50">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>30</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Carry out solution with asymmetrical or symmetrical derivatives. Symmetrical derivatives are more reliable but take twice as long to compute</string>
+      </property>
+      <property name="text">
+       <string>ISYM</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_51">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>139</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Set Fixed</string>
       </property>
      </widget>
     </widget>
@@ -3318,6 +3376,9 @@ the triple system barycenter, in the adopted time system</string>
         <height>20</height>
        </rect>
       </property>
+      <property name="maximum">
+       <number>9</number>
+      </property>
      </widget>
      <widget class="QCheckBox" name="icor1_chk">
       <property name="geometry">
@@ -3400,7 +3461,7 @@ the triple system barycenter, in the adopted time system</string>
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>80</y>
+        <y>170</y>
         <width>131</width>
         <height>22</height>
        </rect>
@@ -3410,7 +3471,7 @@ the triple system barycenter, in the adopted time system</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>80</y>
+        <y>170</y>
         <width>101</width>
         <height>21</height>
        </rect>
@@ -3539,6 +3600,76 @@ the triple system barycenter, in the adopted time system</string>
       </property>
       <property name="text">
        <string>WD Homepage:</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="ifoc_chk">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>80</y>
+        <width>70</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Write extra two columns of &quot;observed&quot; and &quot;computed&quot; data in dcout file.</string>
+      </property>
+      <property name="text">
+       <string>IFOC</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="ifder_chk">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>110</y>
+        <width>70</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Write matrix of parameter derivatives and residuals, or observational equations</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write control integer IFDER is set to 1 for “yes, write” or to 0 for “do not write.” It decides whether the matrix of parameter derivatives and residuals, or observational equations (both the unweighted and the weighted versions), are written. Since the observational equations for the first iteration pertain to the input parameters (and they change only a little for subsequent iterations), they are written only for the base set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>IFDER</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="iflcin_chk">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>140</y>
+        <width>70</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Write an input file for the LC program, from DC INPUT parameters</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>IFLCIN</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="ifcgs_chk">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>80</y>
+        <width>79</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If absolute solution with flux unit erg s&lt;span style=&quot; vertical-align:super;&quot;&gt;−1&lt;/span&gt; cm&lt;span style=&quot; vertical-align:super;&quot;&gt;−3&lt;/span&gt; is desired, check this box. Uncheck this box for a conventional solution in arbitrarily scaled flux.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>IFCGS</string>
       </property>
      </widget>
     </widget>
