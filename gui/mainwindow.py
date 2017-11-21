@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Fri Nov 17 12:38:49 2017
+# Created: Tue Nov 21 11:31:52 2017
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -77,6 +77,8 @@ class Ui_MainWindow(object):
         self.label_74.setObjectName(_fromUtf8("label_74"))
         self.nga_spinbox = QtGui.QSpinBox(self.tab)
         self.nga_spinbox.setGeometry(QtCore.QRect(410, 60, 42, 20))
+        self.nga_spinbox.setMinimum(1)
+        self.nga_spinbox.setMaximum(10)
         self.nga_spinbox.setObjectName(_fromUtf8("nga_spinbox"))
         self.label_62 = QtGui.QLabel(self.tab)
         self.label_62.setGeometry(QtCore.QRect(90, 140, 51, 21))

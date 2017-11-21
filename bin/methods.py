@@ -597,14 +597,23 @@ def exportDc(MainWindow):
                 else:
                     return "1"
 
-            def _formatInput(ipt, width, precision):
+            def _formatInput(ipt, width, precision, exponentFormat="D"):
                 ipt = str(ipt)
                 f_ipt = float(ipt)
                 if f_ipt == float(0):
                     return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
-                if f_ipt > float(0) or f_ipt < float(0):
+                if f_ipt >= float(1) or f_ipt < float(0):
                     output = " " + "{:>{width}.{precision}f}".format(f_ipt, width=width - 1, precision=precision)
-                    if len(output) > (width):
+                    if len(output) > width:
+                        raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
+                                         "\nMake sure your input's integer " +
+                                         "part is maximum {0} characters long".format((width - precision - 2)))
+                    else:
+                        return output
+                if float(1) > f_ipt > float(0):
+                    r = str(f_ipt).replace("e", exponentFormat)
+                    output = " " * (width - len(r)) + r
+                    if len(output) > width:
                         raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
                                          "\nMake sure your input's integer " +
                                          "part is maximum {0} characters long".format((width - precision - 2)))
@@ -804,6 +813,18 @@ def exportDc(MainWindow):
                     + str(MainWindow.linkext_spinbox.value()) + " " \
                     + _formatInput(MainWindow.desextinc_ipt.text(), 7, 4) + "\n"
 
+            jdDict = {
+                "Time": "1",
+                "Phase": "2"
+            }
+
+            nga = " " * (3 - len(str(MainWindow.nga_spinbox.value()))) + str(MainWindow.nga_spinbox.value())
+
+            line8 = jdDict[str(MainWindow.jdphs_combobox.currentText())] + \
+                    _formatInput(MainWindow.jd0_ipt.text(), 15, 6) + _formatInput(MainWindow.p0_ipt.text(), 17, 10) + \
+                    _formatInput(MainWindow.dpdt_ipt.text(), 14, 6) + \
+                    _formatInput(MainWindow.pshift_ipt.text(), 10, 5) + \
+                    _formatInput(MainWindow.delph_ipt.text(), 8, 5) + nga
             # write lines into file
             with open(filePath, 'w') as dcin:
                 dcin.write(line1)
@@ -813,6 +834,7 @@ def exportDc(MainWindow):
                 dcin.write(line5)
                 dcin.write(line6)
                 dcin.write(line7)
+                dcin.write(line8)
 
         except ValueError as ex:
             msg = QtGui.QMessageBox()
