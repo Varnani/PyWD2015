@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Tue Nov 21 11:31:52 2017
+# Created: Wed Nov 22 11:03:02 2017
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -239,6 +239,8 @@ class Ui_MainWindow(object):
         self.ld2_combobox.addItem(_fromUtf8(""))
         self.n1_spinbox = QtGui.QSpinBox(self.tab_3)
         self.n1_spinbox.setGeometry(QtCore.QRect(580, 40, 42, 20))
+        self.n1_spinbox.setMinimum(1)
+        self.n1_spinbox.setMaximum(100)
         self.n1_spinbox.setProperty("value", 30)
         self.n1_spinbox.setObjectName(_fromUtf8("n1_spinbox"))
         self.gr2_spinbox = QtGui.QDoubleSpinBox(self.tab_3)
@@ -322,6 +324,8 @@ class Ui_MainWindow(object):
         self.line_4.setObjectName(_fromUtf8("line_4"))
         self.n2_spinbox = QtGui.QSpinBox(self.tab_3)
         self.n2_spinbox.setGeometry(QtCore.QRect(580, 80, 42, 20))
+        self.n2_spinbox.setMinimum(1)
+        self.n2_spinbox.setMaximum(100)
         self.n2_spinbox.setProperty("value", 30)
         self.n2_spinbox.setObjectName(_fromUtf8("n2_spinbox"))
         self.label_34 = QtGui.QLabel(self.tab_3)
@@ -335,6 +339,7 @@ class Ui_MainWindow(object):
         self.label_100.setObjectName(_fromUtf8("label_100"))
         self.ipb_chk = QtGui.QCheckBox(self.tab_3)
         self.ipb_chk.setGeometry(QtCore.QRect(590, 160, 41, 21))
+        self.ipb_chk.setChecked(False)
         self.ipb_chk.setObjectName(_fromUtf8("ipb_chk"))
         self.label_101 = QtGui.QLabel(self.tab_3)
         self.label_101.setGeometry(QtCore.QRect(340, 140, 51, 16))
@@ -347,10 +352,12 @@ class Ui_MainWindow(object):
         self.label_35 = QtGui.QLabel(self.tab_3)
         self.label_35.setGeometry(QtCore.QRect(20, 160, 31, 21))
         self.label_35.setObjectName(_fromUtf8("label_35"))
-        self.n1l_spinbox_2 = QtGui.QSpinBox(self.tab_3)
-        self.n1l_spinbox_2.setGeometry(QtCore.QRect(670, 40, 42, 20))
-        self.n1l_spinbox_2.setProperty("value", 15)
-        self.n1l_spinbox_2.setObjectName(_fromUtf8("n1l_spinbox_2"))
+        self.n1l_spinbox = QtGui.QSpinBox(self.tab_3)
+        self.n1l_spinbox.setGeometry(QtCore.QRect(670, 40, 42, 20))
+        self.n1l_spinbox.setMinimum(1)
+        self.n1l_spinbox.setMaximum(100)
+        self.n1l_spinbox.setProperty("value", 15)
+        self.n1l_spinbox.setObjectName(_fromUtf8("n1l_spinbox"))
         self.label_102 = QtGui.QLabel(self.tab_3)
         self.label_102.setGeometry(QtCore.QRect(230, 40, 41, 21))
         self.label_102.setObjectName(_fromUtf8("label_102"))
@@ -368,10 +375,12 @@ class Ui_MainWindow(object):
         self.ld1_chk.setText(_fromUtf8(""))
         self.ld1_chk.setChecked(True)
         self.ld1_chk.setObjectName(_fromUtf8("ld1_chk"))
-        self.n2l_spinbox_2 = QtGui.QSpinBox(self.tab_3)
-        self.n2l_spinbox_2.setGeometry(QtCore.QRect(670, 80, 42, 20))
-        self.n2l_spinbox_2.setProperty("value", 15)
-        self.n2l_spinbox_2.setObjectName(_fromUtf8("n2l_spinbox_2"))
+        self.n2l_spinbox = QtGui.QSpinBox(self.tab_3)
+        self.n2l_spinbox.setGeometry(QtCore.QRect(670, 80, 42, 20))
+        self.n2l_spinbox.setMinimum(1)
+        self.n2l_spinbox.setMaximum(100)
+        self.n2l_spinbox.setProperty("value", 15)
+        self.n2l_spinbox.setObjectName(_fromUtf8("n2l_spinbox"))
         self.ifat1_combobox = QtGui.QComboBox(self.tab_3)
         self.ifat1_combobox.setGeometry(QtCore.QRect(60, 40, 151, 22))
         self.ifat1_combobox.setObjectName(_fromUtf8("ifat1_combobox"))
@@ -1021,7 +1030,7 @@ class Ui_MainWindow(object):
         self.label_99.setText(_translate("MainWindow", "GR2", None))
         self.label_100.setToolTip(_translate("MainWindow", "Set local emission formulation for star 1", None))
         self.label_100.setText(_translate("MainWindow", "IFAT1", None))
-        self.ipb_chk.setToolTip(_translate("MainWindow", "Set L2 manually", None))
+        self.ipb_chk.setToolTip(_translate("MainWindow", "Check the box to set L2 manually", None))
         self.ipb_chk.setText(_translate("MainWindow", "IPB", None))
         self.label_101.setToolTip(_translate("MainWindow", "Used if LD1 is set to Logarithmic, this is the coefficient of cos γ ln(cos γ) term in the bolometric logarithmic limb darkening law, for star 1", None))
         self.label_101.setText(_translate("MainWindow", "YBOL1", None))

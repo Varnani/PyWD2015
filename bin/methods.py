@@ -611,14 +611,13 @@ def exportDc(MainWindow):
                     else:
                         return output
                 if float(1) > f_ipt > float(0):
-                    r = str(f_ipt).replace("e", exponentFormat)
-                    output = " " * (width - len(r)) + r
-                    if len(output) > width:
-                        raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
-                                         "\nMake sure your input's integer " +
-                                         "part is maximum {0} characters long".format((width - precision - 2)))
-                    else:
-                        return output
+                    # TODO review this snippet for non-exponent inputs (e.g. period)
+                    f = float(ipt)
+                    front = str(f)[:(precision + 2)]
+                    back = str(f)[(len(str(f)) - 4):]
+                    number = (front + back).replace("e", exponentFormat)
+                    output = (" " * (width - len(number))) + number
+                    return output
 
             def _evalCheckBox(checkBox):
                 if checkBox.isChecked():
@@ -811,7 +810,7 @@ def exportDc(MainWindow):
                     + _evalCheckBox(MainWindow.ifcgs_chk) + " " \
                     + magliteDict[str(MainWindow.maglite_combobox.currentText())] + " " \
                     + str(MainWindow.linkext_spinbox.value()) + " " \
-                    + _formatInput(MainWindow.desextinc_ipt.text(), 7, 4) + "\n"
+                    + _formatInput(MainWindow.desextinc_ipt.text(), 7, 4, exponentFormat="F") + "\n"
 
             jdDict = {
                 "Time": "1",
@@ -821,10 +820,41 @@ def exportDc(MainWindow):
             nga = " " * (3 - len(str(MainWindow.nga_spinbox.value()))) + str(MainWindow.nga_spinbox.value())
 
             line8 = jdDict[str(MainWindow.jdphs_combobox.currentText())] + \
-                    _formatInput(MainWindow.jd0_ipt.text(), 15, 6) + _formatInput(MainWindow.p0_ipt.text(), 17, 10) + \
+                    _formatInput(MainWindow.jd0_ipt.text(), 15, 6, exponentFormat="F") + \
+                    _formatInput(MainWindow.p0_ipt.text(), 17, 10) + \
                     _formatInput(MainWindow.dpdt_ipt.text(), 14, 6) + \
-                    _formatInput(MainWindow.pshift_ipt.text(), 10, 5) + \
-                    _formatInput(MainWindow.delph_ipt.text(), 8, 5) + nga
+                    _formatInput(MainWindow.pshift_ipt.text(), 10, 5, exponentFormat="F") + \
+                    _formatInput(MainWindow.delph_ipt.text(), 8, 5, exponentFormat="F") + nga + "\n"
+
+            modeDict = {
+                "Mode -1": "-1",
+                "Mode 0": " 0",
+                "Mode 1": " 1",
+                "Mode 2": " 2",
+                "Mode 3": " 3",
+                "Mode 4": " 4",
+                "Mode 5": " 5",
+                "Mode 6": " 6"
+            }
+
+            ifatDict = {
+                "Stellar Atmosphere": " 1",
+                "Blackbody": " 0"
+            }
+
+            n1 = " " * (4 - len(str(MainWindow.n1_spinbox.value()))) + str(MainWindow.n1_spinbox.value())
+            n2 = " " * (4 - len(str(MainWindow.n2_spinbox.value()))) + str(MainWindow.n2_spinbox.value())
+            n1l = " " * (4 - len(str(MainWindow.n1l_spinbox.value()))) + str(MainWindow.n1l_spinbox.value())
+            n2l = " " * (4 - len(str(MainWindow.n2l_spinbox.value()))) + str(MainWindow.n2l_spinbox.value())
+
+            line9 = modeDict[str(MainWindow.mode_combobox.currentText())] + " " + _evalCheckBox(MainWindow.ipb_chk) + \
+                    ifatDict[str(MainWindow.ifat1_combobox.currentText())] + \
+                    ifatDict[str(MainWindow.ifat2_combobox.currentText())] + n1 + n2 + n1l + n2l + \
+                    _formatInput(MainWindow.perr0_ipt.text(), 13, 6, exponentFormat="F") + \
+                    _formatInput(MainWindow.dperdt_ipt.text(), 13, 5) + \
+                    _formatInput(MainWindow.the_ipt.text(), 8, 5, exponentFormat="F") + \
+                    _formatInput(MainWindow.vunit_ipt.text(), 9, 3, exponentFormat="F")
+
             # write lines into file
             with open(filePath, 'w') as dcin:
                 dcin.write(line1)
@@ -835,6 +865,7 @@ def exportDc(MainWindow):
                 dcin.write(line6)
                 dcin.write(line7)
                 dcin.write(line8)
+                dcin.write(line9)
 
         except ValueError as ex:
             msg = QtGui.QMessageBox()

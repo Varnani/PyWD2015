@@ -970,6 +970,12 @@
         <height>20</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
       <property name="value">
        <number>30</number>
       </property>
@@ -1307,6 +1313,12 @@
         <height>20</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
       <property name="value">
        <number>30</number>
       </property>
@@ -1369,10 +1381,13 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Set L2 manually</string>
+       <string>Check the box to set L2 manually</string>
       </property>
       <property name="text">
        <string>IPB</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_101">
@@ -1420,7 +1435,7 @@
        <string>LD1</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="n1l_spinbox_2">
+     <widget class="QSpinBox" name="n1l_spinbox">
       <property name="geometry">
        <rect>
         <x>670</x>
@@ -1428,6 +1443,12 @@
         <width>42</width>
         <height>20</height>
        </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
       </property>
       <property name="value">
        <number>15</number>
@@ -1506,7 +1527,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QSpinBox" name="n2l_spinbox_2">
+     <widget class="QSpinBox" name="n2l_spinbox">
       <property name="geometry">
        <rect>
         <x>670</x>
@@ -1514,6 +1535,12 @@
         <width>42</width>
         <height>20</height>
        </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
       </property>
       <property name="value">
        <number>15</number>
