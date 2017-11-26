@@ -1,5 +1,6 @@
 from PyQt4 import QtGui
-from gui import mainwindow, loadwidget, spotconfigurewidget, editlightcurvedialog, editvelocitycurvedialog
+from gui import mainwindow, loadwidget, spotconfigurewidget, \
+    editlightcurvedialog, editvelocitycurvedialog, eclipsewidget
 from functools import partial
 from bin import methods
 
@@ -11,6 +12,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
         self.LoadWidget = LoadWidget()  # get loadwidget
         self.SpotConfigureWidget = SpotConfigureWidget()  # get spotconfigurewidget
+        self.EclipseWidget = EclipseWiget()
         self.populateStyles()  # populate theme combobox
         self.setKeepDefaults()  # set keeps to their defaults
         self.connectSignals()  # connect events with methods
@@ -24,10 +26,12 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.setdeldefaults_btn.clicked.connect(self.setDelDefaults)
         self.clearkeeps_btn.clicked.connect(self.clearKeeps)
         self.setkeepdefaults_btn.clicked.connect(self.setKeepDefaults)
+        self.eclipsewidget_btn.clicked.connect(self.EclipseWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadWidget.close()  # close loadwidget if we exit
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
+        self.EclipseWidget.close()
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
@@ -129,6 +133,20 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.app.setStyle(style)
 
 
+class EclipseWiget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
+    def __init__(self):
+        super(EclipseWiget, self).__init__()
+        self.setupUi(self)  # setup ui from eclipsewidget.py
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        # setup variables
+        #
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.load_btn.clicked.connect(partial(methods.loadEclipseTimings, self))
+        self.clear_btn.clicked.connect(partial(methods.removeEclipseTimings, self))
+
+
 class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget class
     def __init__(self):  # constructor
         super(LoadWidget, self).__init__()
@@ -170,6 +188,7 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
     def connectSignals(self):
         self.accept_btn.clicked.connect(self.acceptChanges)
         self.discard_btn.clicked.connect(self.discardChanges)
+        self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
 
     def populate(self, LightCurveProperties):  # populate ui from a lcprop obj
         self.filepath_label.setText(LightCurveProperties.FilePath)
@@ -189,6 +208,11 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
         self.el3a_ipt.setText(LightCurveProperties.el3a)
         self.opsf_ipt.setText(LightCurveProperties.opsf)
         self.sigma_ipt.setText(LightCurveProperties.sigma)
+        self.noise_combobox.setCurrentIndex(int(LightCurveProperties.noise))
+        self.wla_ipt.setText(LightCurveProperties.wla)
+        self.aextinc_ipt.setText(LightCurveProperties.aextinc)
+        self.xunit_ipt.setText(LightCurveProperties.xunit)
+        self.calib_ipt.setText(LightCurveProperties.calib)
         self.lines = LightCurveProperties.lines
         self.timeList = LightCurveProperties.timeList
         self.observationList = LightCurveProperties.observationList
@@ -215,6 +239,11 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
         self.el3a_ipt.setText("0")
         self.opsf_ipt.setText("0")
         self.sigma_ipt.setText("0")
+        self.noise_combobox.setCurrentIndex(1)
+        self.wla_ipt.setText("0")
+        self.aextinc_ipt.setText("0")
+        self.xunit_ipt.setText("1.0000")
+        self.calib_ipt.setText("0")
         lines = []
         with open(filePath) as f:
             for line in f:
@@ -251,6 +280,7 @@ class EditVelocityCurveDialog(QtGui.QDialog, editvelocitycurvedialog.Ui_EditVelo
     def connectSignals(self):
         self.accept_btn.clicked.connect(self.acceptChanges)
         self.discard_btn.clicked.connect(self.discardChanges)
+        self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
 
     def populate(self, VelocityCurveProperties):  # populate ui from a lcprop obj
         self.filepath_label.setText(VelocityCurveProperties.FilePath)

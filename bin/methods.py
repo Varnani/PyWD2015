@@ -11,40 +11,45 @@ def SaveSpotConfiguration(SpotConfigureWidget):
     dialog.setNameFilter("Spot Configuration File (*.spotconfig)")
     dialog.setAcceptMode(1)
     returnCode = dialog.exec_()
-    filePath = (dialog.selectedFiles())[0]
+    filePath = str((dialog.selectedFiles())[0])
     if filePath != "" and returnCode != 0:
-        parser = ConfigParser.SafeConfigParser()
-        # parse row info
-        parser.add_section("Spot Count")
-        parser.set("Spot Count", "star 1", str(SpotConfigureWidget.star1RowCount))
-        parser.set("Spot Count", "star 2", str(SpotConfigureWidget.star2RowCount))
+        try:
+            parser = ConfigParser.SafeConfigParser()
+            # parse row info
+            parser.add_section("Spot Count")
+            parser.set("Spot Count", "star 1", str(SpotConfigureWidget.star1RowCount))
+            parser.set("Spot Count", "star 2", str(SpotConfigureWidget.star2RowCount))
 
-        # parse actual spot rows
-        i = 0
-        while i < SpotConfigureWidget.star1RowCount:
-            section = "Star 1 Spot " + str(i + 1)
-            parser.add_section(section)
-            parser.set(section, "a", str(SpotConfigureWidget.star1ElementList[i][1].isChecked()))
-            parser.set(section, "b", str(SpotConfigureWidget.star1ElementList[i][2].isChecked()))
-            parser.set(section, "latitude", str(SpotConfigureWidget.star1ElementList[i][3].text()))
-            parser.set(section, "longitude", str(SpotConfigureWidget.star1ElementList[i][4].text()))
-            parser.set(section, "angular radius", str(SpotConfigureWidget.star1ElementList[i][5].text()))
-            parser.set(section, "temperature factor", str(SpotConfigureWidget.star1ElementList[i][6].text()))
-            i += 1
-        i = 0
-        while i < SpotConfigureWidget.star2RowCount:
-            section = "Star 2 Spot " + str(i + 1)
-            parser.add_section(section)
-            parser.set(section, "a", str(SpotConfigureWidget.star2ElementList[i][1].isChecked()))
-            parser.set(section, "b", str(SpotConfigureWidget.star2ElementList[i][2].isChecked()))
-            parser.set(section, "latitude", str(SpotConfigureWidget.star2ElementList[i][3].text()))
-            parser.set(section, "longitude", str(SpotConfigureWidget.star2ElementList[i][4].text()))
-            parser.set(section, "angular radius", str(SpotConfigureWidget.star2ElementList[i][5].text()))
-            parser.set(section, "temperature factor", str(SpotConfigureWidget.star2ElementList[i][6].text()))
-            i += 1
-        with open(filePath, 'w') as f:
-            parser.write(f)
-        SpotConfigureWidget.spotconfigsave_label.setText("Spot config saved: " + filePath)
+            # parse actual spot rows
+            i = 0
+            while i < SpotConfigureWidget.star1RowCount:
+                section = "Star 1 Spot " + str(i + 1)
+                parser.add_section(section)
+                parser.set(section, "a", str(SpotConfigureWidget.star1ElementList[i][1].isChecked()))
+                parser.set(section, "b", str(SpotConfigureWidget.star1ElementList[i][2].isChecked()))
+                parser.set(section, "latitude", str(SpotConfigureWidget.star1ElementList[i][3].text()))
+                parser.set(section, "longitude", str(SpotConfigureWidget.star1ElementList[i][4].text()))
+                parser.set(section, "angular radius", str(SpotConfigureWidget.star1ElementList[i][5].text()))
+                parser.set(section, "temperature factor", str(SpotConfigureWidget.star1ElementList[i][6].text()))
+                i += 1
+            i = 0
+            while i < SpotConfigureWidget.star2RowCount:
+                section = "Star 2 Spot " + str(i + 1)
+                parser.add_section(section)
+                parser.set(section, "a", str(SpotConfigureWidget.star2ElementList[i][1].isChecked()))
+                parser.set(section, "b", str(SpotConfigureWidget.star2ElementList[i][2].isChecked()))
+                parser.set(section, "latitude", str(SpotConfigureWidget.star2ElementList[i][3].text()))
+                parser.set(section, "longitude", str(SpotConfigureWidget.star2ElementList[i][4].text()))
+                parser.set(section, "angular radius", str(SpotConfigureWidget.star2ElementList[i][5].text()))
+                parser.set(section, "temperature factor", str(SpotConfigureWidget.star2ElementList[i][6].text()))
+                i += 1
+            with open(filePath, 'w') as f:
+                parser.write(f)
+            SpotConfigureWidget.spotconfigsave_label.setText("Spot config saved: " + filePath)
+        except:
+            msg = QtGui.QMessageBox()
+            msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+            msg.exec_()
 
 
 def LoadSpotConfiguration(SpotConfigureWidget):
@@ -120,7 +125,7 @@ def addSpotRow(SpotConfigureWidget, starNumber):
     # add elements
     # label
     label = QtGui.QLabel(SpotConfigureWidget)
-    label.setGeometry(10 + xshiftAmount, 130 + yshiftAmount, 41, 16)
+    label.setGeometry(10 + xshiftAmount, 130 + yshiftAmount, 45, 16)
     if starNumber == 1:
         label.setText("Spot " + str(SpotConfigureWidget.star1RowCount))
         label.setObjectName("star1spotlabel" + str(SpotConfigureWidget.star1RowCount - 1))
@@ -134,8 +139,8 @@ def addSpotRow(SpotConfigureWidget, starNumber):
     # radio buttons
     radioA = QtGui.QRadioButton(SpotConfigureWidget)
     radioB = QtGui.QRadioButton(SpotConfigureWidget)
-    radioA.setGeometry(60 + xshiftAmount, 130 + yshiftAmount, 16, 17)
-    radioB.setGeometry(90 + xshiftAmount, 130 + yshiftAmount, 16, 17)
+    radioA.setGeometry(60 + xshiftAmount, 130 + yshiftAmount, 20, 20)
+    radioB.setGeometry(90 + xshiftAmount, 130 + yshiftAmount, 20, 20)
     radioA.type = "A"
     radioB.type = "B"
     if starNumber == 1:
@@ -365,7 +370,7 @@ def addLightCurve(LoadWidget):
             # add new elements
             # label
             label = QtGui.QLabel(LoadWidget)  # load element
-            label.setGeometry(50, 140 + shiftAmount, 80, 21)  # set geometry
+            label.setGeometry(40, 140 + shiftAmount, 90, 21)  # set geometry
             label.setText("Light Curve " + str(LoadWidget.lcCount))  # set text
             label.setObjectName("lclabel" + str(LoadWidget.lcCount))  # set object name
             LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(label)  # store element in the element list
@@ -373,7 +378,7 @@ def addLightCurve(LoadWidget):
 
             # file path
             path = QtGui.QLineEdit(LoadWidget)  # load element
-            path.setGeometry(140, 140 + shiftAmount, 381, 20)  # set geometry
+            path.setGeometry(130, 140 + shiftAmount, 381, 20)  # set geometry
             path.setText(filePath)  # set text
             path.setObjectName("lcpath" + str(LoadWidget.lcCount))  # set object name
             path.setReadOnly(True)  # set read only
@@ -383,7 +388,7 @@ def addLightCurve(LoadWidget):
             # edit button
             row = LoadWidget.lcCount - 1  # current row index
             edit = QtGui.QPushButton(LoadWidget)
-            edit.setGeometry(530, 140 + shiftAmount, 51, 21)
+            edit.setGeometry(520, 140 + shiftAmount, 51, 21)
             edit.setText("Edit")
             edit.setObjectName("lcedit" + str(LoadWidget.lcCount))
             edit.clicked.connect(partial(editLightCurve, LoadWidget, row))
@@ -392,7 +397,7 @@ def addLightCurve(LoadWidget):
 
             # remove button
             remove = QtGui.QPushButton(LoadWidget)
-            remove.setGeometry(590, 140 + shiftAmount, 51, 21)
+            remove.setGeometry(580, 140 + shiftAmount, 61, 21)
             remove.setText("Remove")
             remove.setObjectName("lcload" + str(LoadWidget.lcCount))
             remove.clicked.connect(partial(removeLightCurve, LoadWidget, row))
@@ -463,7 +468,7 @@ def resizeLoadWidget(LoadWidget):
     LoadWidget.resize(650, shiftAmount + 215)
 
     # move existing elements
-    LoadWidget.lcadd_btn.setGeometry(20, shiftAmount + 180, 111, 21)  # move 'add light curve' button
+    LoadWidget.lcadd_btn.setGeometry(20, shiftAmount + 180, 115, 25)  # move 'add light curve' button
     LoadWidget.nlc_label.setGeometry(500, shiftAmount + 180, 141, 21)  # move 'light curve number' label
 
 
@@ -537,12 +542,58 @@ def loadVelocityCurve(vcNumber, LoadWidget):
                 LoadWidget.vc2load_btn.setText("Remove")
 
 
-def exportDc(MainWindow):
-    dialog = QtGui.QFileDialog(MainWindow)
-    dialog.setAcceptMode(1)
-    dialog.selectFile("dcin.active")
+def loadEclipseTimings(EclipseWidget):
+    removeEclipseTimings(EclipseWidget)
+    dialog = QtGui.QFileDialog(EclipseWidget)
+    dialog.setAcceptMode(0)
     returnCode = dialog.exec_()
-    filePath = (dialog.selectedFiles())[0]
+    fileName = str((dialog.selectedFiles())[0])
+    if fileName != "" and returnCode != 0:
+        try:
+            lines = []
+            with open(fileName) as f:
+                for line in f:
+                    i = line.split()
+                    if len(i) is not 0:
+                        lines.append(i)
+            EclipseWidget.timeList = [x[0] for x in lines]
+            EclipseWidget.typeList = [x[1] for x in lines]
+            EclipseWidget.weightList = [x[2] for x in lines]
+            EclipseWidget.lines = lines
+            for x in lines:
+                a = QtGui.QTreeWidgetItem(EclipseWidget.datawidget, x)
+            EclipseWidget.filepath_label.setText(fileName)
+            EclipseWidget.filepath_label.setToolTip(fileName)
+        except IndexError:
+            msg = QtGui.QMessageBox()
+            msg.setText("File is not a valid data source:\n" + fileName)
+            msg.exec_()
+        except:
+            msg = QtGui.QMessageBox()
+            msg.setText("Unknown exception is caught:\n" + sys.exc_info()[0])
+            msg.exec_()
+
+
+def removeEclipseTimings(EclipseWidget):
+    EclipseWidget.datawidget.clear()
+    EclipseWidget.timeList = []
+    EclipseWidget.typeList = []
+    EclipseWidget.weighList = []
+    EclipseWidget.lines = []
+    EclipseWidget.filepath_label.setText("None")
+    EclipseWidget.filepath_label.setToolTip("")
+
+
+def exportDc(MainWindow):
+    # dialog = QtGui.QFileDialog(MainWindow)
+    # dialog.setAcceptMode(1)
+    # dialog.selectFile("dcin.active")
+    # returnCode = dialog.exec_()
+    # filePath = (dialog.selectedFiles())[0]
+    # TODO refactor to (return a file object)
+    import os
+    filePath = os.getcwd() + "/dcin.active"  # spit out dcout.active into current directory
+    returnCode = 1
     if filePath != "" and returnCode != 0:
         try:
             def _formatDels(ipt):
@@ -866,7 +917,9 @@ def exportDc(MainWindow):
                 dcin.write(line7)
                 dcin.write(line8)
                 dcin.write(line9)
-
+            report = QtGui.QMessageBox(MainWindow)
+            report.setText("File saved successfully.")
+            report.exec_()
         except ValueError as ex:
             msg = QtGui.QMessageBox()
             msg.setWindowTitle("pywd - ValueError")

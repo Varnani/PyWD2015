@@ -1,21 +1,31 @@
 class LightCurveProperties:
     def __init__(self, EditLightCurveDialog):
-        self.FilePath = EditLightCurveDialog.filepath_label.text()
-        self.band = EditLightCurveDialog.band_box.text()
-        self.ksd = EditLightCurveDialog.ksd_box.text()
-        self.l1 = EditLightCurveDialog.l1_ipt.text()
-        self.l2 = EditLightCurveDialog.l2_ipt.text()
-        self.x1 = EditLightCurveDialog.x1_ipt.text()
-        self.x2 = EditLightCurveDialog.x2_ipt.text()
-        self.y1 = EditLightCurveDialog.y1_ipt.text()
-        self.y2 = EditLightCurveDialog.y2_ipt.text()
-        self.e1 = EditLightCurveDialog.e1_ipt.text()
-        self.e2 = EditLightCurveDialog.e2_ipt.text()
-        self.e3 = EditLightCurveDialog.e3_ipt.text()
-        self.e4 = EditLightCurveDialog.e4_ipt.text()
-        self.el3a = EditLightCurveDialog.el3a_ipt.text()
-        self.opsf = EditLightCurveDialog.opsf_ipt.text()
-        self.sigma = EditLightCurveDialog.sigma_ipt.text()
+        self.FilePath = str(EditLightCurveDialog.filepath_label.text())
+        self.band = str(EditLightCurveDialog.band_box.text())
+        self.ksd = str(EditLightCurveDialog.ksd_box.text())
+        self.l1 = str(EditLightCurveDialog.l1_ipt.text())
+        self.l2 = str(EditLightCurveDialog.l2_ipt.text())
+        self.x1 = str(EditLightCurveDialog.x1_ipt.text())
+        self.x2 = str(EditLightCurveDialog.x2_ipt.text())
+        self.y1 = str(EditLightCurveDialog.y1_ipt.text())
+        self.y2 = str(EditLightCurveDialog.y2_ipt.text())
+        self.e1 = str(EditLightCurveDialog.e1_ipt.text())
+        self.e2 = str(EditLightCurveDialog.e2_ipt.text())
+        self.e3 = str(EditLightCurveDialog.e3_ipt.text())
+        self.e4 = str(EditLightCurveDialog.e4_ipt.text())
+        self.el3a = str(EditLightCurveDialog.el3a_ipt.text())
+        self.opsf = str(EditLightCurveDialog.opsf_ipt.text())
+        self.sigma = str(EditLightCurveDialog.sigma_ipt.text())
+        noiseDict = {
+            "None": "0",
+            "Square Root": "1",
+            "Linear": "2"
+        }
+        self.noise = noiseDict[str(EditLightCurveDialog.noise_combobox.currentText())]
+        self.wla = str(EditLightCurveDialog.wla_ipt.text())
+        self.aextinc = str(EditLightCurveDialog.aextinc_ipt.text())
+        self.xunit = str(EditLightCurveDialog.xunit_ipt.text())
+        self.calib = str(EditLightCurveDialog.calib_ipt.text())
         self.timeList = EditLightCurveDialog.timeList
         self.observationList = EditLightCurveDialog.observationList
         self.weightList = EditLightCurveDialog.weightList
@@ -24,22 +34,22 @@ class LightCurveProperties:
 
 class VelocityCurveProperties:
     def __init__(self, EditVelocityCurveDialog):
-        self.FilePath = EditVelocityCurveDialog.filepath_label.text()
-        self.band = EditVelocityCurveDialog.band_box.text()
-        self.ksd = EditVelocityCurveDialog.ksd_box.text()
-        self.l1 = EditVelocityCurveDialog.l1_ipt.text()
-        self.l2 = EditVelocityCurveDialog.l2_ipt.text()
-        self.x1 = EditVelocityCurveDialog.x1_ipt.text()
-        self.x2 = EditVelocityCurveDialog.x2_ipt.text()
-        self.y1 = EditVelocityCurveDialog.y1_ipt.text()
-        self.y2 = EditVelocityCurveDialog.y2_ipt.text()
-        self.e1 = EditVelocityCurveDialog.e1_ipt.text()
-        self.e2 = EditVelocityCurveDialog.e2_ipt.text()
-        self.e3 = EditVelocityCurveDialog.e3_ipt.text()
-        self.e4 = EditVelocityCurveDialog.e4_ipt.text()
-        self.wla = EditVelocityCurveDialog.wla_ipt.text()
-        self.opsf = EditVelocityCurveDialog.opsf_ipt.text()
-        self.sigma = EditVelocityCurveDialog.sigma_ipt.text()
+        self.FilePath = str(EditVelocityCurveDialog.filepath_label.text())
+        self.band = str(EditVelocityCurveDialog.band_box.text())
+        self.ksd = str(EditVelocityCurveDialog.ksd_box.text())
+        self.l1 = str(EditVelocityCurveDialog.l1_ipt.text())
+        self.l2 = str(EditVelocityCurveDialog.l2_ipt.text())
+        self.x1 = str(EditVelocityCurveDialog.x1_ipt.text())
+        self.x2 = str(EditVelocityCurveDialog.x2_ipt.text())
+        self.y1 = str(EditVelocityCurveDialog.y1_ipt.text())
+        self.y2 = str(EditVelocityCurveDialog.y2_ipt.text())
+        self.e1 = str(EditVelocityCurveDialog.e1_ipt.text())
+        self.e2 = str(EditVelocityCurveDialog.e2_ipt.text())
+        self.e3 = str(EditVelocityCurveDialog.e3_ipt.text())
+        self.e4 = str(EditVelocityCurveDialog.e4_ipt.text())
+        self.wla = str(EditVelocityCurveDialog.wla_ipt.text())
+        self.opsf = str(EditVelocityCurveDialog.opsf_ipt.text())
+        self.sigma = str(EditVelocityCurveDialog.sigma_ipt.text())
         self.timeList = EditVelocityCurveDialog.timeList
         self.observationList = EditVelocityCurveDialog.observationList
         self.weightList = EditVelocityCurveDialog.weightList
