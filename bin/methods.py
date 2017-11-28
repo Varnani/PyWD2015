@@ -3,6 +3,7 @@ from PyQt4 import QtGui
 from functools import partial
 from bin import classes
 import ConfigParser
+import numpy as np
 
 
 def SaveSpotConfiguration(SpotConfigureWidget):
@@ -648,27 +649,36 @@ def exportDc(MainWindow):
                 else:
                     return "1"
 
-            def _formatInput(ipt, width, precision, exponentFormat="D"):
+            def _formatInput(ipt, width, precision, exponentFormat="D", isDeg=False):
+                #  TODO clean up/refactor
                 ipt = str(ipt)
                 f_ipt = float(ipt)
-                if f_ipt == float(0):
-                    return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
-                if f_ipt >= float(1) or f_ipt < float(0):
-                    output = " " + "{:>{width}.{precision}f}".format(f_ipt, width=width - 1, precision=precision)
-                    if len(output) > width:
-                        raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
-                                         "\nMake sure your input's integer " +
-                                         "part is maximum {0} characters long".format((width - precision - 2)))
+                if isDeg:
+                    f_ipt = f_ipt * np.pi / 180.0  # convert to radians
+                    ipt = str(f_ipt)
+                output = ""
+                if float(1) > f_ipt > float(-1):
+                    if f_ipt == float(0):
+                        return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
+                    if width - 6 - precision >= 0:
+                        output = "{:> {width}.{precision}g}".format(f_ipt, width=width, precision=precision)
                     else:
-                        return output
-                if float(1) > f_ipt > float(0):
-                    # TODO review this snippet for non-exponent inputs (e.g. period)
-                    f = float(ipt)
-                    front = str(f)[:(precision + 2)]
-                    back = str(f)[(len(str(f)) - 4):]
-                    number = (front + back).replace("e", exponentFormat)
-                    output = (" " * (width - len(number))) + number
-                    return output
+                        output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
+                if f_ipt >= float(1) or f_ipt < float(0):
+                    output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
+                if len(output) > width:
+                    raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
+                                     "\nMake sure your input's integer " +
+                                     "part is maximum {0} characters long".format((width - precision - 2)))
+                return output.replace("e", exponentFormat)
+                # if float(1) > f_ipt > float(0):
+                #     # TODO review this snippet for non-exponent inputs (e.g. period)
+                #     f = float(ipt)
+                #     front = str(f)[:(precision + 2)]
+                #     back = str(f)[(len(str(f)) - 4):]
+                #     number = (front + back).replace("e", exponentFormat)
+                #     output = (" " * (width - len(number))) + number
+                #     return output
 
             def _evalCheckBox(checkBox):
                 if checkBox.isChecked():
@@ -818,7 +828,8 @@ def exportDc(MainWindow):
                 "Symmetrical": "1",
                 "Asymmetrical": "0"
             }
-            line6 = ifvc1 + " " + ifvc2 + " " + str(MainWindow.LoadWidget.lcCount) \
+            nlc = ((2 - len(str(MainWindow.LoadWidget.lcCount))) * "0") + str(MainWindow.LoadWidget.lcCount)
+            line6 = ifvc1 + " " + ifvc2 + " " + nlc \
                     + " 0" + " 2" + " 0" + " " + \
                     isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " " + \
                     _evalCheckBox(MainWindow.ifder_chk) + " " + _evalCheckBox(MainWindow.iflcin_chk) \
@@ -901,10 +912,49 @@ def exportDc(MainWindow):
             line9 = modeDict[str(MainWindow.mode_combobox.currentText())] + " " + _evalCheckBox(MainWindow.ipb_chk) + \
                     ifatDict[str(MainWindow.ifat1_combobox.currentText())] + \
                     ifatDict[str(MainWindow.ifat2_combobox.currentText())] + n1 + n2 + n1l + n2l + \
-                    _formatInput(MainWindow.perr0_ipt.text(), 13, 6, exponentFormat="F") + \
+                    _formatInput(MainWindow.perr0_ipt.text(), 13, 6, exponentFormat="F", isDeg=True) + \
                     _formatInput(MainWindow.dperdt_ipt.text(), 13, 5) + \
                     _formatInput(MainWindow.the_ipt.text(), 8, 5, exponentFormat="F") + \
-                    _formatInput(MainWindow.vunit_ipt.text(), 9, 3, exponentFormat="F")
+                    _formatInput(MainWindow.vunit_ipt.text(), 9, 3, exponentFormat="F") + "\n"
+
+            def _formatEcc(ipt):
+                f_ipt = float(ipt)
+                if f_ipt > 1 or f_ipt < 0:
+                    raise ValueError("Invalid eccentricity value: " + ipt)
+                else:
+                    output = "{:6.5f}".format(f_ipt)
+                    return output[1:]
+
+            line10 = _formatEcc(MainWindow.e_ipt.text()) + _formatInput(MainWindow.a_ipt.text(), 13, 6) + \
+                     _formatInput(MainWindow.f1_ipt.text(), 10, 4, exponentFormat="F") + \
+                     _formatInput(MainWindow.f2_ipt.text(), 10, 4, exponentFormat="F") + \
+                     _formatInput(MainWindow.vgam_ipt.text(), 10, 4, exponentFormat="F") + \
+                     _formatInput(MainWindow.xincl_ipt.text(), 9, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.gr1_spinbox.value(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.gr2_spinbox.value(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.abunin_ipt.text(), 7, 2, exponentFormat="F") + \
+                     _formatInput(MainWindow.SpotConfigureWidget.fspot1_ipt.text(), 10, 4, exponentFormat="F") + \
+                     _formatInput(MainWindow.SpotConfigureWidget.fspot2_ipt.text(), 10, 4, exponentFormat="F") + "\n"
+
+            line11 = _formatInput(float(MainWindow.tavh_ipt.text()) / 10000.0, 7, 4, exponentFormat="F") + \
+                     _formatInput(float(MainWindow.tavc_ipt.text()) / 10000.0, 8, 4, exponentFormat="F") + \
+                     _formatInput(MainWindow.alb1_spinbox.value(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.alb2_spinbox.value(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.phsv_ipt.text(), 13, 6) + \
+                     _formatInput(MainWindow.pcsv_ipt.text(), 13, 6) + \
+                     _formatInput(MainWindow.rm_ipt.text(), 13, 6) + \
+                     _formatInput(MainWindow.xbol1_ipt.text(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.xbol2_ipt.text(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.ybol1_ipt.text(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.ybol2_ipt.text(), 7, 3, exponentFormat="F") + \
+                     _formatInput(MainWindow.dpclog_ipt.text(), 9, 5, exponentFormat="F") + "\n"
+
+            line12 = _formatInput(MainWindow.a3b_ipt.text(), 12, 6) + \
+                     _formatInput(MainWindow.p3b_ipt.text(), 14, 7) + \
+                     _formatInput(MainWindow.xinc3b_ipt.text(), 11, 5, exponentFormat="F") + \
+                     _formatInput(MainWindow.e3b_ipt.text(), 9, 6, exponentFormat="F") + \
+                     _formatInput(MainWindow.perr3b_ipt.text(), 10, 7, exponentFormat="F", isDeg=True) + \
+                     _formatInput(MainWindow.tc3b_ipt.text(), 17, 8, exponentFormat="F") + "\n"
 
             # write lines into file
             with open(filePath, 'w') as dcin:
@@ -917,6 +967,9 @@ def exportDc(MainWindow):
                 dcin.write(line7)
                 dcin.write(line8)
                 dcin.write(line9)
+                dcin.write(line10)
+                dcin.write(line11)
+                dcin.write(line12)
             report = QtGui.QMessageBox(MainWindow)
             report.setText("File saved successfully.")
             report.exec_()
