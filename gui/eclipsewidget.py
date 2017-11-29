@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'eclipsewidget.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Wed Nov 29 11:38:32 2017
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -49,11 +50,27 @@ class Ui_EclipseWidget(object):
         self.clear_btn.setGeometry(QtCore.QRect(10, 530, 311, 50))
         self.clear_btn.setObjectName(_fromUtf8("clear_btn"))
         self.label = QtGui.QLabel(EclipseWidget)
-        self.label.setGeometry(QtCore.QRect(10, 60, 141, 31))
+        self.label.setGeometry(QtCore.QRect(10, 70, 141, 21))
         self.label.setObjectName(_fromUtf8("label"))
         self.filepath_label = QtGui.QLabel(EclipseWidget)
         self.filepath_label.setGeometry(QtCore.QRect(10, 80, 311, 31))
         self.filepath_label.setObjectName(_fromUtf8("filepath_label"))
+        self.ksd_box = QtGui.QSpinBox(EclipseWidget)
+        self.ksd_box.setGeometry(QtCore.QRect(260, 39, 51, 22))
+        self.ksd_box.setButtonSymbols(QtGui.QAbstractSpinBox.UpDownArrows)
+        self.ksd_box.setMinimum(1)
+        self.ksd_box.setMaximum(3)
+        self.ksd_box.setProperty("value", 1)
+        self.ksd_box.setObjectName(_fromUtf8("ksd_box"))
+        self.label_16 = QtGui.QLabel(EclipseWidget)
+        self.label_16.setGeometry(QtCore.QRect(230, 40, 41, 20))
+        self.label_16.setObjectName(_fromUtf8("label_16"))
+        self.label_11 = QtGui.QLabel(EclipseWidget)
+        self.label_11.setGeometry(QtCore.QRect(180, 70, 51, 20))
+        self.label_11.setObjectName(_fromUtf8("label_11"))
+        self.sigma_ipt = QtGui.QLineEdit(EclipseWidget)
+        self.sigma_ipt.setGeometry(QtCore.QRect(234, 70, 71, 21))
+        self.sigma_ipt.setObjectName(_fromUtf8("sigma_ipt"))
 
         self.retranslateUi(EclipseWidget)
         QtCore.QMetaObject.connectSlotsByName(EclipseWidget)
@@ -69,4 +86,10 @@ class Ui_EclipseWidget(object):
         self.clear_btn.setText(_translate("EclipseWidget", "Clear", None))
         self.label.setText(_translate("EclipseWidget", "Data preview of file:", None))
         self.filepath_label.setText(_translate("EclipseWidget", "None", None))
+        self.label_16.setToolTip(_translate("EclipseWidget", "Set standard deviation apply method. [?]", None))
+        self.label_16.setWhatsThis(_translate("EclipseWidget", "<html><head/><body><p>An integer array that is 0, 1, or 2 for each input sub-dataset (velocity, light, or eclipse timings). </p><p>The KSDs tell DC whether to apply the input standard deviations (σ’s) to compute curvedependent weights (KSD=0), </p><p>to apply DC’s internally computed σ’s for the weights (KSD=1),</p><p>or to apply σ’s based on one or two restricted phase ranges for the weights (KSD=2).</p><p><span style=\" font-weight:600;\">If unsure, set to 1.</span></p></body></html>", None))
+        self.label_16.setText(_translate("EclipseWidget", "KSD", None))
+        self.label_11.setToolTip(_translate("EclipseWidget", "Estimated standard deviation of observed light", None))
+        self.label_11.setText(_translate("EclipseWidget", "SIGMA", None))
+        self.sigma_ipt.setText(_translate("EclipseWidget", "0", None))
 

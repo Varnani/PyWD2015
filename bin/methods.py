@@ -4,6 +4,7 @@ from functools import partial
 from bin import classes
 import ConfigParser
 import numpy as np
+import itertools
 
 
 def SaveSpotConfiguration(SpotConfigureWidget):
@@ -583,6 +584,8 @@ def removeEclipseTimings(EclipseWidget):
     EclipseWidget.lines = []
     EclipseWidget.filepath_label.setText("None")
     EclipseWidget.filepath_label.setToolTip("")
+    EclipseWidget.sigma_ipt.setText("0")
+    EclipseWidget.ksd_box.setValue(1)
 
 
 def exportDc(MainWindow):
@@ -593,7 +596,7 @@ def exportDc(MainWindow):
     # filePath = (dialog.selectedFiles())[0]
     # TODO refactor to (return a file object)
     import os
-    filePath = os.getcwd() + "/dcin.active"  # spit out dcout.active into current directory
+    filePath = os.getcwd() + "/wd/dcin.active"  # spit out dcout.active into current directory
     returnCode = 1
     if filePath != "" and returnCode != 0:
         try:
@@ -650,7 +653,8 @@ def exportDc(MainWindow):
                     return "1"
 
             def _formatInput(ipt, width, precision, exponentFormat="D", isDeg=False):
-                #  TODO clean up/refactor
+                # TODO clean up/refactor
+                # TODO truncate trailing zeroes
                 ipt = str(ipt)
                 f_ipt = float(ipt)
                 if isDeg:
@@ -671,14 +675,6 @@ def exportDc(MainWindow):
                                      "\nMake sure your input's integer " +
                                      "part is maximum {0} characters long".format((width - precision - 2)))
                 return output.replace("e", exponentFormat)
-                # if float(1) > f_ipt > float(0):
-                #     # TODO review this snippet for non-exponent inputs (e.g. period)
-                #     f = float(ipt)
-                #     front = str(f)[:(precision + 2)]
-                #     back = str(f)[(len(str(f)) - 4):]
-                #     number = (front + back).replace("e", exponentFormat)
-                #     output = (" " * (width - len(number))) + number
-                #     return output
 
             def _evalCheckBox(checkBox):
                 if checkBox.isChecked():
@@ -924,11 +920,12 @@ def exportDc(MainWindow):
                 else:
                     output = "{:6.5f}".format(f_ipt)
                     return output[1:]
-
+            vunit = float(MainWindow.vunit_ipt.text())
+            # TODO add observation/vunit warning message
             line10 = _formatEcc(MainWindow.e_ipt.text()) + _formatInput(MainWindow.a_ipt.text(), 13, 6) + \
                      _formatInput(MainWindow.f1_ipt.text(), 10, 4, exponentFormat="F") + \
                      _formatInput(MainWindow.f2_ipt.text(), 10, 4, exponentFormat="F") + \
-                     _formatInput(MainWindow.vgam_ipt.text(), 10, 4, exponentFormat="F") + \
+                     _formatInput((float(MainWindow.vgam_ipt.text())/vunit), 10, 4, exponentFormat="F") + \
                      _formatInput(MainWindow.xincl_ipt.text(), 9, 3, exponentFormat="F") + \
                      _formatInput(MainWindow.gr1_spinbox.value(), 7, 3, exponentFormat="F") + \
                      _formatInput(MainWindow.gr2_spinbox.value(), 7, 3, exponentFormat="F") + \
@@ -956,6 +953,128 @@ def exportDc(MainWindow):
                      _formatInput(MainWindow.perr3b_ipt.text(), 10, 7, exponentFormat="F", isDeg=True) + \
                      _formatInput(MainWindow.tc3b_ipt.text(), 17, 8, exponentFormat="F") + "\n"
 
+            vclines = ""  # TODO create internal function _formatVC()
+            # TODO create warning for sigma/vunit in velocity curve input
+
+            if ifvc1 == "1":
+                vcprop = MainWindow.LoadWidget.vcPropertiesList[0]
+                iband = (" " * (3 - len(vcprop.band))) + vcprop.band
+
+                vclines = iband + _formatInput(vcprop.l1, 13, 6) + _formatInput(vcprop.l2, 13, 6) \
+                          + _formatInput(vcprop.x1, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.x2, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.y1, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.y2, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.opsf, 10, 3) + _formatInput(float(vcprop.sigma)/vunit, 12, 5) \
+                          + _formatInput(vcprop.e1, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.e2, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.e3, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.e4, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.wla, 10, 6, exponentFormat="F") + " " + vcprop.ksd + "\n"
+            if ifvc2 == "1":
+                vcprop = MainWindow.LoadWidget.vcPropertiesList[1]
+                iband = (" " * (3 - len(vcprop.band))) + vcprop.band
+                vclines = vclines + iband + _formatInput(vcprop.l1, 13, 6) + _formatInput(vcprop.l2, 13, 6) \
+                          + _formatInput(vcprop.x1, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.x2, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.y1, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.y2, 7, 3, exponentFormat="F") \
+                          + _formatInput(vcprop.opsf, 10, 3) + _formatInput(float(vcprop.sigma)/vunit, 12, 5) \
+                          + _formatInput(vcprop.e1, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.e2, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.e3, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.e4, 8, 5, exponentFormat="F") \
+                          + _formatInput(vcprop.wla, 10, 6, exponentFormat="F") + " " + vcprop.ksd + "\n"
+
+            lclines = ""
+            lcextralines = ""
+            if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
+                lcparamsList = []
+                lcextraparamsList = []
+                for lcprop in MainWindow.LoadWidget.lcPropertiesList:
+                    iband = (" " * (3 - len(lcprop.band))) + lcprop.band
+                    lcparams = iband + _formatInput(lcprop.l1, 13, 6, exponentFormat="F") + \
+                               _formatInput(lcprop.l2, 13, 6, exponentFormat="F") + \
+                               _formatInput(lcprop.x1, 7, 3, exponentFormat="F") + \
+                               _formatInput(lcprop.x2, 7, 3, exponentFormat="F") + \
+                               _formatInput(lcprop.y1, 7, 3, exponentFormat="F") + \
+                               _formatInput(lcprop.y2, 7, 3, exponentFormat="F") + \
+                               _formatInput(lcprop.el3a, 12, 4) + _formatInput(lcprop.opsf, 10, 3) + " " + \
+                               lcprop.noise + _formatInput(lcprop.sigma, 12, 5) + \
+                               _formatInput(lcprop.e1, 8, 5, exponentFormat="F") + \
+                               _formatInput(lcprop.e2, 8, 5, exponentFormat="F") + \
+                               _formatInput(lcprop.e3, 8, 5, exponentFormat="F") + \
+                               _formatInput(lcprop.e4, 8, 5, exponentFormat="F") + " " + lcprop.ksd + "\n"
+                    lcextraparams = _formatInput(lcprop.wla, 9, 6, exponentFormat="F") + \
+                                    _formatInput(lcprop.aextinc, 8, 4, exponentFormat="F") + \
+                                    _formatInput(lcprop.xunit, 11, 4) +\
+                                    _formatInput(lcprop.calib, 12, 5) + "\n"
+                    lcparamsList.append(lcparams)
+                    lcextraparamsList.append(lcextraparams)
+                for lcparams in lcparamsList:
+                    lclines = lclines + lcparams
+                for lcextraparams in lcextraparamsList:
+                    lcextralines = lcextralines + lcextraparams
+            eclipseline = ""
+            if _evalCheckBox(MainWindow.EclipseWidget.iftime_chk) == "1":
+                eclipseline = (" " * 82) + \
+                              _formatInput(MainWindow.EclipseWidget.sigma_ipt.text(), 11, 5) + \
+                              (" " * 32) + \
+                              " " + str(MainWindow.EclipseWidget.ksd_box.value()) + "\n"
+
+            star1spotline = ""
+            star2spotline = ""
+            if MainWindow.SpotConfigureWidget.star1RowCount != 0:
+                star1spotparams = MainWindow.SpotConfigureWidget.star1ElementList
+                for spot in star1spotparams:
+                    star1spotline = star1spotline + \
+                                    _formatInput(spot[3].text(), 9, 5, exponentFormat="F", isDeg=True) + \
+                                    _formatInput(spot[4].text(), 9, 5, exponentFormat="F", isDeg=True) + \
+                                    _formatInput(spot[5].text(), 9, 5, exponentFormat="F", isDeg=True) + \
+                                    _formatInput(spot[6].text(), 9, 5, exponentFormat="F") + \
+                                    "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
+
+            if MainWindow.SpotConfigureWidget.star2RowCount != 0:
+                star2spotparams = MainWindow.SpotConfigureWidget.star2ElementList
+                for spot in star2spotparams:
+                    star2spotline = star2spotline + \
+                                    _formatInput(spot[3].text(), 9, 5, exponentFormat="F", isDeg=True) + \
+                                    _formatInput(spot[4].text(), 9, 5, exponentFormat="F", isDeg=True) + \
+                                    _formatInput(spot[5].text(), 9, 5, exponentFormat="F", isDeg=True) + \
+                                    _formatInput(spot[6].text(), 9, 5, exponentFormat="F") + \
+                                    "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
+            vc1dataline = ""
+            if ifvc1 == "1":
+                vc1prop = MainWindow.LoadWidget.vcPropertiesList[0]
+                for time, observation, weight in itertools.izip(vc1prop.timeList,
+                                                                vc1prop.observationList,
+                                                                vc1prop.weightList):
+                    vc1dataline = vc1dataline + \
+                                  _formatInput(time, 14, 5, exponentFormat="F") + \
+                                  _formatInput((float(observation)/vunit), 11, 6, exponentFormat="F") + \
+                                  _formatInput(weight, 8, 3, exponentFormat="F") + "\n"
+            vc2dataline = ""
+            if ifvc2 == "1":
+                vc2prop = MainWindow.LoadWidget.vcPropertiesList[1]
+                for time, observation, weight in itertools.izip(vc2prop.timeList,
+                                                                vc2prop.observationList,
+                                                                vc2prop.weightList):
+                    vc2dataline = vc2dataline + \
+                                  _formatInput(time, 14, 5, exponentFormat="F") + \
+                                  _formatInput((float(observation)/vunit), 11, 6, exponentFormat="F") + \
+                                  _formatInput(weight, 8, 3, exponentFormat="F") + "\n"
+
+            lcdataline = ""
+            if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
+                for lcprop in MainWindow.LoadWidget.lcPropertiesList:
+                    for time, observation, weight in itertools.izip(lcprop.timeList,
+                                                                 lcprop.observationList,
+                                                                 lcprop.weightList):
+                        lcdataline = lcdataline + _formatInput(time, 14, 5, exponentFormat="F") + \
+                                     _formatInput(observation, 11, 6, exponentFormat="F") + \
+                                     _formatInput(weight, 8, 3, exponentFormat="F") + "\n"
+                    lcdataline = lcdataline + "  -10001.00000\n"
+            # TODO implement eclipse data 
             # write lines into file
             with open(filePath, 'w') as dcin:
                 dcin.write(line1)
@@ -970,9 +1089,25 @@ def exportDc(MainWindow):
                 dcin.write(line10)
                 dcin.write(line11)
                 dcin.write(line12)
+                dcin.write(vclines)
+                dcin.write(lclines)
+                dcin.write(eclipseline)
+                dcin.write(lcextralines)
+                dcin.write("300.00000\n")
+                dcin.write(star1spotline)
+                dcin.write("300.00000\n")
+                dcin.write(star2spotline)
+                dcin.write("150.\n")
+                dcin.write(vc1dataline)
+                dcin.write("  -10001.00000\n")
+                dcin.write(vc2dataline)
+                dcin.write("  -10001.00000\n")
+                dcin.write(lcdataline)
+                dcin.write(" 2\n")
             report = QtGui.QMessageBox(MainWindow)
-            report.setText("File saved successfully.")
+            report.setText("File saved successfully, running DC2015...")
             report.exec_()
+            os.system("(cd wd/; ./DC2015 dcin.active dcout.active)")
         except ValueError as ex:
             msg = QtGui.QMessageBox()
             msg.setWindowTitle("pywd - ValueError")

@@ -119,9 +119,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>60</y>
+     <y>70</y>
      <width>141</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
@@ -139,6 +139,76 @@
    </property>
    <property name="text">
     <string>None</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="ksd_box">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>39</y>
+     <width>51</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="buttonSymbols">
+    <enum>QAbstractSpinBox::UpDownArrows</enum>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>3</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_16">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>40</y>
+     <width>41</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Set standard deviation apply method. [?]</string>
+   </property>
+   <property name="whatsThis">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;An integer array that is 0, 1, or 2 for each input sub-dataset (velocity, light, or eclipse timings). &lt;/p&gt;&lt;p&gt;The KSDs tell DC whether to apply the input standard deviations (σ’s) to compute curvedependent weights (KSD=0), &lt;/p&gt;&lt;p&gt;to apply DC’s internally computed σ’s for the weights (KSD=1),&lt;/p&gt;&lt;p&gt;or to apply σ’s based on one or two restricted phase ranges for the weights (KSD=2).&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;If unsure, set to 1.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="text">
+    <string>KSD</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>70</y>
+     <width>51</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Estimated standard deviation of observed light</string>
+   </property>
+   <property name="text">
+    <string>SIGMA</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="sigma_ipt">
+   <property name="geometry">
+    <rect>
+     <x>234</x>
+     <y>70</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>0</string>
    </property>
   </widget>
  </widget>
