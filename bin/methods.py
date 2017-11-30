@@ -742,9 +742,9 @@ def exportDc(MainWindow):
 
         vunit = float(MainWindow.vunit_ipt.text())
         if vunit != float(1):
-            result[1] = result[1] + "\nV Unit parameter is different than 1:" + \
-                        "\nV Gamma, velocity curve Sigma's and all velocity observations " \
-                        "will be divided by V Unit, as it is required by DC program.\n"
+            result[1] = result[1] + "\nVUnit parameter is different than 1:" + \
+                        "\nVGamma, velocity curve sigmas and all velocity observations " \
+                        "will be divided by VUnit, as it is required by DC program.\n"
 
         line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
             _formatDels(MainWindow.del_s1lat_ipt.text()),
@@ -989,10 +989,10 @@ def exportDc(MainWindow):
                  formatInput(MainWindow.SpotConfigureWidget.fspot2_ipt.text(), 10, 4, "F") + "\n"
 
         if float(MainWindow.tavh_ipt.text()) < float(1000) or float(MainWindow.tavc_ipt.text()) < float(1000):
-            result[1] = result[1] + "\nEntered surface temperature value is lower than 1000 Kelvin." + \
-                        "\nKeep in mind that surface temperature parameters will be" + \
-                        "divided by 10000 before writing into dcin.active file, as it is required by DC program." + \
-                        "\nMake sure you provide surface temperatures in Kelvin.\n"
+            result[1] = result[1] + "\nEntered surface temperature value is lower than 1000 Kelvin:" + \
+                        "\nKeep in mind that surface temperature parameters will be " + \
+                        "divided by 10,000 before writing into dcin.active file, as it is required by DC program." + \
+                        "\nMake sure you provide surface temperatures as it is, not in [T/10,000] format.\n"
 
         line11 = formatInput(float(MainWindow.tavh_ipt.text()) / 10000.0, 7, 4, "F") + \
                  formatInput(float(MainWindow.tavc_ipt.text()) / 10000.0, 8, 4, "F") + \
@@ -1132,7 +1132,7 @@ def exportDc(MainWindow):
                                                     MainWindow.EclipseWidget.typeList,
                                                     MainWindow.EclipseWidget.weightList):
                 ecdataline = ecdataline + \
-                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3) + "\n"
+                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3, "F") + "\n"
             ecdataline = ecdataline + "  -10001.00000\n"
 
         result[2] = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \
@@ -1144,6 +1144,8 @@ def exportDc(MainWindow):
             result[1] = result[1] + "\nThere aren't any velocity curves loaded.\n"
         if lcdataline == "":
             result[1] = result[1] + "\nThere aren't any light curves loaded.\n"
+        if evalCheckBox(MainWindow.EclipseWidget.iftime_chk) and ecdataline == "":
+            result[1] = result[1] + "\nIFTIMES is checked, but eclipse timings are not provided.\n"
 
     except ValueError as ex:
         result[0] = "Value Error - Can't cast input into a numeric value: \n" + ex.message
