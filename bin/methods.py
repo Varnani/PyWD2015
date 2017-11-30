@@ -588,541 +588,574 @@ def removeEclipseTimings(EclipseWidget):
     EclipseWidget.ksd_box.setValue(1)
 
 
+def formatEcc(ipt):
+    f_ipt = float(ipt)
+    if f_ipt > 1 or f_ipt < 0:
+        raise ValueError("Invalid eccentricity value: " + ipt)
+    else:
+        output = "{:6.5f}".format(f_ipt)
+        return output[1:]
+
+
+def formatInput(ipt, width, precision, exponent, isDeg=False):
+    ipt = str(ipt)
+    if ipt == "":
+        raise IndexError("Inputs can't be blank.")
+    f_ipt = float(ipt)
+    if isDeg:
+        f_ipt = f_ipt * np.pi / 180.0  # convert to radians
+        ipt = str(f_ipt)
+    output = ""
+    if float(1) > f_ipt > float(-1):
+        if f_ipt == float(0):
+            return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
+        if width - 6 - precision >= 0:
+            output = "{:> {width}.{precision}g}".format(f_ipt, width=width, precision=precision)
+        else:
+            output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
+    if f_ipt >= float(1) or f_ipt < float(0):
+        output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
+    output = output.rstrip("0")
+    if output[-1] == ".":
+        output = output + "0"
+    output = " " * (width - len(output)) + output
+    if len(output) > width:
+        raise IndexError("This input can't be formatted into dcin.active file: " + ipt +
+                         "\nMaximum character lenght: " + str(width) +
+                         "\nMaximum decimal precision: " + str(precision) +
+                         "\nTried to write: " + output +
+                         "\nLenght: " + str(len(output)) +
+                         "\nPlease reformat your input parameter.")
+    else:
+        return output.replace("e", exponent)
+
+
+def evalCheckBox(checkBox):
+    if checkBox.isChecked():
+        return "1"
+    else:
+        return "0"
+
+
+def runDc(MainWindow):
+    dcin = exportDc(MainWindow)
+    msg = QtGui.QMessageBox(MainWindow)
+    if dcin[0] != "":
+        msg.setWindowTitle("PyWD - Fatal Error")
+        msg.setText("There were errors while parsing inputs:\n" + dcin[0] + "\n")
+        if dcin[1] != "":
+            msg.setText(msg.text() + "\nPlus, warnings were encountered: \n" + dcin[1])
+        msg.exec_()
+    else:
+        if dcin[1] != "":
+            title = "PyWD - Warning"
+            text = "Warnings are encountered while parsing inputs: \n" + dcin[1] + \
+                   "\nDo you still want to run the DC Program?"
+            answer = QtGui.QMessageBox.question(MainWindow, title, text, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if answer == QtGui.QMessageBox.Yes:
+                try:
+                    cwd = ""
+                    import os
+                    import platform
+                    if platform.system() == "Windows":
+                        cwd = os.getcwd() + "\wd\dcin.active"
+                    if platform.system() == "Linux":
+                        cwd = os.getcwd() + "/wd/dcin.active"
+                    with open(cwd, "w") as f:
+                        f.write(dcin[2])
+                    # TODO continue implementing
+                except IOError as ex:
+                    msg.setWindowTitle("PyWD - IO Error")
+                    msg.setText("An IO error has been caught:\n" + ex.strerror + "\n" +
+                                ex.filename.rstrip("dcin.active"))
+                    msg.exec_()
+                except:
+                    msg.setWindowTitle("PyWD - Unknown Exception")
+                    msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
+                    msg.exec_()
+
+
 def exportDc(MainWindow):
-    # dialog = QtGui.QFileDialog(MainWindow)
-    # dialog.setAcceptMode(1)
-    # dialog.selectFile("dcin.active")
-    # returnCode = dialog.exec_()
-    # filePath = (dialog.selectedFiles())[0]
-    # TODO refactor to (return a file object)
-    import os
-    filePath = os.getcwd() + "/wd/dcin.active"  # spit out dcout.active into current directory
-    returnCode = 1
-    if filePath != "" and returnCode != 0:
-        try:
-            def _formatDels(ipt):
-                error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
-                ipt = str(ipt)  # convert to string from QString
-                float(ipt)  # sanity check first
-                if float(ipt) < 0:
-                    msg = "Del's must be larger than 0: " + ipt
+    """
+    Constructs a dcin.active file from MainWindow object
+    :param MainWindow: A MainWindow QtGui interface object
+    :return: a list with 3 elements:
+        [0]: Errors if any.
+            If there is, [2] will be "FATAL"
+        [1]: Warnings if any.
+            This won't interrupt parsing the dcin.active file. These errors most likely break the DC program though.
+        [2]: dcin.active itself, ready to write.
+    """
+    result = ["", "", ""]
+    try:
+        def _formatDels(ipt):  # only used in dcin.active
+            error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
+            ipt = str(ipt)  # convert to string from QString
+            float(ipt)  # sanity check first
+            if float(ipt) < 0:
+                msg = "Del's must be larger than 0: " + ipt
+                raise IndexError(msg)
+            if ipt == "0":
+                return "+0.0d-0"
+            if 0 < float(ipt) < 0.1:
+                if len(ipt) > 12:
+                    msg = error + "\nMake sure your input is larger than 1x10^-8"
                     raise IndexError(msg)
-                if ipt == "0":
-                    return "+0.0d-0"
-                if 0 < float(ipt) < 0.1:
-                    if len(ipt) > 12:
-                        msg = error + "\nMake sure your input is larger than 1x10^-8"
-                        raise IndexError(msg)
-                    else:
-                        a = ipt[2:]  # trim '0.'
-                        i = 1
-                        for char in a:
-                            if char is "0":
-                                i += 1
-                        b = "+" + str(float(ipt) * pow(10, i)) + "d-" + str(i)
-                        if len(b) > 7:
-                            msg = error + "\nMake sure your input's non-zero fractional " \
-                                          "part consist of 2 digits, ex. 0.00056"
-                            raise IndexError(msg)
-                        else:
-                            return b
-                if 0.1 <= float(ipt) < 10:
-                    if len(ipt) is 1:
-                        ipt = ipt + ".0"
-                    a = "+" + ipt + "d-0"
-                    if len(a) > 7:
-                        msg = error + "\nMake sure your input is made of 1 integer and 1 fractional part, ex. 8.3"
-                        raise IndexError(msg)
-                    else:
-                        return a
-                if 10 <= float(ipt):
-                    a = str(float(ipt) / float(pow(10, (len(ipt) - 1))))
-                    if len(a) > 3 or len(ipt) > 10:
-                        msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with " \
-                              + "maximum number of 8 trailing zeroes, ex. 120000"
-                        raise IndexError(msg)
-                    else:
-                        if len(a) == 1:
-                            a = a + ".0"
-                        return "+" + a + "d+" + str(len(ipt) - 1)
-
-            def _formatKeeps(keep):
-                if keep.isChecked():
-                    return "0"
                 else:
-                    return "1"
-
-            def _formatInput(ipt, width, precision, exponentFormat="D", isDeg=False):
-                # TODO clean up/refactor
-                # TODO truncate trailing zeroes
-                ipt = str(ipt)
-                f_ipt = float(ipt)
-                if isDeg:
-                    f_ipt = f_ipt * np.pi / 180.0  # convert to radians
-                    ipt = str(f_ipt)
-                output = ""
-                if float(1) > f_ipt > float(-1):
-                    if f_ipt == float(0):
-                        return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
-                    if width - 6 - precision >= 0:
-                        output = "{:> {width}.{precision}g}".format(f_ipt, width=width, precision=precision)
+                    a = ipt[2:]  # trim '0.'
+                    i = 1
+                    for char in a:
+                        if char is "0":
+                            i += 1
+                    b = "+" + str(float(ipt) * pow(10, i)) + "d-" + str(i)
+                    if len(b) > 7:
+                        msg = error + "\nMake sure your input's non-zero fractional " \
+                                      "part consist of 2 digits, ex. 0.00056"
+                        raise IndexError(msg)
                     else:
-                        output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
-                if f_ipt >= float(1) or f_ipt < float(0):
-                    output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
-                if len(output) > width:
-                    raise IndexError("This input can't be formatted into dcin.active file: {0}".format(ipt) +
-                                     "\nMake sure your input's integer " +
-                                     "part is maximum {0} characters long".format((width - precision - 2)))
-                return output.replace("e", exponentFormat)
-
-            def _evalCheckBox(checkBox):
-                if checkBox.isChecked():
-                    return "1"
+                        return b
+            if 0.1 <= float(ipt) < 10:
+                if len(ipt) is 1:
+                    ipt = ipt + ".0"
+                a = "+" + ipt + "d-0"
+                if len(a) > 7:
+                    msg = error + "\nMake sure your input is made of 1 integer and 1 fractional part, ex. 8.3"
+                    raise IndexError(msg)
                 else:
-                    return "0"
+                    return a
+            if 10 <= float(ipt):
+                a = str(float(ipt) / float(pow(10, (len(ipt) - 1))))
+                if len(a) > 3 or len(ipt) > 10:
+                    msg = error + "\nMake sure your input's every integer other than leftmost 2 are 0, with " \
+                          + "maximum number of 8 trailing zeroes, ex. 120000"
+                    raise IndexError(msg)
+                else:
+                    if len(a) == 1:
+                        a = a + ".0"
+                    return "+" + a + "d+" + str(len(ipt) - 1)
 
-            line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
-                _formatDels(MainWindow.del_s1lat_ipt.text()),
-                _formatDels(MainWindow.del_s1lng_ipt.text()),
-                _formatDels(MainWindow.del_s1agrad_ipt.text()),
-                _formatDels(MainWindow.del_s1tmpf_ipt.text()),
-                _formatDels(MainWindow.del_s2lat_ipt.text()),
-                _formatDels(MainWindow.del_s2lng_ipt.text()),
-                _formatDels(MainWindow.del_s2agrad_ipt.text()),
-                _formatDels(MainWindow.del_s2tmpf_ipt.text())
-            )
-            line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
-                _formatDels(MainWindow.del_a_ipt.text()),
-                _formatDels(MainWindow.del_e_ipt.text()),
-                _formatDels(MainWindow.del_perr0_ipt.text()),
-                _formatDels(MainWindow.del_f1_ipt.text()),
-                _formatDels(MainWindow.del_f2_ipt.text()),
-                _formatDels(MainWindow.del_pshift_ipt.text()),
-                _formatDels(MainWindow.del_i_ipt.text()),
-                _formatDels(MainWindow.del_g1_ipt.text()),
-                _formatDels(MainWindow.del_g2_ipt.text()),
-                _formatDels(MainWindow.del_t1_ipt.text()),
-                _formatDels(MainWindow.del_t2_ipt.text())
-            )
-            line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
-                _formatDels(MainWindow.del_alb1_ipt.text()),
-                _formatDels(MainWindow.del_alb2_ipt.text()),
-                _formatDels(MainWindow.del_pot1_ipt.text()),
-                _formatDels(MainWindow.del_pot2_ipt.text()),
-                _formatDels(MainWindow.del_q_ipt.text()),
-                _formatDels(MainWindow.del_l1_ipt.text()),
-                _formatDels(MainWindow.del_l2_ipt.text()),
-                _formatDels(MainWindow.del_x1_ipt.text()),
-                _formatDels(MainWindow.del_x2_ipt.text())
-            )
-            block1 = "{0}{1}{2}{3}".format(
-                _formatKeeps(MainWindow.s1lat_chk),
-                _formatKeeps(MainWindow.s1long_chk),
-                _formatKeeps(MainWindow.s1rad_chk),
-                _formatKeeps(MainWindow.s1temp_chk),
-            )
-            block2 = "{0}{1}{2}{3}".format(
-                _formatKeeps(MainWindow.s2lat_chk),
-                _formatKeeps(MainWindow.s2long_chk),
-                _formatKeeps(MainWindow.s2rad_chk),
-                _formatKeeps(MainWindow.s2temp_chk)
-            )
-            block3 = "{0}{1}{2}{3}{4}{5}{6}".format(
-                _formatKeeps(MainWindow.a_chk),
-                _formatKeeps(MainWindow.e_chk),
-                _formatKeeps(MainWindow.perr0_chk),
-                _formatKeeps(MainWindow.f1_chk),
-                _formatKeeps(MainWindow.f2_chk),
-                _formatKeeps(MainWindow.pshift_chk),
-                _formatKeeps(MainWindow.vgam_chk)
-            )
-            block4 = "{0}{1}{2}{3}{4}".format(
-                _formatKeeps(MainWindow.incl_chk),
-                _formatKeeps(MainWindow.g1_chk),
-                _formatKeeps(MainWindow.g2_chk),
-                _formatKeeps(MainWindow.t1_chk),
-                _formatKeeps(MainWindow.t2_chk)
-            )
-            block5 = "{0}{1}{2}{3}{4}".format(
-                _formatKeeps(MainWindow.alb1_chk),
-                _formatKeeps(MainWindow.alb2_chk),
-                _formatKeeps(MainWindow.pot1_chk),
-                _formatKeeps(MainWindow.pot2_chk),
-                _formatKeeps(MainWindow.q_chk)
-            )
-            block6 = "{0}{1}{2}{3}{4}".format(
-                _formatKeeps(MainWindow.jd0_chk),
-                _formatKeeps(MainWindow.p0_chk),
-                _formatKeeps(MainWindow.dpdt_chk),
-                _formatKeeps(MainWindow.dperdt_chk),
-                _formatKeeps(MainWindow.a3b_chk),
-            )
-            block7 = "{0}{1}{2}{3}{4}".format(
-                _formatKeeps(MainWindow.p3b_chk),
-                _formatKeeps(MainWindow.xinc3b_chk),
-                _formatKeeps(MainWindow.e3b_chk),
-                _formatKeeps(MainWindow.perr3b_chk),
-                _formatKeeps(MainWindow.tc3b_chk),
-            )
-            block8 = "11111"  # unused block
-            block9 = "{0}{1}{2}{3}{4}".format(
-                _formatKeeps(MainWindow.logd_chk),
-                _formatKeeps(MainWindow.desextinc_chk),
-                "1",  # will implement later
-                "1",
-                "1",
-            )
-            block10 = "11111"  # will implement later
-            block11 = "11111"  # unused block
-            block12 = "{0}{1}{2}{3}{4}".format(
-                _formatKeeps(MainWindow.l1_chk),
-                _formatKeeps(MainWindow.l2_chk),
-                _formatKeeps(MainWindow.x1_chk),
-                _formatKeeps(MainWindow.x2_chk),
-                _formatKeeps(MainWindow.el3_chk)
-            )
-            line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
-                    " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
-                    " " + block11 + " " + block12 + " 01 1.000d-05 1.000\n"
-            spot1 = "  0  0"
-            spot2 = "  0  0"
-            if len(MainWindow.SpotConfigureWidget.star1ElementList) != 0:
-                i = 1
-                for radioButtonAList in MainWindow.SpotConfigureWidget.star1ElementList:
-                    if radioButtonAList[1].isChecked():
-                        spot1 = "  1  {0}".format(i)
-                        break
-                    i += 1
-                i = 1
-                for radioButtonBList in MainWindow.SpotConfigureWidget.star1ElementList:
-                    if radioButtonBList[2].isChecked():
-                        spot2 = "  1  {0}".format(i)
-                        break
-                    i += 1
-            if len(MainWindow.SpotConfigureWidget.star2ElementList) != 0:
-                i = 1
-                for radioButtonAList in MainWindow.SpotConfigureWidget.star2ElementList:
-                    if radioButtonAList[1].isChecked():
-                        spot1 = "  2  {0}".format(i)
-                        break
-                    i += 1
-                i = 1
-                for radioButtonBList in MainWindow.SpotConfigureWidget.star2ElementList:
-                    if radioButtonBList[2].isChecked():
-                        spot2 = "  2  {0}".format(i)
-                        break
-                    i += 1
-            line5 = spot1 + spot2 + "\n"
-            ifvc1 = "0"
-            ifvc2 = "0"
-            if MainWindow.LoadWidget.vcPropertiesList[0] != 0:
-                ifvc1 = "1"
-            if MainWindow.LoadWidget.vcPropertiesList[1] != 0:
-                ifvc2 = "1"
-            isymDict = {
-                "Symmetrical": "1",
-                "Asymmetrical": "0"
-            }
-            nlc = ((2 - len(str(MainWindow.LoadWidget.lcCount))) * "0") + str(MainWindow.LoadWidget.lcCount)
-            line6 = ifvc1 + " " + ifvc2 + " " + nlc \
-                    + " 0" + " 2" + " 0" + " " + \
-                    isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " " + \
-                    _evalCheckBox(MainWindow.ifder_chk) + " " + _evalCheckBox(MainWindow.iflcin_chk) \
-                    + " " + _evalCheckBox(MainWindow.ifoc_chk) + "\n"
-            ldDict = {
-                "Linear Cosine": "1",
-                "Logarithmic": "2",
-                "Square Root": "3"
-            }
-            ld1_sign = ""
-            ld2_sign = ""
-            if MainWindow.ld1_chk.isChecked():
-                ld1_sign = "+"
+        def _formatKeeps(keep):  # only used in dcin.active
+            if keep.isChecked():
+                return "0"
             else:
-                ld1_sign = "-"
+                return "1"
 
-            if MainWindow.ld2_chk.isChecked():
-                ld2_sign = "+"
-            else:
-                ld2_sign = "-"
-            nomaxDict = {
-                "Trapezoidal": "0",
-                "Triangular": "1"
-            }
-            magliteDict = {
-                "Flux": "0",
-                "Magnitude": "1"
-            }
-            ld1 = ld1_sign + ldDict[str(MainWindow.ld1_combobox.currentText())]
-            ld2 = ld2_sign + ldDict[str(MainWindow.ld2_combobox.currentText())]
-            line7 = str(MainWindow.nref_spinbox.value()) + " " + _evalCheckBox(MainWindow.mref_chk) + " " \
-                    + _evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv1_chk) + " " \
-                    + _evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv2_chk) + " " \
-                    + _evalCheckBox(MainWindow.icor1_chk) + " " + _evalCheckBox(MainWindow.icor2_chk) + " " \
-                    + _evalCheckBox(MainWindow.if3b_chk) \
-                    + " " + ld1 + " " + ld2 + " " \
-                    + _evalCheckBox(MainWindow.SpotConfigureWidget.kspev_chk) + " " \
-                    + _evalCheckBox(MainWindow.SpotConfigureWidget.kspot_chk) + " " \
-                    + nomaxDict[str(MainWindow.SpotConfigureWidget.nomax_combobox.currentText())] + " " \
-                    + _evalCheckBox(MainWindow.ifcgs_chk) + " " \
-                    + magliteDict[str(MainWindow.maglite_combobox.currentText())] + " " \
-                    + str(MainWindow.linkext_spinbox.value()) + " " \
-                    + _formatInput(MainWindow.desextinc_ipt.text(), 7, 4, exponentFormat="F") + "\n"
+        vunit = float(MainWindow.vunit_ipt.text())
+        if vunit != float(1):
+            result[1] = result[1] + "\nV Unit parameter is different than 1:" + \
+                        "\nV Gamma, velocity curve Sigma's and all velocity observations " \
+                        "will be divided by V Unit, as it is required by DC program.\n"
 
-            jdDict = {
-                "Time": "1",
-                "Phase": "2"
-            }
+        line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
+            _formatDels(MainWindow.del_s1lat_ipt.text()),
+            _formatDels(MainWindow.del_s1lng_ipt.text()),
+            _formatDels(MainWindow.del_s1agrad_ipt.text()),
+            _formatDels(MainWindow.del_s1tmpf_ipt.text()),
+            _formatDels(MainWindow.del_s2lat_ipt.text()),
+            _formatDels(MainWindow.del_s2lng_ipt.text()),
+            _formatDels(MainWindow.del_s2agrad_ipt.text()),
+            _formatDels(MainWindow.del_s2tmpf_ipt.text())
+        )
+        line2 = " {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}\n".format(
+            _formatDels(MainWindow.del_a_ipt.text()),
+            _formatDels(MainWindow.del_e_ipt.text()),
+            _formatDels(MainWindow.del_perr0_ipt.text()),
+            _formatDels(MainWindow.del_f1_ipt.text()),
+            _formatDels(MainWindow.del_f2_ipt.text()),
+            _formatDels(MainWindow.del_pshift_ipt.text()),
+            _formatDels(MainWindow.del_i_ipt.text()),
+            _formatDels(MainWindow.del_g1_ipt.text()),
+            _formatDels(MainWindow.del_g2_ipt.text()),
+            _formatDels(MainWindow.del_t1_ipt.text()),
+            _formatDels(MainWindow.del_t2_ipt.text())
+        )
+        line3 = " {0} {1} {2} {3} {4} {5} {6} {7} {8}\n".format(
+            _formatDels(MainWindow.del_alb1_ipt.text()),
+            _formatDels(MainWindow.del_alb2_ipt.text()),
+            _formatDels(MainWindow.del_pot1_ipt.text()),
+            _formatDels(MainWindow.del_pot2_ipt.text()),
+            _formatDels(MainWindow.del_q_ipt.text()),
+            _formatDels(MainWindow.del_l1_ipt.text()),
+            _formatDels(MainWindow.del_l2_ipt.text()),
+            _formatDels(MainWindow.del_x1_ipt.text()),
+            _formatDels(MainWindow.del_x2_ipt.text())
+        )
+        block1 = "{0}{1}{2}{3}".format(
+            _formatKeeps(MainWindow.s1lat_chk),
+            _formatKeeps(MainWindow.s1long_chk),
+            _formatKeeps(MainWindow.s1rad_chk),
+            _formatKeeps(MainWindow.s1temp_chk),
+        )
+        block2 = "{0}{1}{2}{3}".format(
+            _formatKeeps(MainWindow.s2lat_chk),
+            _formatKeeps(MainWindow.s2long_chk),
+            _formatKeeps(MainWindow.s2rad_chk),
+            _formatKeeps(MainWindow.s2temp_chk)
+        )
+        block3 = "{0}{1}{2}{3}{4}{5}{6}".format(
+            _formatKeeps(MainWindow.a_chk),
+            _formatKeeps(MainWindow.e_chk),
+            _formatKeeps(MainWindow.perr0_chk),
+            _formatKeeps(MainWindow.f1_chk),
+            _formatKeeps(MainWindow.f2_chk),
+            _formatKeeps(MainWindow.pshift_chk),
+            _formatKeeps(MainWindow.vgam_chk)
+        )
+        block4 = "{0}{1}{2}{3}{4}".format(
+            _formatKeeps(MainWindow.incl_chk),
+            _formatKeeps(MainWindow.g1_chk),
+            _formatKeeps(MainWindow.g2_chk),
+            _formatKeeps(MainWindow.t1_chk),
+            _formatKeeps(MainWindow.t2_chk)
+        )
+        block5 = "{0}{1}{2}{3}{4}".format(
+            _formatKeeps(MainWindow.alb1_chk),
+            _formatKeeps(MainWindow.alb2_chk),
+            _formatKeeps(MainWindow.pot1_chk),
+            _formatKeeps(MainWindow.pot2_chk),
+            _formatKeeps(MainWindow.q_chk)
+        )
+        block6 = "{0}{1}{2}{3}{4}".format(
+            _formatKeeps(MainWindow.jd0_chk),
+            _formatKeeps(MainWindow.p0_chk),
+            _formatKeeps(MainWindow.dpdt_chk),
+            _formatKeeps(MainWindow.dperdt_chk),
+            _formatKeeps(MainWindow.a3b_chk),
+        )
+        block7 = "{0}{1}{2}{3}{4}".format(
+            _formatKeeps(MainWindow.p3b_chk),
+            _formatKeeps(MainWindow.xinc3b_chk),
+            _formatKeeps(MainWindow.e3b_chk),
+            _formatKeeps(MainWindow.perr3b_chk),
+            _formatKeeps(MainWindow.tc3b_chk),
+        )
+        block8 = "11111"  # unused block
+        block9 = "{0}{1}{2}{3}{4}".format(
+            _formatKeeps(MainWindow.logd_chk),
+            _formatKeeps(MainWindow.desextinc_chk),
+            "1",  # will implement later
+            "1",
+            "1",
+        )
+        block10 = "11111"  # will implement later
+        block11 = "11111"  # unused block
+        block12 = "{0}{1}{2}{3}{4}".format(
+            _formatKeeps(MainWindow.l1_chk),
+            _formatKeeps(MainWindow.l2_chk),
+            _formatKeeps(MainWindow.x1_chk),
+            _formatKeeps(MainWindow.x2_chk),
+            _formatKeeps(MainWindow.el3_chk)
+        )
+        line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
+                " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
+                " " + block11 + " " + block12 + " 01 1.000d-05 1.000\n"
+        spot1 = "  0  0"
+        spot2 = "  0  0"
+        if len(MainWindow.SpotConfigureWidget.star1ElementList) != 0:
+            i = 1
+            for radioButtonAList in MainWindow.SpotConfigureWidget.star1ElementList:
+                if radioButtonAList[1].isChecked():
+                    spot1 = "  1  {0}".format(i)
+                    break
+                i += 1
+            i = 1
+            for radioButtonBList in MainWindow.SpotConfigureWidget.star1ElementList:
+                if radioButtonBList[2].isChecked():
+                    spot2 = "  1  {0}".format(i)
+                    break
+                i += 1
+        if len(MainWindow.SpotConfigureWidget.star2ElementList) != 0:
+            i = 1
+            for radioButtonAList in MainWindow.SpotConfigureWidget.star2ElementList:
+                if radioButtonAList[1].isChecked():
+                    spot1 = "  2  {0}".format(i)
+                    break
+                i += 1
+            i = 1
+            for radioButtonBList in MainWindow.SpotConfigureWidget.star2ElementList:
+                if radioButtonBList[2].isChecked():
+                    spot2 = "  2  {0}".format(i)
+                    break
+                i += 1
+        line5 = spot1 + spot2 + "\n"
+        ifvc1 = "0"
+        ifvc2 = "0"
+        if MainWindow.LoadWidget.vcPropertiesList[0] != 0:
+            ifvc1 = "1"
+        if MainWindow.LoadWidget.vcPropertiesList[1] != 0:
+            ifvc2 = "1"
+        isymDict = {
+            "Symmetrical": "1",
+            "Asymmetrical": "0"
+        }
+        nlc = ((2 - len(str(MainWindow.LoadWidget.lcCount))) * "0") + str(MainWindow.LoadWidget.lcCount)
+        line6 = ifvc1 + " " + ifvc2 + " " + nlc \
+                + " 0" + " 2" + " 0" + " " + \
+                isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " " + \
+                evalCheckBox(MainWindow.ifder_chk) + " " + evalCheckBox(MainWindow.iflcin_chk) \
+                + " " + evalCheckBox(MainWindow.ifoc_chk) + "\n"
+        ldDict = {
+            "Linear Cosine": "1",
+            "Logarithmic": "2",
+            "Square Root": "3"
+        }
+        ld1_sign = ""
+        ld2_sign = ""
+        if MainWindow.ld1_chk.isChecked():
+            ld1_sign = "+"
+        else:
+            ld1_sign = "-"
 
-            nga = " " * (3 - len(str(MainWindow.nga_spinbox.value()))) + str(MainWindow.nga_spinbox.value())
+        if MainWindow.ld2_chk.isChecked():
+            ld2_sign = "+"
+        else:
+            ld2_sign = "-"
+        nomaxDict = {
+            "Trapezoidal": "0",
+            "Triangular": "1"
+        }
+        magliteDict = {
+            "Flux": "0",
+            "Magnitude": "1"
+        }
+        ld1 = ld1_sign + ldDict[str(MainWindow.ld1_combobox.currentText())]
+        ld2 = ld2_sign + ldDict[str(MainWindow.ld2_combobox.currentText())]
+        line7 = str(MainWindow.nref_spinbox.value()) + " " + evalCheckBox(MainWindow.mref_chk) + " " \
+                + evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv1_chk) + " " \
+                + evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv2_chk) + " " \
+                + evalCheckBox(MainWindow.icor1_chk) + " " + evalCheckBox(MainWindow.icor2_chk) + " " \
+                + evalCheckBox(MainWindow.if3b_chk) \
+                + " " + ld1 + " " + ld2 + " " \
+                + evalCheckBox(MainWindow.SpotConfigureWidget.kspev_chk) + " " \
+                + evalCheckBox(MainWindow.SpotConfigureWidget.kspot_chk) + " " \
+                + nomaxDict[str(MainWindow.SpotConfigureWidget.nomax_combobox.currentText())] + " " \
+                + evalCheckBox(MainWindow.ifcgs_chk) + " " \
+                + magliteDict[str(MainWindow.maglite_combobox.currentText())] + " " \
+                + str(MainWindow.linkext_spinbox.value()) + " " \
+                + formatInput(MainWindow.desextinc_ipt.text(), 7, 4, "F") + "\n"
 
-            line8 = jdDict[str(MainWindow.jdphs_combobox.currentText())] + \
-                    _formatInput(MainWindow.jd0_ipt.text(), 15, 6, exponentFormat="F") + \
-                    _formatInput(MainWindow.p0_ipt.text(), 17, 10) + \
-                    _formatInput(MainWindow.dpdt_ipt.text(), 14, 6) + \
-                    _formatInput(MainWindow.pshift_ipt.text(), 10, 5, exponentFormat="F") + \
-                    _formatInput(MainWindow.delph_ipt.text(), 8, 5, exponentFormat="F") + nga + "\n"
+        jdDict = {
+            "Time": "1",
+            "Phase": "2"
+        }
 
-            modeDict = {
-                "Mode -1": "-1",
-                "Mode 0": " 0",
-                "Mode 1": " 1",
-                "Mode 2": " 2",
-                "Mode 3": " 3",
-                "Mode 4": " 4",
-                "Mode 5": " 5",
-                "Mode 6": " 6"
-            }
+        nga = " " * (3 - len(str(MainWindow.nga_spinbox.value()))) + str(MainWindow.nga_spinbox.value())
 
-            ifatDict = {
-                "Stellar Atmosphere": " 1",
-                "Blackbody": " 0"
-            }
+        line8 = jdDict[str(MainWindow.jdphs_combobox.currentText())] + \
+                formatInput(MainWindow.jd0_ipt.text(), 15, 6, "F") + \
+                formatInput(MainWindow.p0_ipt.text(), 17, 10, "D") + \
+                formatInput(MainWindow.dpdt_ipt.text(), 14, 6, "D") + \
+                formatInput(MainWindow.pshift_ipt.text(), 10, 5, "F") + \
+                formatInput(MainWindow.delph_ipt.text(), 8, 5, "F") + nga + "\n"
 
-            n1 = " " * (4 - len(str(MainWindow.n1_spinbox.value()))) + str(MainWindow.n1_spinbox.value())
-            n2 = " " * (4 - len(str(MainWindow.n2_spinbox.value()))) + str(MainWindow.n2_spinbox.value())
-            n1l = " " * (4 - len(str(MainWindow.n1l_spinbox.value()))) + str(MainWindow.n1l_spinbox.value())
-            n2l = " " * (4 - len(str(MainWindow.n2l_spinbox.value()))) + str(MainWindow.n2l_spinbox.value())
+        modeDict = {
+            "Mode -1": "-1",
+            "Mode 0": " 0",
+            "Mode 1": " 1",
+            "Mode 2": " 2",
+            "Mode 3": " 3",
+            "Mode 4": " 4",
+            "Mode 5": " 5",
+            "Mode 6": " 6"
+        }
 
-            line9 = modeDict[str(MainWindow.mode_combobox.currentText())] + " " + _evalCheckBox(MainWindow.ipb_chk) + \
-                    ifatDict[str(MainWindow.ifat1_combobox.currentText())] + \
-                    ifatDict[str(MainWindow.ifat2_combobox.currentText())] + n1 + n2 + n1l + n2l + \
-                    _formatInput(MainWindow.perr0_ipt.text(), 13, 6, exponentFormat="F", isDeg=True) + \
-                    _formatInput(MainWindow.dperdt_ipt.text(), 13, 5) + \
-                    _formatInput(MainWindow.the_ipt.text(), 8, 5, exponentFormat="F") + \
-                    _formatInput(MainWindow.vunit_ipt.text(), 9, 3, exponentFormat="F") + "\n"
+        ifatDict = {
+            "Stellar Atmosphere": " 1",
+            "Blackbody": " 0"
+        }
 
-            def _formatEcc(ipt):
-                f_ipt = float(ipt)
-                if f_ipt > 1 or f_ipt < 0:
-                    raise ValueError("Invalid eccentricity value: " + ipt)
-                else:
-                    output = "{:6.5f}".format(f_ipt)
-                    return output[1:]
-            vunit = float(MainWindow.vunit_ipt.text())
-            # TODO add observation/vunit warning message
-            line10 = _formatEcc(MainWindow.e_ipt.text()) + _formatInput(MainWindow.a_ipt.text(), 13, 6) + \
-                     _formatInput(MainWindow.f1_ipt.text(), 10, 4, exponentFormat="F") + \
-                     _formatInput(MainWindow.f2_ipt.text(), 10, 4, exponentFormat="F") + \
-                     _formatInput((float(MainWindow.vgam_ipt.text())/vunit), 10, 4, exponentFormat="F") + \
-                     _formatInput(MainWindow.xincl_ipt.text(), 9, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.gr1_spinbox.value(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.gr2_spinbox.value(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.abunin_ipt.text(), 7, 2, exponentFormat="F") + \
-                     _formatInput(MainWindow.SpotConfigureWidget.fspot1_ipt.text(), 10, 4, exponentFormat="F") + \
-                     _formatInput(MainWindow.SpotConfigureWidget.fspot2_ipt.text(), 10, 4, exponentFormat="F") + "\n"
+        n1 = " " * (4 - len(str(MainWindow.n1_spinbox.value()))) + str(MainWindow.n1_spinbox.value())
+        n2 = " " * (4 - len(str(MainWindow.n2_spinbox.value()))) + str(MainWindow.n2_spinbox.value())
+        n1l = " " * (4 - len(str(MainWindow.n1l_spinbox.value()))) + str(MainWindow.n1l_spinbox.value())
+        n2l = " " * (4 - len(str(MainWindow.n2l_spinbox.value()))) + str(MainWindow.n2l_spinbox.value())
 
-            line11 = _formatInput(float(MainWindow.tavh_ipt.text()) / 10000.0, 7, 4, exponentFormat="F") + \
-                     _formatInput(float(MainWindow.tavc_ipt.text()) / 10000.0, 8, 4, exponentFormat="F") + \
-                     _formatInput(MainWindow.alb1_spinbox.value(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.alb2_spinbox.value(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.phsv_ipt.text(), 13, 6) + \
-                     _formatInput(MainWindow.pcsv_ipt.text(), 13, 6) + \
-                     _formatInput(MainWindow.rm_ipt.text(), 13, 6) + \
-                     _formatInput(MainWindow.xbol1_ipt.text(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.xbol2_ipt.text(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.ybol1_ipt.text(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.ybol2_ipt.text(), 7, 3, exponentFormat="F") + \
-                     _formatInput(MainWindow.dpclog_ipt.text(), 9, 5, exponentFormat="F") + "\n"
+        line9 = modeDict[str(MainWindow.mode_combobox.currentText())] + " " + evalCheckBox(MainWindow.ipb_chk) + \
+                ifatDict[str(MainWindow.ifat1_combobox.currentText())] + \
+                ifatDict[str(MainWindow.ifat2_combobox.currentText())] + n1 + n2 + n1l + n2l + \
+                formatInput(MainWindow.perr0_ipt.text(), 13, 6, "F", isDeg=True) + \
+                formatInput(MainWindow.dperdt_ipt.text(), 13, 5, "D") + \
+                formatInput(MainWindow.the_ipt.text(), 8, 5, "F") + \
+                formatInput(MainWindow.vunit_ipt.text(), 9, 3, "F") + "\n"
 
-            line12 = _formatInput(MainWindow.a3b_ipt.text(), 12, 6) + \
-                     _formatInput(MainWindow.p3b_ipt.text(), 14, 7) + \
-                     _formatInput(MainWindow.xinc3b_ipt.text(), 11, 5, exponentFormat="F") + \
-                     _formatInput(MainWindow.e3b_ipt.text(), 9, 6, exponentFormat="F") + \
-                     _formatInput(MainWindow.perr3b_ipt.text(), 10, 7, exponentFormat="F", isDeg=True) + \
-                     _formatInput(MainWindow.tc3b_ipt.text(), 17, 8, exponentFormat="F") + "\n"
+        line10 = formatEcc(MainWindow.e_ipt.text()) + formatInput(MainWindow.a_ipt.text(), 13, 6, "D") + \
+                 formatInput(MainWindow.f1_ipt.text(), 10, 4, "F") + \
+                 formatInput(MainWindow.f2_ipt.text(), 10, 4, "F") + \
+                 formatInput((float(MainWindow.vgam_ipt.text())/vunit), 10, 4, "F") + \
+                 formatInput(MainWindow.xincl_ipt.text(), 9, 3, "F") + \
+                 formatInput(MainWindow.gr1_spinbox.value(), 7, 3, "F") + \
+                 formatInput(MainWindow.gr2_spinbox.value(), 7, 3, "F") + \
+                 formatInput(MainWindow.abunin_ipt.text(), 7, 2, "F") + \
+                 formatInput(MainWindow.SpotConfigureWidget.fspot1_ipt.text(), 10, 4, "F") + \
+                 formatInput(MainWindow.SpotConfigureWidget.fspot2_ipt.text(), 10, 4, "F") + "\n"
 
-            vclines = ""  # TODO create internal function _formatVC()
-            # TODO create warning for sigma/vunit in velocity curve input
+        if float(MainWindow.tavh_ipt.text()) < float(1000) or float(MainWindow.tavc_ipt.text()) < float(1000):
+            result[1] = result[1] + "\nEntered surface temperature value is lower than 1000 Kelvin." + \
+                        "\nKeep in mind that surface temperature parameters will be" + \
+                        "divided by 10000 before writing into dcin.active file, as it is required by DC program." + \
+                        "\nMake sure you provide surface temperatures in Kelvin.\n"
 
-            if ifvc1 == "1":
-                vcprop = MainWindow.LoadWidget.vcPropertiesList[0]
+        line11 = formatInput(float(MainWindow.tavh_ipt.text()) / 10000.0, 7, 4, "F") + \
+                 formatInput(float(MainWindow.tavc_ipt.text()) / 10000.0, 8, 4, "F") + \
+                 formatInput(MainWindow.alb1_spinbox.value(), 7, 3, "F") + \
+                 formatInput(MainWindow.alb2_spinbox.value(), 7, 3, "F") + \
+                 formatInput(MainWindow.phsv_ipt.text(), 13, 6, "D") + \
+                 formatInput(MainWindow.pcsv_ipt.text(), 13, 6, "D") + \
+                 formatInput(MainWindow.rm_ipt.text(), 13, 6, "D") + \
+                 formatInput(MainWindow.xbol1_ipt.text(), 7, 3, "F") + \
+                 formatInput(MainWindow.xbol2_ipt.text(), 7, 3, "F") + \
+                 formatInput(MainWindow.ybol1_ipt.text(), 7, 3, "F") + \
+                 formatInput(MainWindow.ybol2_ipt.text(), 7, 3, "F") + \
+                 formatInput(MainWindow.dpclog_ipt.text(), 9, 5, "F") + "\n"
+
+        line12 = formatInput(MainWindow.a3b_ipt.text(), 12, 6, "D") + \
+                 formatInput(MainWindow.p3b_ipt.text(), 14, 7, "D") + \
+                 formatInput(MainWindow.xinc3b_ipt.text(), 11, 5, "F") + \
+                 formatInput(MainWindow.e3b_ipt.text(), 9, 6, "F") + \
+                 formatInput(MainWindow.perr3b_ipt.text(), 10, 7, "F", isDeg=True) + \
+                 formatInput(MainWindow.tc3b_ipt.text(), 17, 8, "F") + "\n"
+
+        vclines = ""
+        vcList = []
+        if ifvc1 == "1":
+            vcList.append(MainWindow.LoadWidget.vcPropertiesList[0])
+        if ifvc2 == "1":
+            vcList.append(MainWindow.LoadWidget.vcPropertiesList[1])
+        if len(vcList) != 0:
+            for vcprop in vcList:
                 iband = (" " * (3 - len(vcprop.band))) + vcprop.band
+                vclines = vclines + iband + formatInput(vcprop.l1, 13, 6, "D") \
+                          + formatInput(vcprop.l2, 13, 6, "D") \
+                          + formatInput(vcprop.x1, 7, 3, "F") \
+                          + formatInput(vcprop.x2, 7, 3, "F") \
+                          + formatInput(vcprop.y1, 7, 3, "F") \
+                          + formatInput(vcprop.y2, 7, 3, "F") \
+                          + formatInput(vcprop.opsf, 10, 3, "D") \
+                          + formatInput(float(vcprop.sigma) / vunit, 12, 5, "D") \
+                          + formatInput(vcprop.e1, 8, 5, "F") \
+                          + formatInput(vcprop.e2, 8, 5, "F") \
+                          + formatInput(vcprop.e3, 8, 5, "F") \
+                          + formatInput(vcprop.e4, 8, 5, "F") \
+                          + formatInput(vcprop.wla, 10, 6, "F") + " " + vcprop.ksd + "\n"
 
-                vclines = iband + _formatInput(vcprop.l1, 13, 6) + _formatInput(vcprop.l2, 13, 6) \
-                          + _formatInput(vcprop.x1, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.x2, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.y1, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.y2, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.opsf, 10, 3) + _formatInput(float(vcprop.sigma)/vunit, 12, 5) \
-                          + _formatInput(vcprop.e1, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.e2, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.e3, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.e4, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.wla, 10, 6, exponentFormat="F") + " " + vcprop.ksd + "\n"
-            if ifvc2 == "1":
-                vcprop = MainWindow.LoadWidget.vcPropertiesList[1]
-                iband = (" " * (3 - len(vcprop.band))) + vcprop.band
-                vclines = vclines + iband + _formatInput(vcprop.l1, 13, 6) + _formatInput(vcprop.l2, 13, 6) \
-                          + _formatInput(vcprop.x1, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.x2, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.y1, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.y2, 7, 3, exponentFormat="F") \
-                          + _formatInput(vcprop.opsf, 10, 3) + _formatInput(float(vcprop.sigma)/vunit, 12, 5) \
-                          + _formatInput(vcprop.e1, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.e2, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.e3, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.e4, 8, 5, exponentFormat="F") \
-                          + _formatInput(vcprop.wla, 10, 6, exponentFormat="F") + " " + vcprop.ksd + "\n"
+        lclines = ""
+        lcextralines = ""
+        if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
+            lcparamsList = []
+            lcextraparamsList = []
+            for lcprop in MainWindow.LoadWidget.lcPropertiesList:
+                iband = (" " * (3 - len(lcprop.band))) + lcprop.band
+                lcparams = iband + formatInput(lcprop.l1, 13, 6, "F") + \
+                           formatInput(lcprop.l2, 13, 6, "F") + \
+                           formatInput(lcprop.x1, 7, 3, "F") + \
+                           formatInput(lcprop.x2, 7, 3, "F") + \
+                           formatInput(lcprop.y1, 7, 3, "F") + \
+                           formatInput(lcprop.y2, 7, 3, "F") + \
+                           formatInput(lcprop.el3a, 12, 4, "D") + formatInput(lcprop.opsf, 10, 3, "D") + " " + \
+                           lcprop.noise + formatInput(lcprop.sigma, 12, 5, "D") + \
+                           formatInput(lcprop.e1, 8, 5, "F") + \
+                           formatInput(lcprop.e2, 8, 5, "F") + \
+                           formatInput(lcprop.e3, 8, 5, "F") + \
+                           formatInput(lcprop.e4, 8, 5, "F") + " " + lcprop.ksd + "\n"
+                lcextraparams = formatInput(lcprop.wla, 9, 6, "F") + \
+                                formatInput(lcprop.aextinc, 8, 4, "F") + \
+                                formatInput(lcprop.xunit, 11, 4, "D") +\
+                                formatInput(lcprop.calib, 12, 5, "D") + "\n"
+                lcparamsList.append(lcparams)
+                lcextraparamsList.append(lcextraparams)
+            for lcparams in lcparamsList:
+                lclines = lclines + lcparams
+            for lcextraparams in lcextraparamsList:
+                lcextralines = lcextralines + lcextraparams
+        eclipseline = ""
+        if evalCheckBox(MainWindow.EclipseWidget.iftime_chk) == "1":
+            eclipseline = (" " * 82) + \
+                          formatInput(MainWindow.EclipseWidget.sigma_ipt.text(), 11, 5, "D") + \
+                          (" " * 32) + \
+                          " " + str(MainWindow.EclipseWidget.ksd_box.value()) + "\n"
 
-            lclines = ""
-            lcextralines = ""
-            if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
-                lcparamsList = []
-                lcextraparamsList = []
-                for lcprop in MainWindow.LoadWidget.lcPropertiesList:
-                    iband = (" " * (3 - len(lcprop.band))) + lcprop.band
-                    lcparams = iband + _formatInput(lcprop.l1, 13, 6, exponentFormat="F") + \
-                               _formatInput(lcprop.l2, 13, 6, exponentFormat="F") + \
-                               _formatInput(lcprop.x1, 7, 3, exponentFormat="F") + \
-                               _formatInput(lcprop.x2, 7, 3, exponentFormat="F") + \
-                               _formatInput(lcprop.y1, 7, 3, exponentFormat="F") + \
-                               _formatInput(lcprop.y2, 7, 3, exponentFormat="F") + \
-                               _formatInput(lcprop.el3a, 12, 4) + _formatInput(lcprop.opsf, 10, 3) + " " + \
-                               lcprop.noise + _formatInput(lcprop.sigma, 12, 5) + \
-                               _formatInput(lcprop.e1, 8, 5, exponentFormat="F") + \
-                               _formatInput(lcprop.e2, 8, 5, exponentFormat="F") + \
-                               _formatInput(lcprop.e3, 8, 5, exponentFormat="F") + \
-                               _formatInput(lcprop.e4, 8, 5, exponentFormat="F") + " " + lcprop.ksd + "\n"
-                    lcextraparams = _formatInput(lcprop.wla, 9, 6, exponentFormat="F") + \
-                                    _formatInput(lcprop.aextinc, 8, 4, exponentFormat="F") + \
-                                    _formatInput(lcprop.xunit, 11, 4) +\
-                                    _formatInput(lcprop.calib, 12, 5) + "\n"
-                    lcparamsList.append(lcparams)
-                    lcextraparamsList.append(lcextraparams)
-                for lcparams in lcparamsList:
-                    lclines = lclines + lcparams
-                for lcextraparams in lcextraparamsList:
-                    lcextralines = lcextralines + lcextraparams
-            eclipseline = ""
-            if _evalCheckBox(MainWindow.EclipseWidget.iftime_chk) == "1":
-                eclipseline = (" " * 82) + \
-                              _formatInput(MainWindow.EclipseWidget.sigma_ipt.text(), 11, 5) + \
-                              (" " * 32) + \
-                              " " + str(MainWindow.EclipseWidget.ksd_box.value()) + "\n"
+        star1spotline = ""
+        star2spotline = ""
+        if MainWindow.SpotConfigureWidget.star1RowCount != 0:
+            star1spotparams = MainWindow.SpotConfigureWidget.star1ElementList
+            for spot in star1spotparams:
+                star1spotline = star1spotline + \
+                                formatInput(spot[3].text(), 9, 5, "F", isDeg=True) + \
+                                formatInput(spot[4].text(), 9, 5, "F", isDeg=True) + \
+                                formatInput(spot[5].text(), 9, 5, "F", isDeg=True) + \
+                                formatInput(spot[6].text(), 9, 5, "F") + \
+                                "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
 
-            star1spotline = ""
-            star2spotline = ""
-            if MainWindow.SpotConfigureWidget.star1RowCount != 0:
-                star1spotparams = MainWindow.SpotConfigureWidget.star1ElementList
-                for spot in star1spotparams:
-                    star1spotline = star1spotline + \
-                                    _formatInput(spot[3].text(), 9, 5, exponentFormat="F", isDeg=True) + \
-                                    _formatInput(spot[4].text(), 9, 5, exponentFormat="F", isDeg=True) + \
-                                    _formatInput(spot[5].text(), 9, 5, exponentFormat="F", isDeg=True) + \
-                                    _formatInput(spot[6].text(), 9, 5, exponentFormat="F") + \
-                                    "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
+        if MainWindow.SpotConfigureWidget.star2RowCount != 0:
+            star2spotparams = MainWindow.SpotConfigureWidget.star2ElementList
+            for spot in star2spotparams:
+                star2spotline = star2spotline + \
+                                formatInput(spot[3].text(), 9, 5, "F", isDeg=True) + \
+                                formatInput(spot[4].text(), 9, 5, "F", isDeg=True) + \
+                                formatInput(spot[5].text(), 9, 5, "F", isDeg=True) + \
+                                formatInput(spot[6].text(), 9, 5, "F") + \
+                                "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
+        vc1dataline = ""
+        if ifvc1 == "1":
+            vc1prop = MainWindow.LoadWidget.vcPropertiesList[0]
+            for time, observation, weight in itertools.izip(vc1prop.timeList,
+                                                            vc1prop.observationList,
+                                                            vc1prop.weightList):
+                vc1dataline = vc1dataline + \
+                              formatInput(time, 14, 5, "F") + \
+                              formatInput((float(observation)/vunit), 11, 6, "F") + \
+                              formatInput(weight, 8, 3, "F") + "\n"
+        vc2dataline = ""
+        if ifvc2 == "1":
+            vc2prop = MainWindow.LoadWidget.vcPropertiesList[1]
+            for time, observation, weight in itertools.izip(vc2prop.timeList,
+                                                            vc2prop.observationList,
+                                                            vc2prop.weightList):
+                vc2dataline = vc2dataline + \
+                              formatInput(time, 14, 5, "F") + \
+                              formatInput((float(observation)/vunit), 11, 6, "F") + \
+                              formatInput(weight, 8, 3, "F") + "\n"
 
-            if MainWindow.SpotConfigureWidget.star2RowCount != 0:
-                star2spotparams = MainWindow.SpotConfigureWidget.star2ElementList
-                for spot in star2spotparams:
-                    star2spotline = star2spotline + \
-                                    _formatInput(spot[3].text(), 9, 5, exponentFormat="F", isDeg=True) + \
-                                    _formatInput(spot[4].text(), 9, 5, exponentFormat="F", isDeg=True) + \
-                                    _formatInput(spot[5].text(), 9, 5, exponentFormat="F", isDeg=True) + \
-                                    _formatInput(spot[6].text(), 9, 5, exponentFormat="F") + \
-                                    "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
-            vc1dataline = ""
-            if ifvc1 == "1":
-                vc1prop = MainWindow.LoadWidget.vcPropertiesList[0]
-                for time, observation, weight in itertools.izip(vc1prop.timeList,
-                                                                vc1prop.observationList,
-                                                                vc1prop.weightList):
-                    vc1dataline = vc1dataline + \
-                                  _formatInput(time, 14, 5, exponentFormat="F") + \
-                                  _formatInput((float(observation)/vunit), 11, 6, exponentFormat="F") + \
-                                  _formatInput(weight, 8, 3, exponentFormat="F") + "\n"
-            vc2dataline = ""
-            if ifvc2 == "1":
-                vc2prop = MainWindow.LoadWidget.vcPropertiesList[1]
-                for time, observation, weight in itertools.izip(vc2prop.timeList,
-                                                                vc2prop.observationList,
-                                                                vc2prop.weightList):
-                    vc2dataline = vc2dataline + \
-                                  _formatInput(time, 14, 5, exponentFormat="F") + \
-                                  _formatInput((float(observation)/vunit), 11, 6, exponentFormat="F") + \
-                                  _formatInput(weight, 8, 3, exponentFormat="F") + "\n"
+        lcdataline = ""
+        if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
+            for lcprop in MainWindow.LoadWidget.lcPropertiesList:
+                for time, observation, weight in itertools.izip(lcprop.timeList,
+                                                             lcprop.observationList,
+                                                             lcprop.weightList):
+                    lcdataline = lcdataline + formatInput(time, 14, 5, "F") + \
+                                 formatInput(observation, 11, 6, "F") + \
+                                 formatInput(weight, 8, 3, "F") + "\n"
+                lcdataline = lcdataline + "  -10001.00000\n"
 
-            lcdataline = ""
-            if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
-                for lcprop in MainWindow.LoadWidget.lcPropertiesList:
-                    for time, observation, weight in itertools.izip(lcprop.timeList,
-                                                                 lcprop.observationList,
-                                                                 lcprop.weightList):
-                        lcdataline = lcdataline + _formatInput(time, 14, 5, exponentFormat="F") + \
-                                     _formatInput(observation, 11, 6, exponentFormat="F") + \
-                                     _formatInput(weight, 8, 3, exponentFormat="F") + "\n"
-                    lcdataline = lcdataline + "  -10001.00000\n"
-            # TODO implement eclipse data 
-            # write lines into file
-            with open(filePath, 'w') as dcin:
-                dcin.write(line1)
-                dcin.write(line2)
-                dcin.write(line3)
-                dcin.write(line4)
-                dcin.write(line5)
-                dcin.write(line6)
-                dcin.write(line7)
-                dcin.write(line8)
-                dcin.write(line9)
-                dcin.write(line10)
-                dcin.write(line11)
-                dcin.write(line12)
-                dcin.write(vclines)
-                dcin.write(lclines)
-                dcin.write(eclipseline)
-                dcin.write(lcextralines)
-                dcin.write("300.00000\n")
-                dcin.write(star1spotline)
-                dcin.write("300.00000\n")
-                dcin.write(star2spotline)
-                dcin.write("150.\n")
-                dcin.write(vc1dataline)
-                dcin.write("  -10001.00000\n")
-                dcin.write(vc2dataline)
-                dcin.write("  -10001.00000\n")
-                dcin.write(lcdataline)
-                dcin.write(" 2\n")
-            report = QtGui.QMessageBox(MainWindow)
-            report.setText("File saved successfully, running DC2015...")
-            report.exec_()
-            os.system("(cd wd/; ./DC2015 dcin.active dcout.active)")
-        except ValueError as ex:
-            msg = QtGui.QMessageBox()
-            msg.setWindowTitle("pywd - ValueError")
-            msg.setText("Can't cast your input into a numeric value;" + "\n" + ex.message)
-            msg.exec_()
-        except IndexError as ex:
-            msg = QtGui.QMessageBox()
-            msg.setWindowTitle("pywd - Wrong Input")
-            msg.setText(ex.message)  # most exceptions store their first arguments in (exception).message field
-            msg.exec_()
-        except:
-            msg = QtGui.QMessageBox()
-            msg.setWindowTitle("pywd - UnknownError")
-            msg.setText("Unknown exception is caught:\n" + str(sys.exc_info()))
-            msg.exec_()
+        ecdataline = ""
+        if len(MainWindow.EclipseWidget.lines) != 0:
+            for time, type, weight in itertools.izip(MainWindow.EclipseWidget.timeList,
+                                                    MainWindow.EclipseWidget.typeList,
+                                                    MainWindow.EclipseWidget.weightList):
+                ecdataline = ecdataline + \
+                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3) + "\n"
+            ecdataline = ecdataline + "  -10001.00000\n"
+
+        result[2] = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \
+                    + vclines + lclines + eclipseline + lcextralines + \
+                    "300.00000\n" + star1spotline + "300.00000\n" + star2spotline + \
+                    "150.\n" + vc1dataline + "  -10001.00000\n" + vc2dataline + "  -10001.00000\n" + lcdataline  + \
+                    "  -10001.00000\n" + ecdataline + "  -10001.00000\n" + " 2\n"
+        if vc1dataline == "" and vc2dataline == "":
+            result[1] = result[1] + "\nThere aren't any velocity curves loaded.\n"
+        if lcdataline == "":
+            result[1] = result[1] + "\nThere aren't any light curves loaded.\n"
+
+    except ValueError as ex:
+        result[0] = "Value Error - Can't cast input into a numeric value: \n" + ex.message
+        result[2] = "FATAL"
+    except IndexError as ex:
+        result[0] = "Wrong Input: \n" + ex.message
+        result[2] = "FATAL"
+    except:
+        result[0] = "Unknown exception has been caught. This is most likely a programming error: \n" + \
+                    str(sys.exc_info())
+        result[2] = "FATAL"
+    return result
 
 
 if __name__ == "__main__":

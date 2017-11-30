@@ -21,7 +21,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
         self.loadwidget_btn.clicked.connect(self.LoadWidget.show)  # opens loadwidget
         self.spotconfigure_btn.clicked.connect(self.SpotConfigureWidget.show)  # opens spotconfigurewidget
-        self.export_btn.clicked.connect(partial(methods.exportDc, self))
+        self.export_btn.clicked.connect(partial(methods.runDc, self))
         self.theme_combobox.currentIndexChanged.connect(self.changeStyle)
         self.setdeldefaults_btn.clicked.connect(self.setDelDefaults)
         self.clearkeeps_btn.clicked.connect(self.clearKeeps)
@@ -139,6 +139,10 @@ class EclipseWiget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
         self.setupUi(self)  # setup ui from eclipsewidget.py
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
         # setup variables
+        self.timeList = []
+        self.typeList = []
+        self.weightList = []
+        self.lines = []
         #
         self.connectSignals()
 
