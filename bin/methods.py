@@ -1067,7 +1067,7 @@ def exportDc(MainWindow):
             for lcextraparams in lcextraparamsList:
                 lcextralines = lcextralines + lcextraparams
         eclipseline = ""
-        if evalCheckBox(MainWindow.EclipseWidget.iftime_chk) == "1":
+        if MainWindow.EclipseWidget.iftime_chk.isChecked():
             eclipseline = (" " * 82) + \
                           formatInput(MainWindow.EclipseWidget.sigma_ipt.text(), 11, 5, "D") + \
                           (" " * 32) + \
@@ -1104,6 +1104,7 @@ def exportDc(MainWindow):
                               formatInput(time, 14, 5, "F") + \
                               formatInput((float(observation)/vunit), 11, 6, "F") + \
                               formatInput(weight, 8, 3, "F") + "\n"
+            vc1dataline = vc1dataline + "  -10001.00000\n"
         vc2dataline = ""
         if ifvc2 == "1":
             vc2prop = MainWindow.LoadWidget.vcPropertiesList[1]
@@ -1114,7 +1115,8 @@ def exportDc(MainWindow):
                               formatInput(time, 14, 5, "F") + \
                               formatInput((float(observation)/vunit), 11, 6, "F") + \
                               formatInput(weight, 8, 3, "F") + "\n"
-
+            vc2dataline = vc2dataline + "  -10001.00000\n"
+            
         lcdataline = ""
         if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
             for lcprop in MainWindow.LoadWidget.lcPropertiesList:
@@ -1127,24 +1129,24 @@ def exportDc(MainWindow):
                 lcdataline = lcdataline + "  -10001.00000\n"
 
         ecdataline = ""
-        if len(MainWindow.EclipseWidget.lines) != 0:
+        if len(MainWindow.EclipseWidget.lines) != 0 and MainWindow.EclipseWidget.iftime_chk.isChecked():
             for time, type, weight in itertools.izip(MainWindow.EclipseWidget.timeList,
                                                     MainWindow.EclipseWidget.typeList,
                                                     MainWindow.EclipseWidget.weightList):
                 ecdataline = ecdataline + \
-                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3, "F") + "\n"
+                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3, "F")+ "\n"
             ecdataline = ecdataline + "  -10001.00000\n"
 
         result[2] = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \
                     + vclines + lclines + eclipseline + lcextralines + \
                     "300.00000\n" + star1spotline + "300.00000\n" + star2spotline + \
-                    "150.\n" + vc1dataline + "  -10001.00000\n" + vc2dataline + "  -10001.00000\n" + lcdataline  + \
-                    "  -10001.00000\n" + ecdataline + "  -10001.00000\n" + " 2\n"
+                    "150.\n" + vc1dataline + vc2dataline + lcdataline + \
+                    ecdataline + " 2\n"
         if vc1dataline == "" and vc2dataline == "":
             result[1] = result[1] + "\nThere aren't any velocity curves loaded.\n"
         if lcdataline == "":
             result[1] = result[1] + "\nThere aren't any light curves loaded.\n"
-        if evalCheckBox(MainWindow.EclipseWidget.iftime_chk) and ecdataline == "":
+        if MainWindow.EclipseWidget.iftime_chk.isChecked() and ecdataline == "":
             result[1] = result[1] + "\nIFTIMES is checked, but eclipse timings are not provided.\n"
 
     except ValueError as ex:
