@@ -7,121 +7,102 @@ import numpy as np
 import itertools
 
 
-def SaveSpotConfiguration(SpotConfigureWidget):
-    dialog = QtGui.QFileDialog(SpotConfigureWidget)
-    dialog.setDefaultSuffix("spotconfig")
-    dialog.setNameFilter("Spot Configuration File (*.spotconfig)")
-    dialog.setAcceptMode(1)
-    returnCode = dialog.exec_()
-    filePath = str((dialog.selectedFiles())[0])
-    if filePath != "" and returnCode != 0:
-        try:
-            parser = ConfigParser.SafeConfigParser()
-            # parse spot config
-            parser.add_section("Spot Configuration")
-            parser.set("Spot Configuration", "ifsmv1", str(SpotConfigureWidget.ifsmv1_chk.isChecked()))
-            parser.set("Spot Configuration", "ifsmv2", str(SpotConfigureWidget.ifsmv2_chk.isChecked()))
-            parser.set("Spot Configuration", "kspev", str(SpotConfigureWidget.kspev_chk.isChecked()))
-            parser.set("Spot Configuration", "kspot", str(SpotConfigureWidget.kspot_chk.isChecked()))
-            parser.set("Spot Configuration", "fspot1", str(SpotConfigureWidget.fspot1_ipt.value()))
-            parser.set("Spot Configuration", "fspot2", str(SpotConfigureWidget.fspot2_ipt.value()))
-            parser.set("Spot Configuration", "nomax", str(SpotConfigureWidget.nomax_combobox.currentIndex()))
+def SaveSpotConfiguration(SpotConfigureWidget, filePath):
+    parser = ConfigParser.SafeConfigParser()
+    # parse spot config
+    parser.add_section("Spot Configuration")
+    parser.set("Spot Configuration", "ifsmv1", str(SpotConfigureWidget.ifsmv1_chk.isChecked()))
+    parser.set("Spot Configuration", "ifsmv2", str(SpotConfigureWidget.ifsmv2_chk.isChecked()))
+    parser.set("Spot Configuration", "kspev", str(SpotConfigureWidget.kspev_chk.isChecked()))
+    parser.set("Spot Configuration", "kspot", str(SpotConfigureWidget.kspot_chk.isChecked()))
+    parser.set("Spot Configuration", "fspot1", str(SpotConfigureWidget.fspot1_ipt.value()))
+    parser.set("Spot Configuration", "fspot2", str(SpotConfigureWidget.fspot2_ipt.value()))
+    parser.set("Spot Configuration", "nomax", str(SpotConfigureWidget.nomax_combobox.currentIndex()))
 
-            # parse row info
-            parser.add_section("Spot Count")
-            parser.set("Spot Count", "star 1", str(SpotConfigureWidget.star1RowCount))
-            parser.set("Spot Count", "star 2", str(SpotConfigureWidget.star2RowCount))
+    # parse row info
+    parser.add_section("Spot Count")
+    parser.set("Spot Count", "star 1", str(SpotConfigureWidget.star1RowCount))
+    parser.set("Spot Count", "star 2", str(SpotConfigureWidget.star2RowCount))
 
-            # parse actual spot rows
-            i = 0
-            while i < SpotConfigureWidget.star1RowCount:
-                section = "Star 1 Spot " + str(i + 1)
-                parser.add_section(section)
-                parser.set(section, "a", str(SpotConfigureWidget.star1ElementList[i][1].isChecked()))
-                parser.set(section, "b", str(SpotConfigureWidget.star1ElementList[i][2].isChecked()))
-                parser.set(section, "latitude", str(SpotConfigureWidget.star1ElementList[i][3].text()))
-                parser.set(section, "longitude", str(SpotConfigureWidget.star1ElementList[i][4].text()))
-                parser.set(section, "angular radius", str(SpotConfigureWidget.star1ElementList[i][5].text()))
-                parser.set(section, "temperature factor", str(SpotConfigureWidget.star1ElementList[i][6].text()))
-                i += 1
-            i = 0
-            while i < SpotConfigureWidget.star2RowCount:
-                section = "Star 2 Spot " + str(i + 1)
-                parser.add_section(section)
-                parser.set(section, "a", str(SpotConfigureWidget.star2ElementList[i][1].isChecked()))
-                parser.set(section, "b", str(SpotConfigureWidget.star2ElementList[i][2].isChecked()))
-                parser.set(section, "latitude", str(SpotConfigureWidget.star2ElementList[i][3].text()))
-                parser.set(section, "longitude", str(SpotConfigureWidget.star2ElementList[i][4].text()))
-                parser.set(section, "angular radius", str(SpotConfigureWidget.star2ElementList[i][5].text()))
-                parser.set(section, "temperature factor", str(SpotConfigureWidget.star2ElementList[i][6].text()))
-                i += 1
-            with open(filePath, 'w') as f:
-                parser.write(f)
-            SpotConfigureWidget.spotconfigsave_label.setText("Spot config saved: " + filePath)
-            SpotConfigureWidget.spotconfigsave_label.setToolTip("Spot config saved: " + filePath)
-        except:
-            msg = QtGui.QMessageBox()
-            msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
-            msg.exec_()
+    # parse actual spot rows
+    i = 0
+    while i < SpotConfigureWidget.star1RowCount:
+        section = "Star 1 Spot " + str(i + 1)
+        parser.add_section(section)
+        parser.set(section, "a", str(SpotConfigureWidget.star1ElementList[i][1].isChecked()))
+        parser.set(section, "b", str(SpotConfigureWidget.star1ElementList[i][2].isChecked()))
+        parser.set(section, "latitude", str(SpotConfigureWidget.star1ElementList[i][3].text()))
+        parser.set(section, "longitude", str(SpotConfigureWidget.star1ElementList[i][4].text()))
+        parser.set(section, "angular radius", str(SpotConfigureWidget.star1ElementList[i][5].text()))
+        parser.set(section, "temperature factor", str(SpotConfigureWidget.star1ElementList[i][6].text()))
+        i += 1
+    i = 0
+    while i < SpotConfigureWidget.star2RowCount:
+        section = "Star 2 Spot " + str(i + 1)
+        parser.add_section(section)
+        parser.set(section, "a", str(SpotConfigureWidget.star2ElementList[i][1].isChecked()))
+        parser.set(section, "b", str(SpotConfigureWidget.star2ElementList[i][2].isChecked()))
+        parser.set(section, "latitude", str(SpotConfigureWidget.star2ElementList[i][3].text()))
+        parser.set(section, "longitude", str(SpotConfigureWidget.star2ElementList[i][4].text()))
+        parser.set(section, "angular radius", str(SpotConfigureWidget.star2ElementList[i][5].text()))
+        parser.set(section, "temperature factor", str(SpotConfigureWidget.star2ElementList[i][6].text()))
+        i += 1
+    with open(filePath, 'w') as f:
+        parser.write(f)
+    SpotConfigureWidget.spotconfigsave_label.setText("Spot config saved: " + filePath)
+    SpotConfigureWidget.spotconfigsave_label.setToolTip("Spot config saved: " + filePath)
 
 
-def LoadSpotConfiguration(SpotConfigureWidget):
-    dialog = QtGui.QFileDialog(SpotConfigureWidget)
-    dialog.setAcceptMode(0)
-    dialog.setDefaultSuffix("spotconfig")
-    dialog.setNameFilter("Spot Configuration File (*.spotconfig)")
-    returnCode = dialog.exec_()
-    filePath = (dialog.selectedFiles())[0]
-    if filePath != "" and returnCode != 0:
-        clearSpotConfigureWidget(SpotConfigureWidget)
-        parser = ConfigParser.SafeConfigParser()
-        with open(filePath, 'r') as f:
-            parser.readfp(f)
-        if parser.getboolean("Spot Configuration", "ifsmv1"):
-            SpotConfigureWidget.ifsmv1_chk.toggle()
-        if parser.getboolean("Spot Configuration", "ifsmv2"):
-            SpotConfigureWidget.ifsmv2_chk.toggle()
-        if parser.getboolean("Spot Configuration", "kspev"):
-            SpotConfigureWidget.kspev_chk.toggle()
-        if parser.getboolean("Spot Configuration", "kspot"):
-            SpotConfigureWidget.kspot_chk.toggle()
-        SpotConfigureWidget.fspot1_ipt.setValue(parser.getfloat("Spot Configuration", "fspot1"))
-        SpotConfigureWidget.fspot2_ipt.setValue(parser.getfloat("Spot Configuration", "fspot2"))
-        SpotConfigureWidget.nomax_combobox.setCurrentIndex(parser.getint("Spot Configuration", "nomax"))
-        star1spotcount = parser.getint("Spot Count", "star 1")
-        star2spotcount = parser.getint("Spot Count", "star 2")
-        i = 0
-        SpotConfigureWidget.radioButtonGroupA.setExclusive(False)
-        SpotConfigureWidget.radioButtonGroupB.setExclusive(False)
-        while i < star1spotcount:
-            SpotConfigureWidget.addspot1_btn.click()
-            section = "Star 1 Spot " + str(i + 1)
-            if parser.getboolean(section, "a"):
-                SpotConfigureWidget.star1ElementList[i][1].toggle()
-            if parser.getboolean(section, "b"):
-                SpotConfigureWidget.star1ElementList[i][2].toggle()
-            SpotConfigureWidget.star1ElementList[i][3].setText(parser.get(section, "latitude"))
-            SpotConfigureWidget.star1ElementList[i][4].setText(parser.get(section, "longitude"))
-            SpotConfigureWidget.star1ElementList[i][5].setText(parser.get(section, "angular radius"))
-            SpotConfigureWidget.star1ElementList[i][6].setText(parser.get(section, "temperature factor"))
-            i += 1
-        i = 0
-        while i < star2spotcount:
-            SpotConfigureWidget.addspot2_btn.click()
-            section = "Star 2 Spot " + str(i + 1)
-            if parser.getboolean(section, "a"):
-                SpotConfigureWidget.star2ElementList[i][1].toggle()
-            if parser.getboolean(section, "b"):
-                SpotConfigureWidget.star2ElementList[i][2].toggle()
-            SpotConfigureWidget.star2ElementList[i][3].setText(parser.get(section, "latitude"))
-            SpotConfigureWidget.star2ElementList[i][4].setText(parser.get(section, "longitude"))
-            SpotConfigureWidget.star2ElementList[i][5].setText(parser.get(section, "angular radius"))
-            SpotConfigureWidget.star2ElementList[i][6].setText(parser.get(section, "temperature factor"))
-            i += 1
-        SpotConfigureWidget.radioButtonGroupA.setExclusive(True)
-        SpotConfigureWidget.radioButtonGroupB.setExclusive(True)
-        SpotConfigureWidget.spotconfigload_label.setText("Spot config loaded: " + filePath)
-        SpotConfigureWidget.spotconfigload_label.setToolTip("Spot config loaded: " + filePath)
+def LoadSpotConfiguration(SpotConfigureWidget, filePath):
+    clearSpotConfigureWidget(SpotConfigureWidget)
+    parser = ConfigParser.SafeConfigParser()
+    with open(filePath, 'r') as f:
+        parser.readfp(f)
+    if parser.getboolean("Spot Configuration", "ifsmv1"):
+        SpotConfigureWidget.ifsmv1_chk.toggle()
+    if parser.getboolean("Spot Configuration", "ifsmv2"):
+        SpotConfigureWidget.ifsmv2_chk.toggle()
+    if parser.getboolean("Spot Configuration", "kspev"):
+        SpotConfigureWidget.kspev_chk.toggle()
+    if parser.getboolean("Spot Configuration", "kspot"):
+        SpotConfigureWidget.kspot_chk.toggle()
+    SpotConfigureWidget.fspot1_ipt.setValue(parser.getfloat("Spot Configuration", "fspot1"))
+    SpotConfigureWidget.fspot2_ipt.setValue(parser.getfloat("Spot Configuration", "fspot2"))
+    SpotConfigureWidget.nomax_combobox.setCurrentIndex(parser.getint("Spot Configuration", "nomax"))
+    star1spotcount = parser.getint("Spot Count", "star 1")
+    star2spotcount = parser.getint("Spot Count", "star 2")
+    i = 0
+    SpotConfigureWidget.radioButtonGroupA.setExclusive(False)
+    SpotConfigureWidget.radioButtonGroupB.setExclusive(False)
+    while i < star1spotcount:
+        SpotConfigureWidget.addspot1_btn.click()
+        section = "Star 1 Spot " + str(i + 1)
+        if parser.getboolean(section, "a"):
+            SpotConfigureWidget.star1ElementList[i][1].toggle()
+        if parser.getboolean(section, "b"):
+            SpotConfigureWidget.star1ElementList[i][2].toggle()
+        SpotConfigureWidget.star1ElementList[i][3].setText(parser.get(section, "latitude"))
+        SpotConfigureWidget.star1ElementList[i][4].setText(parser.get(section, "longitude"))
+        SpotConfigureWidget.star1ElementList[i][5].setText(parser.get(section, "angular radius"))
+        SpotConfigureWidget.star1ElementList[i][6].setText(parser.get(section, "temperature factor"))
+        i += 1
+    i = 0
+    while i < star2spotcount:
+        SpotConfigureWidget.addspot2_btn.click()
+        section = "Star 2 Spot " + str(i + 1)
+        if parser.getboolean(section, "a"):
+            SpotConfigureWidget.star2ElementList[i][1].toggle()
+        if parser.getboolean(section, "b"):
+            SpotConfigureWidget.star2ElementList[i][2].toggle()
+        SpotConfigureWidget.star2ElementList[i][3].setText(parser.get(section, "latitude"))
+        SpotConfigureWidget.star2ElementList[i][4].setText(parser.get(section, "longitude"))
+        SpotConfigureWidget.star2ElementList[i][5].setText(parser.get(section, "angular radius"))
+        SpotConfigureWidget.star2ElementList[i][6].setText(parser.get(section, "temperature factor"))
+        i += 1
+    SpotConfigureWidget.radioButtonGroupA.setExclusive(True)
+    SpotConfigureWidget.radioButtonGroupB.setExclusive(True)
+    SpotConfigureWidget.spotconfigload_label.setText("Spot config loaded: " + filePath)
+    SpotConfigureWidget.spotconfigload_label.setToolTip("Spot config loaded: " + filePath)
 
 
 def clearSpotConfigureWidget(SpotConfigureWidget):
@@ -1182,8 +1163,20 @@ def exportDc(MainWindow):
     return dcin
 
 
-def saveProject(MainWindow):
-    pass
+def saveProject(MainWindow, filePath):
+    parser = ConfigParser.SafeConfigParser()
+    # config
+    parser.add_section("Configuration")
+    parser.set("Configuration", "version", "2015")
+    # main tab
+    parser.add_section("Main")
+    parser.set("Main", "operation mode", str(MainWindow.mode_combobox.currentIndex()))
+    parser.set("Main", "jdphs", str(MainWindow.jdphs_combobox.currentIndex()))
+    parser.set("Main", "magltie", str(MainWindow.maglite_combobox.currentIndex()))
+    parser.set("Main", "isym", str(MainWindow.isym_combobox.currentIndex()))
+
+    with open(filePath, "w") as f:
+        parser.write(f)
 
 
 if __name__ == "__main__":

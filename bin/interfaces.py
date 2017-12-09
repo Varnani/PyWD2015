@@ -3,6 +3,7 @@ from gui import mainwindow, loadwidget, spotconfigurewidget, \
     editlightcurvedialog, editvelocitycurvedialog, eclipsewidget
 from functools import partial
 from bin import methods, classes
+import sys
 
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
@@ -27,11 +28,27 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.clearkeeps_btn.clicked.connect(self.clearKeeps)
         self.setkeepdefaults_btn.clicked.connect(self.setKeepDefaults)
         self.eclipsewidget_btn.clicked.connect(self.EclipseWidget.show)
+        self.saveproject_btn.clicked.connect(self.saveProjectDialog)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadWidget.close()  # close loadwidget if we exit
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
         self.EclipseWidget.close()
+
+    def saveProjectDialog(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("pywdproject")
+        dialog.setNameFilter("PyWD2015 Project File (*pywdproject)")
+        dialog.setAcceptMode(1)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        if filePath != "" and returnCode != 0:
+            try:
+                methods.saveProject(self, filePath)
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
@@ -337,10 +354,40 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
     def connectSignals(self):
         self.addspot1_btn.clicked.connect(partial(methods.addSpotRow, self, 1))
         self.addspot2_btn.clicked.connect(partial(methods.addSpotRow, self, 2))
-        self.spotconfigsave_btn.clicked.connect(partial(methods.SaveSpotConfiguration, self))
-        self.spotconfigload_btn.clicked.connect(partial(methods.LoadSpotConfiguration, self))
+        self.spotconfigsave_btn.clicked.connect(self.saveSpotConfigDialog)
+        self.spotconfigload_btn.clicked.connect(self.loadSpotConfigDialog)
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
 
+    def saveSpotConfigDialog(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("spotconfig")
+        dialog.setNameFilter("Spot Configuration File (*.spotconfig)")
+        dialog.setAcceptMode(1)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        if filePath != "" and returnCode != 0:
+            try:
+                methods.SaveSpotConfiguration(self, filePath)
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+
+    def loadSpotConfigDialog(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setAcceptMode(0)
+        dialog.setDefaultSuffix("spotconfig")
+        dialog.setNameFilter("Spot Configuration File (*.spotconfig)")
+        returnCode = dialog.exec_()
+        filePath = (dialog.selectedFiles())[0]
+        if filePath != "" and returnCode != 0:
+            try:
+                methods.LoadSpotConfiguration(self, filePath)
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+                methods.clearSpotConfigureWidget(self)
 
 if __name__ == "__main__":
     pass
