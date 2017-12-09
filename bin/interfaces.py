@@ -216,7 +216,7 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
         for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)
 
-    def load(self, filePath):  # populate ui from a file
+    def load(self, filePath, curve):  # populate ui from a file
         self.filepath_label.setText(filePath)
         self.filepath_label.setToolTip(filePath)
         self.band_box.setValue(7)
@@ -239,7 +239,6 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
         self.aextinc_ipt.setText("0")
         self.xunit_ipt.setText("1.0000")
         self.calib_ipt.setText("0")
-        curve = classes.Curve(filePath)
         self.datawidget.clear()
         for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)

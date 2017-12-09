@@ -344,67 +344,63 @@ def addLightCurve(LoadWidget):
     filePath = (dialog.selectedFiles())[0]
     if filePath != "" and returnCode != 0:
         exitcode = 0
-        try:
-            LoadWidget.EditLightCurveDialog.load(filePath)  # populate edit curve widget
+        curve = classes.Curve(filePath)
+        if curve.hasError:
+            msg = QtGui.QMessageBox()
+            msg.setText(curve.error)
+            msg.setWindowTitle("PyWD - Error")
+            msg.exec_()
+        else:
+            LoadWidget.EditLightCurveDialog.load(filePath, curve)  # populate edit curve widget
             LoadWidget.EditLightCurveDialog.setWindowTitle("Load Light Curve")
             exitcode = LoadWidget.EditLightCurveDialog.exec_()  # wait for edit curve widget to finish
             LoadWidget.EditLightCurveDialog.setWindowTitle("Edit Light Curve")
-        except IndexError:
-            msg = QtGui.QMessageBox()
-            msg.setText("File is not a valid data source:\n" + filePath)
-            msg.exec_()
-            exitcode = 0
-        except:
-            msg = QtGui.QMessageBox()
-            msg.setText("Unknown exception is caught:\n" + sys.exc_info()[0])
-            msg.exec_()
-            exitcode = 0
-        if exitcode == 1:
-            lcprop = classes.LightCurveProperties(LoadWidget.EditLightCurveDialog)
-            LoadWidget.lcPropertiesList.append(lcprop)  # store accepted lcprop
+            if exitcode == 1:
+                lcprop = classes.LightCurveProperties(LoadWidget.EditLightCurveDialog)
+                LoadWidget.lcPropertiesList.append(lcprop)  # store accepted lcprop
 
-            # start adding row
-            LoadWidget.lcElementList.append([])  # get a new row
-            LoadWidget.lcCount += 1  # increment lc count since we are adding a row
-            shiftAmount = (LoadWidget.lcCount * 40)  # shifting this number of pixels downwards
-            resizeLoadWidget(LoadWidget)
+                # start adding row
+                LoadWidget.lcElementList.append([])  # get a new row
+                LoadWidget.lcCount += 1  # increment lc count since we are adding a row
+                shiftAmount = (LoadWidget.lcCount * 40)  # shifting this number of pixels downwards
+                resizeLoadWidget(LoadWidget)
 
-            # add new elements
-            # label
-            label = QtGui.QLabel(LoadWidget)  # load element
-            label.setGeometry(40, 140 + shiftAmount, 90, 21)  # set geometry
-            label.setText("Light Curve " + str(LoadWidget.lcCount))  # set text
-            label.setObjectName("lclabel" + str(LoadWidget.lcCount))  # set object name
-            LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(label)  # store element in the element list
-            label.show()  # show the element
+                # add new elements
+                # label
+                label = QtGui.QLabel(LoadWidget)  # load element
+                label.setGeometry(40, 140 + shiftAmount, 90, 21)  # set geometry
+                label.setText("Light Curve " + str(LoadWidget.lcCount))  # set text
+                label.setObjectName("lclabel" + str(LoadWidget.lcCount))  # set object name
+                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(label)  # store element in the element list
+                label.show()  # show the element
 
-            # file path
-            path = QtGui.QLineEdit(LoadWidget)  # load element
-            path.setGeometry(130, 140 + shiftAmount, 381, 20)  # set geometry
-            path.setText(filePath)  # set text
-            path.setObjectName("lcpath" + str(LoadWidget.lcCount))  # set object name
-            path.setReadOnly(True)  # set read only
-            LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(path)  # store element in the element list
-            path.show()  # show the element
+                # file path
+                path = QtGui.QLineEdit(LoadWidget)  # load element
+                path.setGeometry(130, 140 + shiftAmount, 381, 20)  # set geometry
+                path.setText(filePath)  # set text
+                path.setObjectName("lcpath" + str(LoadWidget.lcCount))  # set object name
+                path.setReadOnly(True)  # set read only
+                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(path)  # store element in the element list
+                path.show()  # show the element
 
-            # edit button
-            row = LoadWidget.lcCount - 1  # current row index
-            edit = QtGui.QPushButton(LoadWidget)
-            edit.setGeometry(520, 140 + shiftAmount, 51, 21)
-            edit.setText("Edit")
-            edit.setObjectName("lcedit" + str(LoadWidget.lcCount))
-            edit.clicked.connect(partial(editLightCurve, LoadWidget, row))
-            LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(edit)
-            edit.show()
+                # edit button
+                row = LoadWidget.lcCount - 1  # current row index
+                edit = QtGui.QPushButton(LoadWidget)
+                edit.setGeometry(520, 140 + shiftAmount, 51, 21)
+                edit.setText("Edit")
+                edit.setObjectName("lcedit" + str(LoadWidget.lcCount))
+                edit.clicked.connect(partial(editLightCurve, LoadWidget, row))
+                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(edit)
+                edit.show()
 
-            # remove button
-            remove = QtGui.QPushButton(LoadWidget)
-            remove.setGeometry(580, 140 + shiftAmount, 61, 21)
-            remove.setText("Remove")
-            remove.setObjectName("lcload" + str(LoadWidget.lcCount))
-            remove.clicked.connect(partial(removeLightCurve, LoadWidget, row))
-            LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(remove)
-            remove.show()
+                # remove button
+                remove = QtGui.QPushButton(LoadWidget)
+                remove.setGeometry(580, 140 + shiftAmount, 61, 21)
+                remove.setText("Remove")
+                remove.setObjectName("lcload" + str(LoadWidget.lcCount))
+                remove.clicked.connect(partial(removeLightCurve, LoadWidget, row))
+                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(remove)
+                remove.show()
 
 
 def editLightCurve(LoadWidget, buttonRow):
@@ -512,36 +508,32 @@ def loadVelocityCurve(vcNumber, LoadWidget):
     fileName = (dialog.selectedFiles())[0]
     if fileName != "" and returnCode != 0:
         exitcode = 0
-        try:
+        curve = classes.Curve(fileName)
+        if curve.hasError:
+            msg = QtGui.QMessageBox()
+            msg.setText(curve.error)
+            msg.setWindowTitle("PyWD - Error")
+            msg.exec_()
+        else:
             LoadWidget.EditVelocityCurveDialog.load(fileName)
             LoadWidget.EditVelocityCurveDialog.setWindowTitle("Load Velocity Curve")
             exitcode = LoadWidget.EditVelocityCurveDialog.exec_()
             LoadWidget.EditVelocityCurveDialog.setWindowTitle("Edit Velocity Curve")
-        except IndexError:
-            msg = QtGui.QMessageBox()
-            msg.setText("File is not a valid data source:\n" + fileName)
-            msg.exec_()
-            exitcode = 0
-        except:
-            msg = QtGui.QMessageBox()
-            msg.setText("Unknown exception is caught:\n" + str(sys.exc_info()[0]))
-            msg.exec_()
-            exitcode = 0
-        if exitcode == 1:
-            if vcNumber == 1:
-                vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
-                LoadWidget.vcPropertiesList[0] = vcprop
-                LoadWidget.vc1_fileline.setText(fileName)
-                LoadWidget.vc1load_btn.clicked.disconnect()
-                LoadWidget.vc1load_btn.clicked.connect(partial(removeVelocityCurve, 1, LoadWidget))
-                LoadWidget.vc1load_btn.setText("Remove")
-            if vcNumber == 2:
-                vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
-                LoadWidget.vcPropertiesList[1] = vcprop
-                LoadWidget.vc2_fileline.setText(fileName)
-                LoadWidget.vc2load_btn.clicked.disconnect()
-                LoadWidget.vc2load_btn.clicked.connect(partial(removeVelocityCurve, 2, LoadWidget))
-                LoadWidget.vc2load_btn.setText("Remove")
+            if exitcode == 1:
+                if vcNumber == 1:
+                    vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
+                    LoadWidget.vcPropertiesList[0] = vcprop
+                    LoadWidget.vc1_fileline.setText(fileName)
+                    LoadWidget.vc1load_btn.clicked.disconnect()
+                    LoadWidget.vc1load_btn.clicked.connect(partial(removeVelocityCurve, 1, LoadWidget))
+                    LoadWidget.vc1load_btn.setText("Remove")
+                if vcNumber == 2:
+                    vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
+                    LoadWidget.vcPropertiesList[1] = vcprop
+                    LoadWidget.vc2_fileline.setText(fileName)
+                    LoadWidget.vc2load_btn.clicked.disconnect()
+                    LoadWidget.vc2load_btn.clicked.connect(partial(removeVelocityCurve, 2, LoadWidget))
+                    LoadWidget.vc2load_btn.setText("Remove")
 
 
 def loadEclipseTimings(EclipseWidget):
@@ -551,20 +543,18 @@ def loadEclipseTimings(EclipseWidget):
     returnCode = dialog.exec_()
     fileName = str((dialog.selectedFiles())[0])
     if fileName != "" and returnCode != 0:
-        try:
-            curve = classes.Curve(fileName)
+        curve = classes.Curve(fileName)
+        if curve.hasError:
+            if curve.hasError:
+                msg = QtGui.QMessageBox()
+                msg.setText(curve.error)
+                msg.setWindowTitle("PyWD - Error")
+                msg.exec_()
+        else:
             for x in curve.lines:
                 a = QtGui.QTreeWidgetItem(EclipseWidget.datawidget, x)
             EclipseWidget.filepath_label.setText(fileName)
             EclipseWidget.filepath_label.setToolTip(fileName)
-        except IndexError:
-            msg = QtGui.QMessageBox()
-            msg.setText("File is not a valid data source:\n" + fileName)
-            msg.exec_()
-        except:
-            msg = QtGui.QMessageBox()
-            msg.setText("Unknown exception is caught:\n" + sys.exc_info()[0])
-            msg.exec_()
 
 
 def removeEclipseTimings(EclipseWidget):
