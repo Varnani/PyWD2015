@@ -640,53 +640,47 @@ def evalCheckBox(checkBox):
 def runDc(MainWindow):
     dcin = exportDc(MainWindow)
     msg = QtGui.QMessageBox(MainWindow)
-    if dcin[0] != "":
+    if dcin.hasError:
         msg.setWindowTitle("PyWD - Fatal Error")
-        msg.setText("There were errors while parsing inputs:\n" + dcin[0] + "\n")
-        if dcin[1] != "":
-            msg.setText(msg.text() + "\nPlus, warnings were encountered: \n" + dcin[1])
+        msg.setText("There were errors while parsing inputs:\n" + dcin.error + "\n")
+        if dcin.hasWarning:
+            msg.setText(msg.text() + "\nPlus, warnings were encountered: \n" + dcin.warning)
         msg.exec_()
     else:
-        if dcin[1] != "":
+        answer = 0
+        if dcin.hasWarning:
             title = "PyWD - Warning"
-            text = "Warnings are encountered while parsing inputs: \n" + dcin[1] + \
+            text = "Warnings are encountered while parsing inputs: \n" + dcin.warning + \
                    "\nDo you still want to run the DC Program?"
             answer = QtGui.QMessageBox.question(MainWindow, title, text, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if answer == QtGui.QMessageBox.Yes:
-                try:
-                    cwd = ""
-                    import os
-                    import platform
-                    if platform.system() == "Windows":
-                        cwd = os.getcwd() + "\wd\dcin.active"
-                    if platform.system() == "Linux":
-                        cwd = os.getcwd() + "/wd/dcin.active"
-                    with open(cwd, "w") as f:
-                        f.write(dcin[2])
-                    # TODO continue implementing
-                except IOError as ex:
-                    msg.setWindowTitle("PyWD - IO Error")
-                    msg.setText("An IO error has been caught:\n" + ex.strerror + "\n" +
-                                ex.filename.rstrip("dcin.active"))
-                    msg.exec_()
-                except:
-                    msg.setWindowTitle("PyWD - Unknown Exception")
-                    msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
-                    msg.exec_()
+        if answer == QtGui.QMessageBox.Yes or dcin.hasWarning is False:
+            try:
+                cwd = ""
+                import os
+                import platform
+                if platform.system() == "Windows":
+                    cwd = os.getcwd() + "\wd\dcin.active"
+                if platform.system() == "Linux":
+                    cwd = os.getcwd() + "/wd/dcin.active"
+                with open(cwd, "w") as f:
+                    f.write(dcin.output)
+                msg.setText("file written")
+                msg.setWindowTitle("PyWD - Success")
+                msg.exec_()
+                # TODO continue implementing
+            except IOError as ex:
+                msg.setWindowTitle("PyWD - IO Error")
+                msg.setText("An IO error has been caught:\n" + ex.strerror + "\n" +
+                            ex.filename.rstrip("dcin.active"))
+                msg.exec_()
+            except:
+                msg.setWindowTitle("PyWD - Unknown Exception")
+                msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
+                msg.exec_()
 
 
 def exportDc(MainWindow):
-    """
-    Constructs a dcin.active file from MainWindow object
-    :param MainWindow: A MainWindow QtGui interface object
-    :return: a list with 3 elements:
-        [0]: Errors if any.
-            If there is, [2] will be "FATAL"
-        [1]: Warnings if any.
-            This won't interrupt parsing the dcin.active file. These errors most likely break the DC program though.
-        [2]: dcin.active itself, ready to write.
-    """
-    result = ["", "", ""]
+    dcin = classes.dcin()
     try:
         def _formatDels(ipt):  # only used in dcin.active
             error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
@@ -742,9 +736,10 @@ def exportDc(MainWindow):
 
         vunit = float(MainWindow.vunit_ipt.text())
         if vunit != float(1):
-            result[1] = result[1] + "\nVUnit parameter is different than 1:" + \
-                        "\nVGamma, velocity curve sigmas and all velocity observations " \
-                        "will be divided by VUnit, as it is required by DC program.\n"
+            warning = "VUnit parameter is different than 1:" + \
+                      "\nVGamma, velocity curve sigmas and all velocity observations " + \
+                      "will be divided by VUnit, as it is required by DC program."
+            dcin.addWarning(warning)
 
         line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
             _formatDels(MainWindow.del_s1lat_ipt.text()),
@@ -980,7 +975,7 @@ def exportDc(MainWindow):
         line10 = formatEcc(MainWindow.e_ipt.text()) + formatInput(MainWindow.a_ipt.text(), 13, 6, "D") + \
                  formatInput(MainWindow.f1_ipt.text(), 10, 4, "F") + \
                  formatInput(MainWindow.f2_ipt.text(), 10, 4, "F") + \
-                 formatInput((float(MainWindow.vgam_ipt.text())/vunit), 10, 4, "F") + \
+                 formatInput((float(MainWindow.vgam_ipt.text()) / vunit), 10, 4, "F") + \
                  formatInput(MainWindow.xincl_ipt.text(), 9, 3, "F") + \
                  formatInput(MainWindow.gr1_spinbox.value(), 7, 3, "F") + \
                  formatInput(MainWindow.gr2_spinbox.value(), 7, 3, "F") + \
@@ -989,10 +984,11 @@ def exportDc(MainWindow):
                  formatInput(MainWindow.SpotConfigureWidget.fspot2_ipt.text(), 10, 4, "F") + "\n"
 
         if float(MainWindow.tavh_ipt.text()) < float(1000) or float(MainWindow.tavc_ipt.text()) < float(1000):
-            result[1] = result[1] + "\nEntered surface temperature value is lower than 1000 Kelvin:" + \
-                        "\nKeep in mind that surface temperature parameters will be " + \
-                        "divided by 10,000 before writing into dcin.active file, as it is required by DC program." + \
-                        "\nMake sure you provide surface temperatures as it is, not in [T/10,000] format.\n"
+            warning = "Entered surface temperature value is lower than 1000 Kelvin:" + \
+                      "\nKeep in mind that surface temperature parameters will be " + \
+                      "divided by 10,000 before writing into dcin.active file, as it is required by DC program." + \
+                      "\nMake sure you provide surface temperatures as it is, not in [T/10,000] format."
+            dcin.addWarning(warning)
 
         line11 = formatInput(float(MainWindow.tavh_ipt.text()) / 10000.0, 7, 4, "F") + \
                  formatInput(float(MainWindow.tavc_ipt.text()) / 10000.0, 8, 4, "F") + \
@@ -1058,7 +1054,7 @@ def exportDc(MainWindow):
                            formatInput(lcprop.e4, 8, 5, "F") + " " + lcprop.ksd + "\n"
                 lcextraparams = formatInput(lcprop.wla, 9, 6, "F") + \
                                 formatInput(lcprop.aextinc, 8, 4, "F") + \
-                                formatInput(lcprop.xunit, 11, 4, "D") +\
+                                formatInput(lcprop.xunit, 11, 4, "D") + \
                                 formatInput(lcprop.calib, 12, 5, "D") + "\n"
                 lcparamsList.append(lcparams)
                 lcextraparamsList.append(lcextraparams)
@@ -1102,7 +1098,7 @@ def exportDc(MainWindow):
                                                             vc1prop.weightList):
                 vc1dataline = vc1dataline + \
                               formatInput(time, 14, 5, "F") + \
-                              formatInput((float(observation)/vunit), 11, 6, "F") + \
+                              formatInput((float(observation) / vunit), 11, 6, "F") + \
                               formatInput(weight, 8, 3, "F") + "\n"
             vc1dataline = vc1dataline + "  -10001.00000\n"
         vc2dataline = ""
@@ -1113,16 +1109,16 @@ def exportDc(MainWindow):
                                                             vc2prop.weightList):
                 vc2dataline = vc2dataline + \
                               formatInput(time, 14, 5, "F") + \
-                              formatInput((float(observation)/vunit), 11, 6, "F") + \
+                              formatInput((float(observation) / vunit), 11, 6, "F") + \
                               formatInput(weight, 8, 3, "F") + "\n"
             vc2dataline = vc2dataline + "  -10001.00000\n"
-            
+
         lcdataline = ""
         if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
             for lcprop in MainWindow.LoadWidget.lcPropertiesList:
                 for time, observation, weight in itertools.izip(lcprop.timeList,
-                                                             lcprop.observationList,
-                                                             lcprop.weightList):
+                                                                lcprop.observationList,
+                                                                lcprop.weightList):
                     lcdataline = lcdataline + formatInput(time, 14, 5, "F") + \
                                  formatInput(observation, 11, 6, "F") + \
                                  formatInput(weight, 8, 3, "F") + "\n"
@@ -1131,35 +1127,32 @@ def exportDc(MainWindow):
         ecdataline = ""
         if len(MainWindow.EclipseWidget.lines) != 0 and MainWindow.EclipseWidget.iftime_chk.isChecked():
             for time, type, weight in itertools.izip(MainWindow.EclipseWidget.timeList,
-                                                    MainWindow.EclipseWidget.typeList,
-                                                    MainWindow.EclipseWidget.weightList):
+                                                     MainWindow.EclipseWidget.typeList,
+                                                     MainWindow.EclipseWidget.weightList):
                 ecdataline = ecdataline + \
-                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3, "F")+ "\n"
+                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3, "F") + "\n"
             ecdataline = ecdataline + "  -10001.00000\n"
 
-        result[2] = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \
-                    + vclines + lclines + eclipseline + lcextralines + \
-                    "300.00000\n" + star1spotline + "300.00000\n" + star2spotline + \
-                    "150.\n" + vc1dataline + vc2dataline + lcdataline + \
-                    ecdataline + " 2\n"
+        dcin.output = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \
+                      + vclines + lclines + eclipseline + lcextralines + \
+                      "300.00000\n" + star1spotline + "300.00000\n" + star2spotline + \
+                      "150.\n" + vc1dataline + vc2dataline + lcdataline + \
+                      ecdataline + " 2\n"
         if vc1dataline == "" and vc2dataline == "":
-            result[1] = result[1] + "\nThere aren't any velocity curves loaded.\n"
+            dcin.addWarning("There aren't any velocity curves loaded.")
         if lcdataline == "":
-            result[1] = result[1] + "\nThere aren't any light curves loaded.\n"
+            dcin.addWarning("There aren't any light curves loaded.")
         if MainWindow.EclipseWidget.iftime_chk.isChecked() and ecdataline == "":
-            result[1] = result[1] + "\nIFTIMES is checked, but eclipse timings are not provided.\n"
+            dcin.addWarning("IFTIMES is checked, but eclipse timings are not provided.")
 
     except ValueError as ex:
-        result[0] = "Value Error - Can't cast input into a numeric value: \n" + ex.message
-        result[2] = "FATAL"
+        dcin.addError("Value Error - Can't cast input into a numeric value: \n" + ex.message)
     except IndexError as ex:
-        result[0] = "Wrong Input: \n" + ex.message
-        result[2] = "FATAL"
+        dcin.addError("Wrong Input: \n" + ex.message)
     except:
-        result[0] = "Unknown exception has been caught. This is most likely a programming error: \n" + \
-                    str(sys.exc_info())
-        result[2] = "FATAL"
-    return result
+        dcin.addError("Unknown exception has been caught. This is most likely a programming error: \n" +
+                      str(sys.exc_info()))
+    return dcin
 
 
 if __name__ == "__main__":

@@ -55,6 +55,23 @@ class VelocityCurveProperties:
         self.weightList = EditVelocityCurveDialog.weightList
         self.lines = EditVelocityCurveDialog.lines
 
+class dcin:
+    def __init__(self):
+        self.output = ""  # ready-to-write dcin.active file
+        self.warning = ""  # stored warnings
+        self.error = ""  # caught error
+        self.hasWarning = False
+        self.hasError = False
+
+    def addWarning(self, warning):
+        self.warning = self.warning + "\n" + warning + "\n"
+        self.hasWarning = True
+
+    def addError(self, error):
+        self.error = self.error + "\n" + error + "\n"
+        self.hasError = True
+        self.output = ""
+
 
 if __name__ == "__main__":
     pass
