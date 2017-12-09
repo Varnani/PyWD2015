@@ -1,3 +1,5 @@
+from itertools import izip
+
 class LightCurveProperties:
     def __init__(self, EditLightCurveDialog):
         self.FilePath = str(EditLightCurveDialog.filepath_label.text())
@@ -77,6 +79,17 @@ class Curve:
         self.error = ""
         self.parseFile(filePath)
 
+    def validateData(self):
+        try:
+            for time, observation, weight in izip(self.timeList, self.observationList, self.weightList):
+                float(time)
+                float(observation)
+                float(weight)
+        except ValueError as ex:
+            self.hasError = True
+            self.error = "File has data that can't be parsed into a numerical value:\n" + \
+                         self.filepath + "\n" + ex.message
+
     def parseFile(self, filePath):
         try:
             with open(filePath) as data:
@@ -87,6 +100,7 @@ class Curve:
             self.timeList = [x[0] for x in self.lines]
             self.observationList = [x[1] for x in self.lines]
             self.weightList = [x[2] for x in self.lines]
+            self.validateData()
         except IndexError:
             self.hasError = True
             self.error = "File is not a valid data source:\n" + filePath

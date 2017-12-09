@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>330</width>
-    <height>590</height>
+    <height>640</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>330</width>
-    <height>590</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>330</width>
-    <height>590</height>
+    <width>10000</width>
+    <height>10000</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>711</width>
+     <width>311</width>
      <height>21</height>
     </rect>
    </property>
@@ -68,7 +68,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>470</y>
+     <y>520</y>
      <width>311</width>
      <height>50</height>
     </rect>
@@ -81,7 +81,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>110</y>
+     <y>160</y>
      <width>311</width>
      <height>351</height>
     </rect>
@@ -106,7 +106,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>530</y>
+     <y>580</y>
      <width>311</width>
      <height>50</height>
     </rect>
@@ -119,7 +119,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>70</y>
+     <y>110</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -132,7 +132,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>80</y>
+     <y>130</y>
      <width>311</width>
      <height>31</height>
     </rect>
@@ -144,8 +144,8 @@
   <widget class="QSpinBox" name="ksd_box">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>39</y>
+     <x>40</x>
+     <y>69</y>
      <width>51</width>
      <height>22</height>
     </rect>
@@ -166,8 +166,8 @@
   <widget class="QLabel" name="label_16">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>40</y>
+     <x>10</x>
+     <y>70</y>
      <width>41</width>
      <height>20</height>
     </rect>
@@ -185,7 +185,7 @@
   <widget class="QLabel" name="label_11">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>170</x>
      <y>70</y>
      <width>51</width>
      <height>20</height>
@@ -201,14 +201,27 @@
   <widget class="QLineEdit" name="sigma_ipt">
    <property name="geometry">
     <rect>
-     <x>234</x>
+     <x>220</x>
      <y>70</y>
-     <width>71</width>
+     <width>101</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
     <string>0</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line_13">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>90</y>
+     <width>251</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
  </widget>

@@ -515,7 +515,7 @@ def loadVelocityCurve(vcNumber, LoadWidget):
             msg.setWindowTitle("PyWD - Error")
             msg.exec_()
         else:
-            LoadWidget.EditVelocityCurveDialog.load(fileName)
+            LoadWidget.EditVelocityCurveDialog.load(fileName, curve)
             LoadWidget.EditVelocityCurveDialog.setWindowTitle("Load Velocity Curve")
             exitcode = LoadWidget.EditVelocityCurveDialog.exec_()
             LoadWidget.EditVelocityCurveDialog.setWindowTitle("Edit Velocity Curve")

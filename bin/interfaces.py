@@ -289,7 +289,7 @@ class EditVelocityCurveDialog(QtGui.QDialog, editvelocitycurvedialog.Ui_EditVelo
         for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)
 
-    def load(self, filePath):
+    def load(self, filePath, curve):
         self.filepath_label.setText(filePath)
         self.filepath_label.setToolTip(filePath)
         self.band_box.setValue(7)
@@ -307,7 +307,6 @@ class EditVelocityCurveDialog(QtGui.QDialog, editvelocitycurvedialog.Ui_EditVelo
         self.wla_ipt.setText("0")
         self.opsf_ipt.setText("0")
         self.sigma_ipt.setText("0")
-        curve = classes.Curve(filePath)
         self.datawidget.clear()
         for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)
