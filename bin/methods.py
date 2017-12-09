@@ -552,17 +552,8 @@ def loadEclipseTimings(EclipseWidget):
     fileName = str((dialog.selectedFiles())[0])
     if fileName != "" and returnCode != 0:
         try:
-            lines = []
-            with open(fileName) as f:
-                for line in f:
-                    i = line.split()
-                    if len(i) is not 0:
-                        lines.append(i)
-            EclipseWidget.timeList = [x[0] for x in lines]
-            EclipseWidget.typeList = [x[1] for x in lines]
-            EclipseWidget.weightList = [x[2] for x in lines]
-            EclipseWidget.lines = lines
-            for x in lines:
+            curve = classes.Curve(fileName)
+            for x in curve.lines:
                 a = QtGui.QTreeWidgetItem(EclipseWidget.datawidget, x)
             EclipseWidget.filepath_label.setText(fileName)
             EclipseWidget.filepath_label.setToolTip(fileName)
@@ -578,10 +569,6 @@ def loadEclipseTimings(EclipseWidget):
 
 def removeEclipseTimings(EclipseWidget):
     EclipseWidget.datawidget.clear()
-    EclipseWidget.timeList = []
-    EclipseWidget.typeList = []
-    EclipseWidget.weighList = []
-    EclipseWidget.lines = []
     EclipseWidget.filepath_label.setText("None")
     EclipseWidget.filepath_label.setToolTip("")
     EclipseWidget.sigma_ipt.setText("0")
@@ -1092,45 +1079,61 @@ def exportDc(MainWindow):
                                 "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
         vc1dataline = ""
         if ifvc1 == "1":
-            vc1prop = MainWindow.LoadWidget.vcPropertiesList[0]
-            for time, observation, weight in itertools.izip(vc1prop.timeList,
-                                                            vc1prop.observationList,
-                                                            vc1prop.weightList):
-                vc1dataline = vc1dataline + \
-                              formatInput(time, 14, 5, "F") + \
-                              formatInput((float(observation) / vunit), 11, 6, "F") + \
-                              formatInput(weight, 8, 3, "F") + "\n"
+            vc1prop = classes.Curve(MainWindow.LoadWidget.vcPropertiesList[0].FilePath)
+            if vc1prop.hasError:
+                dcin.addError(vc1prop.error)
+            else:
+                for time, observation, weight in itertools.izip(vc1prop.timeList,
+                                                                vc1prop.observationList,
+                                                                vc1prop.weightList):
+                    vc1dataline = vc1dataline + \
+                                  formatInput(time, 14, 5, "F") + \
+                                  formatInput((float(observation) / vunit), 11, 6, "F") + \
+                                  formatInput(weight, 8, 3, "F") + "\n"
             vc1dataline = vc1dataline + "  -10001.00000\n"
         vc2dataline = ""
         if ifvc2 == "1":
-            vc2prop = MainWindow.LoadWidget.vcPropertiesList[1]
-            for time, observation, weight in itertools.izip(vc2prop.timeList,
-                                                            vc2prop.observationList,
-                                                            vc2prop.weightList):
-                vc2dataline = vc2dataline + \
-                              formatInput(time, 14, 5, "F") + \
-                              formatInput((float(observation) / vunit), 11, 6, "F") + \
-                              formatInput(weight, 8, 3, "F") + "\n"
+            vc2prop = classes.Curve(MainWindow.LoadWidget.vcPropertiesList[1].FilePath)
+            if vc2prop.hasError:
+                dcin.addError(vc2prop.error)
+            else:
+                for time, observation, weight in itertools.izip(vc2prop.timeList,
+                                                                vc2prop.observationList,
+                                                                vc2prop.weightList):
+                    vc2dataline = vc2dataline + \
+                                  formatInput(time, 14, 5, "F") + \
+                                  formatInput((float(observation) / vunit), 11, 6, "F") + \
+                                  formatInput(weight, 8, 3, "F") + "\n"
             vc2dataline = vc2dataline + "  -10001.00000\n"
 
         lcdataline = ""
         if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
             for lcprop in MainWindow.LoadWidget.lcPropertiesList:
-                for time, observation, weight in itertools.izip(lcprop.timeList,
-                                                                lcprop.observationList,
-                                                                lcprop.weightList):
-                    lcdataline = lcdataline + formatInput(time, 14, 5, "F") + \
-                                 formatInput(observation, 11, 6, "F") + \
-                                 formatInput(weight, 8, 3, "F") + "\n"
+                curve = classes.Curve(lcprop.FilePath)
+                if curve.hasError:
+                    dcin.addError(curve.error)
+                else:
+                    for time, observation, weight in itertools.izip(curve.timeList,
+                                                                    curve.observationList,
+                                                                    curve.weightList):
+                        lcdataline = lcdataline + formatInput(time, 14, 5, "F") + \
+                                     formatInput(observation, 11, 6, "F") + \
+                                     formatInput(weight, 8, 3, "F") + "\n"
                 lcdataline = lcdataline + "  -10001.00000\n"
 
         ecdataline = ""
-        if len(MainWindow.EclipseWidget.lines) != 0 and MainWindow.EclipseWidget.iftime_chk.isChecked():
-            for time, type, weight in itertools.izip(MainWindow.EclipseWidget.timeList,
-                                                     MainWindow.EclipseWidget.typeList,
-                                                     MainWindow.EclipseWidget.weightList):
-                ecdataline = ecdataline + \
-                             formatInput(time, 14, 5, "F") + (" " * 5 + type) + formatInput(weight, 13, 3, "F") + "\n"
+        if len(MainWindow.EclipseWidget.filepath_label.text()) != "None" \
+                and MainWindow.EclipseWidget.iftime_chk.isChecked():
+            curve = classes.Curve(MainWindow.EclipseWidget.filepath_label.text())
+            if curve.hasError:
+                dcin.addError(curve.error)
+            else:
+                for time, mintype, weight in itertools.izip(curve.timeList,
+                                                         curve.observationList,
+                                                         curve.weightList):
+                    ecdataline = ecdataline + \
+                                 formatInput(time, 14, 5, "F") + (" " * 5 + mintype) + \
+                                 formatInput(weight, 13, 3, "F") + "\n"
             ecdataline = ecdataline + "  -10001.00000\n"
 
         dcin.output = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \

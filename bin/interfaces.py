@@ -2,7 +2,7 @@ from PyQt4 import QtGui
 from gui import mainwindow, loadwidget, spotconfigurewidget, \
     editlightcurvedialog, editvelocitycurvedialog, eclipsewidget
 from functools import partial
-from bin import methods
+from bin import methods, classes
 
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
@@ -138,12 +138,6 @@ class EclipseWiget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
         super(EclipseWiget, self).__init__()
         self.setupUi(self)  # setup ui from eclipsewidget.py
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
-        # setup variables
-        self.timeList = []
-        self.typeList = []
-        self.weightList = []
-        self.lines = []
-        #
         self.connectSignals()
 
     def connectSignals(self):
@@ -196,6 +190,7 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
 
     def populate(self, LightCurveProperties):  # populate ui from a lcprop obj
         self.filepath_label.setText(LightCurveProperties.FilePath)
+        curve = classes.Curve(LightCurveProperties.FilePath)
         self.filepath_label.setToolTip(LightCurveProperties.FilePath)
         self.band_box.setValue(int(LightCurveProperties.band))
         self.ksd_box.setValue(int(LightCurveProperties.ksd))
@@ -217,12 +212,8 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
         self.aextinc_ipt.setText(LightCurveProperties.aextinc)
         self.xunit_ipt.setText(LightCurveProperties.xunit)
         self.calib_ipt.setText(LightCurveProperties.calib)
-        self.lines = LightCurveProperties.lines
-        self.timeList = LightCurveProperties.timeList
-        self.observationList = LightCurveProperties.observationList
-        self.weightList = LightCurveProperties.weightList
         self.datawidget.clear()
-        for x in self.lines:
+        for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)
 
     def load(self, filePath):  # populate ui from a file
@@ -248,20 +239,10 @@ class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurve
         self.aextinc_ipt.setText("0")
         self.xunit_ipt.setText("1.0000")
         self.calib_ipt.setText("0")
-        lines = []
-        with open(filePath) as f:
-            for line in f:
-                i = line.split()
-                if i.__len__() is not 0:
-                    lines.append(i)
-                    # lines.append([str(x) for x in line.split()])
-        self.timeList = [x[0] for x in lines]
-        self.observationList = [x[1] for x in lines]
-        self.weightList = [x[2] for x in lines]
+        curve = classes.Curve(filePath)
         self.datawidget.clear()
-        for x in lines:
+        for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)
-        self.lines = lines
 
     def acceptChanges(self):
         self.done(1)
@@ -288,6 +269,7 @@ class EditVelocityCurveDialog(QtGui.QDialog, editvelocitycurvedialog.Ui_EditVelo
 
     def populate(self, VelocityCurveProperties):  # populate ui from a lcprop obj
         self.filepath_label.setText(VelocityCurveProperties.FilePath)
+        curve = classes.Curve(VelocityCurveProperties.FilePath)
         self.filepath_label.setToolTip(VelocityCurveProperties.FilePath)
         self.band_box.setValue(int(VelocityCurveProperties.band))
         self.ksd_box.setValue(int(VelocityCurveProperties.ksd))
@@ -304,12 +286,8 @@ class EditVelocityCurveDialog(QtGui.QDialog, editvelocitycurvedialog.Ui_EditVelo
         self.wla_ipt.setText(VelocityCurveProperties.wla)
         self.opsf_ipt.setText(VelocityCurveProperties.opsf)
         self.sigma_ipt.setText(VelocityCurveProperties.sigma)
-        self.lines = VelocityCurveProperties.lines
-        self.timeList = VelocityCurveProperties.timeList
-        self.observationList = VelocityCurveProperties.observationList
-        self.weightList = VelocityCurveProperties.weightList
         self.datawidget.clear()
-        for x in self.lines:
+        for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)
 
     def load(self, filePath):
@@ -330,19 +308,10 @@ class EditVelocityCurveDialog(QtGui.QDialog, editvelocitycurvedialog.Ui_EditVelo
         self.wla_ipt.setText("0")
         self.opsf_ipt.setText("0")
         self.sigma_ipt.setText("0")
-        lines = []
-        with open(filePath) as f:
-            for line in f:
-                i = line.split()
-                if i.__len__() is not 0:
-                    lines.append(i)
-        self.timeList = [x[0] for x in lines]
-        self.observationList = [x[1] for x in lines]
-        self.weightList = [x[2] for x in lines]
+        curve = classes.Curve(filePath)
         self.datawidget.clear()
-        for x in lines:
+        for x in curve.lines:
             a = QtGui.QTreeWidgetItem(self.datawidget, x)
-        self.lines = lines
 
     def acceptChanges(self):
         self.done(1)

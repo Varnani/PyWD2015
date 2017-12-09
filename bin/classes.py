@@ -26,10 +26,6 @@ class LightCurveProperties:
         self.aextinc = str(EditLightCurveDialog.aextinc_ipt.text())
         self.xunit = str(EditLightCurveDialog.xunit_ipt.text())
         self.calib = str(EditLightCurveDialog.calib_ipt.text())
-        self.timeList = EditLightCurveDialog.timeList
-        self.observationList = EditLightCurveDialog.observationList
-        self.weightList = EditLightCurveDialog.weightList
-        self.lines = EditLightCurveDialog.lines
 
 
 class VelocityCurveProperties:
@@ -50,10 +46,7 @@ class VelocityCurveProperties:
         self.wla = str(EditVelocityCurveDialog.wla_ipt.text())
         self.opsf = str(EditVelocityCurveDialog.opsf_ipt.text())
         self.sigma = str(EditVelocityCurveDialog.sigma_ipt.text())
-        self.timeList = EditVelocityCurveDialog.timeList
-        self.observationList = EditVelocityCurveDialog.observationList
-        self.weightList = EditVelocityCurveDialog.weightList
-        self.lines = EditVelocityCurveDialog.lines
+
 
 class dcin:
     def __init__(self):
@@ -71,6 +64,35 @@ class dcin:
         self.error = self.error + "\n" + error + "\n"
         self.hasError = True
         self.output = ""
+
+
+class Curve:
+    def __init__(self, filePath):
+        self.timeList = []
+        self.observationList = []
+        self.weightList = []
+        self.lines = []
+        self.filepath = filePath
+        self.hasError = False
+        self.error = ""
+        self.parseFile(filePath)
+
+    def parseFile(self, filePath):
+        try:
+            with open(filePath) as data:
+                for line in data:
+                    i = line.split()
+                    if len(i) is not 0:
+                        self.lines.append(i)
+            self.timeList = [x[0] for x in self.lines]
+            self.observationList = [x[1] for x in self.lines]
+            self.weightList = [x[2] for x in self.lines]
+        except IndexError:
+            self.hasError = True
+            self.error = "File is not a valid data source:\n" + filePath
+        except IOError as ex:
+            self.hasError = True
+            self.error = "An IO error has been caught:\n" + ex.strerror + filePath
 
 
 if __name__ == "__main__":
