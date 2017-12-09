@@ -72,8 +72,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>752</width>
-        <height>308</height>
+        <width>800</width>
+        <height>400</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -367,7 +367,7 @@
          <rect>
           <x>270</x>
           <y>50</y>
-          <width>21</width>
+          <width>31</width>
           <height>191</height>
          </rect>
         </property>
@@ -3911,6 +3911,32 @@ the triple system barycenter, in the adopted time system</string>
          <string>Miscellaneous Settings - Various parameters that does not fit into a particular group.</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="saveproject_btn">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>220</y>
+          <width>161</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save Project</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="loadproject_btn">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>220</y>
+          <width>161</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Load Project</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -3923,8 +3949,8 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>752</width>
-        <height>308</height>
+        <width>800</width>
+        <height>400</height>
        </rect>
       </property>
       <property name="currentIndex">

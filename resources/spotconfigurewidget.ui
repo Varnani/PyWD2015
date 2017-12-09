@@ -378,7 +378,7 @@
     <string>Save your current configuration.</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="spotconfigload_label">
@@ -394,7 +394,7 @@
     <string>Load previously saved configuration.</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
   <widget class="QPushButton" name="addspot1_btn">

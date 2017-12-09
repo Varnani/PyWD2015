@@ -17,6 +17,16 @@ def SaveSpotConfiguration(SpotConfigureWidget):
     if filePath != "" and returnCode != 0:
         try:
             parser = ConfigParser.SafeConfigParser()
+            # parse spot config
+            parser.add_section("Spot Configuration")
+            parser.set("Spot Configuration", "ifsmv1", str(SpotConfigureWidget.ifsmv1_chk.isChecked()))
+            parser.set("Spot Configuration", "ifsmv2", str(SpotConfigureWidget.ifsmv2_chk.isChecked()))
+            parser.set("Spot Configuration", "kspev", str(SpotConfigureWidget.kspev_chk.isChecked()))
+            parser.set("Spot Configuration", "kspot", str(SpotConfigureWidget.kspot_chk.isChecked()))
+            parser.set("Spot Configuration", "fspot1", str(SpotConfigureWidget.fspot1_ipt.value()))
+            parser.set("Spot Configuration", "fspot2", str(SpotConfigureWidget.fspot2_ipt.value()))
+            parser.set("Spot Configuration", "nomax", str(SpotConfigureWidget.nomax_combobox.currentIndex()))
+
             # parse row info
             parser.add_section("Spot Count")
             parser.set("Spot Count", "star 1", str(SpotConfigureWidget.star1RowCount))
@@ -48,6 +58,7 @@ def SaveSpotConfiguration(SpotConfigureWidget):
             with open(filePath, 'w') as f:
                 parser.write(f)
             SpotConfigureWidget.spotconfigsave_label.setText("Spot config saved: " + filePath)
+            SpotConfigureWidget.spotconfigsave_label.setToolTip("Spot config saved: " + filePath)
         except:
             msg = QtGui.QMessageBox()
             msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
@@ -66,6 +77,17 @@ def LoadSpotConfiguration(SpotConfigureWidget):
         parser = ConfigParser.SafeConfigParser()
         with open(filePath, 'r') as f:
             parser.readfp(f)
+        if parser.getboolean("Spot Configuration", "ifsmv1"):
+            SpotConfigureWidget.ifsmv1_chk.toggle()
+        if parser.getboolean("Spot Configuration", "ifsmv2"):
+            SpotConfigureWidget.ifsmv2_chk.toggle()
+        if parser.getboolean("Spot Configuration", "kspev"):
+            SpotConfigureWidget.kspev_chk.toggle()
+        if parser.getboolean("Spot Configuration", "kspot"):
+            SpotConfigureWidget.kspot_chk.toggle()
+        SpotConfigureWidget.fspot1_ipt.setValue(parser.getfloat("Spot Configuration", "fspot1"))
+        SpotConfigureWidget.fspot2_ipt.setValue(parser.getfloat("Spot Configuration", "fspot2"))
+        SpotConfigureWidget.nomax_combobox.setCurrentIndex(parser.getint("Spot Configuration", "nomax"))
         star1spotcount = parser.getint("Spot Count", "star 1")
         star2spotcount = parser.getint("Spot Count", "star 2")
         i = 0
@@ -99,9 +121,21 @@ def LoadSpotConfiguration(SpotConfigureWidget):
         SpotConfigureWidget.radioButtonGroupA.setExclusive(True)
         SpotConfigureWidget.radioButtonGroupB.setExclusive(True)
         SpotConfigureWidget.spotconfigload_label.setText("Spot config loaded: " + filePath)
+        SpotConfigureWidget.spotconfigload_label.setToolTip("Spot config loaded: " + filePath)
 
 
 def clearSpotConfigureWidget(SpotConfigureWidget):
+    if SpotConfigureWidget.ifsmv1_chk.isChecked():
+        SpotConfigureWidget.ifsmv1_chk.toggle()
+    if SpotConfigureWidget.ifsmv2_chk.isChecked():
+        SpotConfigureWidget.ifsmv2_chk.toggle()
+    if SpotConfigureWidget.kspev_chk.isChecked():
+        SpotConfigureWidget.kspev_chk.toggle()
+    if SpotConfigureWidget.kspot_chk.isChecked():
+        SpotConfigureWidget.kspot_chk.toggle()
+    SpotConfigureWidget.fspot1_ipt.setValue(1)
+    SpotConfigureWidget.fspot1_ipt.setValue(1)
+    SpotConfigureWidget.nomax_combobox.setCurrentIndex(0)
     # we'll just click every remove button
     for elementList in reversed(SpotConfigureWidget.star1ElementList):
         elementList[7].click()
@@ -1146,6 +1180,10 @@ def exportDc(MainWindow):
         dcin.addError("Unknown exception has been caught. This is most likely a programming error: \n" +
                       str(sys.exc_info()))
     return dcin
+
+
+def saveProject(MainWindow):
+    pass
 
 
 if __name__ == "__main__":
