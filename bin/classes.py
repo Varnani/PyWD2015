@@ -1,5 +1,7 @@
 from itertools import izip
 
+# TODO Merge LightCurveProperties and VelocityCurveProperties, since having 2 identical classes is redundant
+# TODO Merge EditLightCurveDialog and EditVelocityCurveDialog
 class LightCurveProperties:
     def __init__(self, EditLightCurveDialog):
         self.FilePath = str(EditLightCurveDialog.filepath_label.text())

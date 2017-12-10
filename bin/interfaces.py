@@ -389,5 +389,6 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
                 msg.exec_()
                 methods.clearSpotConfigureWidget(self)
 
+
 if __name__ == "__main__":
     pass
