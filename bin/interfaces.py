@@ -1,4 +1,4 @@
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from gui import mainwindow, loadwidget, spotconfigurewidget, \
     editlightcurvedialog, editvelocitycurvedialog, eclipsewidget
 from functools import partial
@@ -29,6 +29,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.setkeepdefaults_btn.clicked.connect(self.setKeepDefaults)
         self.eclipsewidget_btn.clicked.connect(self.EclipseWidget.show)
         self.saveproject_btn.clicked.connect(self.saveProjectDialog)
+        self.loadproject_btn.clicked.connect(self.loadProjectDialog)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadWidget.close()  # close loadwidget if we exit
@@ -49,6 +50,35 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
                 msg = QtGui.QMessageBox()
                 msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
                 msg.exec_()
+
+    def loadProjectDialog(self):
+        msg = QtGui.QMessageBox()
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("pywdproject")
+        dialog.setNameFilter("PyWD2015 Project File (*pywdproject)")
+        dialog.setAcceptMode(0)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        fi = QtCore.QFileInfo(filePath)
+        if filePath != "" and returnCode != 0:
+            title = "PyWD - Warning"
+            text = "Loading a project file will erase all unsaved changes. Do you want to load \"" + \
+                   fi.fileName() + "\" ?"
+            answer = QtGui.QMessageBox.question(self, title, text, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if answer == QtGui.QMessageBox.Yes:
+                try:
+                    methods.loadProject(self, filePath)
+                    msg.setText("Project file \"" + fi.fileName() + "\" loaded.")
+                    msg.setWindowTitle("PyWD - Project Loaded")
+                    msg.exec_()
+                except RuntimeError as ex:
+                    msg.setText(ex.message)
+                    msg.setWindowTitle("PyWD - Wrong File Version")
+                    msg.exec_()
+                except:
+                    msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                    msg.exec_()
+
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")

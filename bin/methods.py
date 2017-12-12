@@ -5,7 +5,7 @@ from bin import classes
 import ConfigParser
 import numpy as np
 import itertools
-# TODO create a loadDialog()/saveDialog() helper methods
+
 
 def SaveSpotConfiguration(SpotConfigureWidget, filePath):
     parser = ConfigParser.SafeConfigParser()
@@ -1172,7 +1172,7 @@ def saveProject(MainWindow, filePath):
     parser.add_section("Main")
     parser.set("Main", "operation mode", str(MainWindow.mode_combobox.currentIndex()))
     parser.set("Main", "jdphs", str(MainWindow.jdphs_combobox.currentIndex()))
-    parser.set("Main", "magltie", str(MainWindow.maglite_combobox.currentIndex()))
+    parser.set("Main", "maglite", str(MainWindow.maglite_combobox.currentIndex()))
     parser.set("Main", "isym", str(MainWindow.isym_combobox.currentIndex()))
     # system tab
     parser.add_section("System")
@@ -1314,11 +1314,59 @@ def saveProject(MainWindow, filePath):
     parser.set("Miscellaneous", "iflcin", str(MainWindow.ifder_chk.isChecked()))
     parser.set("Miscellaneous", "linkext", str(MainWindow.linkext_spinbox.value()))
     parser.set("Miscellaneous", "desextinc", str(MainWindow.desextinc_ipt.text()))
-
-
     # write file
     with open(filePath, "w") as f:
         parser.write(f)
+
+
+def loadProject(MainWindow, filePath):
+    parser = ConfigParser.SafeConfigParser()
+    with open(filePath, 'r') as f:
+        parser.readfp(f)
+    # check version
+    if parser.get("Info", "version") != "2015":
+        raise RuntimeError("This project file is for another version of PyWD.\n" +
+                           "Current Version: 2015\n" + "Project File Version: " +
+                           parser.get("Info", "version"))
+    else:
+        # main tab
+        MainWindow.mode_combobox.setCurrentIndex(parser.getint("Main", "operation mode"))
+        MainWindow.jdphs_combobox.setCurrentIndex(parser.getint("Main", "jdphs"))
+        MainWindow.maglite_combobox.setCurrentIndex(parser.getint("Main", "maglite"))
+        MainWindow.isym_combobox.setCurrentIndex(parser.getint("Main", "isym"))
+        # system tab
+        MainWindow.jd0_ipt.setText(parser.get("System", "jd0"))
+        MainWindow.p0_ipt.setText(parser.get("System", "p0"))
+        MainWindow.dpdt_ipt.setText(parser.get("System", "dpdt"))
+        MainWindow.pshift_ipt.setText(parser.get("System", "pshift"))
+        MainWindow.delph_ipt.setText(parser.get("System", "delph"))
+        MainWindow.a_ipt.setText(parser.get("System", "a"))
+        MainWindow.e_ipt.setText(parser.get("System", "e"))
+        MainWindow.perr0_ipt.setText(parser.get("System", "perr0"))
+        MainWindow.dperdt_ipt.setText(parser.get("System", "dperdt"))
+        MainWindow.xincl_ipt.setText(parser.get("System", "xincl"))
+        MainWindow.vgam_ipt.setText(parser.get("System", "vgam"))
+        MainWindow.rm_ipt.setText(parser.get("System", "rm"))
+        MainWindow.abunin_ipt.setText(parser.get("System", "abunin"))
+        MainWindow.tavh_ipt.setText(parser.get("System", "tavh"))
+        MainWindow.tavc_ipt.setText(parser.get("System", "tavc"))
+        MainWindow.phsv_ipt.setText(parser.get("System", "pot1"))
+        MainWindow.pcsv_ipt.setText(parser.get("System", "pot2"))
+        MainWindow.f1_ipt.setText(parser.get("System", "f1"))
+        MainWindow.f2_ipt.setText(parser.get("System", "f2"))
+        MainWindow.the_ipt.setText(parser.get("System", "th e"))
+        MainWindow.vunit_ipt.setText(parser.get("System", "vunit"))
+        MainWindow.dpclog_ipt.setText(parser.get("System", "dpclog"))
+        MainWindow.nga_spinbox.setValue(parser.getint("System", "nga"))
+        # surface tab
+        MainWindow.ifat1_combobox.setCurrentIndex(parser.getint("Surface", "ifat1"))
+        MainWindow.ifat2_combobox.setCurrentIndex(parser.getint("Surface", "ifat2"))
+        MainWindow.alb1_spinbox.setValue(parser.getfloat("Surface", "alb1"))
+        MainWindow.alb2_spinbox.setValue(parser.getfloat("Surface", "alb2"))
+        MainWindow.gr1_spinbox.setValue(parser.getfloat("Surface", "gr1"))
+        MainWindow.gr2_spinbox.setValue(parser.getfloat("Surface", "gr2"))
+        MainWindow.ld1_combobox.setCurrentIndex(parser.getint("Surface", "ld1"))
+        MainWindow.ld2_combobox.setCurrentIndex(parser.getint("Surface", "ld2"))
 
 
 if __name__ == "__main__":
