@@ -77,7 +77,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_7">
        <attribute name="title">
@@ -666,12 +666,18 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>51</width>
+          <width>91</width>
           <height>21</height>
          </rect>
         </property>
-        <property name="text">
+        <property name="toolTip">
+         <string>Ephemeris time of the eclipsing system in JD time</string>
+        </property>
+        <property name="statusTip">
          <string>JD0</string>
+        </property>
+        <property name="text">
+         <string>Ephemeris</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="tavh_ipt">
@@ -827,8 +833,11 @@
         <property name="toolTip">
          <string>Period</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>P0</string>
+        </property>
+        <property name="text">
+         <string>Period</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_71">
@@ -844,7 +853,7 @@
          <string>Mean effective temperature for star 1, re-radiation or spots not included</string>
         </property>
         <property name="text">
-         <string>TAVH</string>
+         <string>T1</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_56">
@@ -972,7 +981,7 @@
          <string>Mean effective temperature for star 2, re-radiation or spots not included</string>
         </property>
         <property name="text">
-         <string>TAVC</string>
+         <string>T2</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_64">
