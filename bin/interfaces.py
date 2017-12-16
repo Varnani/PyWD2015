@@ -4,6 +4,7 @@ from gui import mainwindow, loadwidget, spotconfigurewidget, \
 from functools import partial
 from bin import methods, classes
 import sys
+import ConfigParser
 
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
@@ -397,7 +398,9 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
         filePath = str((dialog.selectedFiles())[0])
         if filePath != "" and returnCode != 0:
             try:
-                methods.SaveSpotConfiguration(self, filePath)
+                parser = methods.SaveSpotConfiguration(self)
+                with open(filePath, 'w') as f:
+                    parser.write(f)
             except:
                 msg = QtGui.QMessageBox()
                 msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
@@ -412,7 +415,10 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
         filePath = (dialog.selectedFiles())[0]
         if filePath != "" and returnCode != 0:
             try:
-                methods.LoadSpotConfiguration(self, filePath)
+                parser = ConfigParser.SafeConfigParser()
+                with open(filePath, 'r') as f:
+                    parser.readfp(f)
+                methods.LoadSpotConfiguration(self, parser)
             except:
                 msg = QtGui.QMessageBox()
                 msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))

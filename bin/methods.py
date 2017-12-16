@@ -7,7 +7,7 @@ import numpy as np
 import itertools
 
 
-def SaveSpotConfiguration(SpotConfigureWidget, filePath):
+def SaveSpotConfiguration(SpotConfigureWidget):
     parser = ConfigParser.SafeConfigParser()
     # parse spot config
     parser.add_section("Spot Configuration")
@@ -18,7 +18,6 @@ def SaveSpotConfiguration(SpotConfigureWidget, filePath):
     parser.set("Spot Configuration", "fspot1", str(SpotConfigureWidget.fspot1_ipt.value()))
     parser.set("Spot Configuration", "fspot2", str(SpotConfigureWidget.fspot2_ipt.value()))
     parser.set("Spot Configuration", "nomax", str(SpotConfigureWidget.nomax_combobox.currentIndex()))
-
     # parse row info
     parser.add_section("Spot Count")
     parser.set("Spot Count", "star 1", str(SpotConfigureWidget.star1RowCount))
@@ -35,6 +34,10 @@ def SaveSpotConfiguration(SpotConfigureWidget, filePath):
         parser.set(section, "longitude", str(SpotConfigureWidget.star1ElementList[i][4].text()))
         parser.set(section, "angular radius", str(SpotConfigureWidget.star1ElementList[i][5].text()))
         parser.set(section, "temperature factor", str(SpotConfigureWidget.star1ElementList[i][6].text()))
+        parser.set(section, "onset start", str(SpotConfigureWidget.star1ElementList[i][7].text()))
+        parser.set(section, "maximum start", str(SpotConfigureWidget.star1ElementList[i][8].text()))
+        parser.set(section, "maximum end", str(SpotConfigureWidget.star1ElementList[i][9].text()))
+        parser.set(section, "onset end", str(SpotConfigureWidget.star1ElementList[i][10].text()))
         i += 1
     i = 0
     while i < SpotConfigureWidget.star2RowCount:
@@ -46,18 +49,16 @@ def SaveSpotConfiguration(SpotConfigureWidget, filePath):
         parser.set(section, "longitude", str(SpotConfigureWidget.star2ElementList[i][4].text()))
         parser.set(section, "angular radius", str(SpotConfigureWidget.star2ElementList[i][5].text()))
         parser.set(section, "temperature factor", str(SpotConfigureWidget.star2ElementList[i][6].text()))
+        parser.set(section, "onset start", str(SpotConfigureWidget.star2ElementList[i][7].text()))
+        parser.set(section, "maximum start", str(SpotConfigureWidget.star2ElementList[i][8].text()))
+        parser.set(section, "maximum end", str(SpotConfigureWidget.star2ElementList[i][9].text()))
+        parser.set(section, "onset end", str(SpotConfigureWidget.star2ElementList[i][10].text()))
         i += 1
-    with open(filePath, 'w') as f:
-        parser.write(f)
-    SpotConfigureWidget.spotconfigsave_label.setText("Spot config saved: " + filePath)
-    SpotConfigureWidget.spotconfigsave_label.setToolTip("Spot config saved: " + filePath)
+    return parser
 
 
-def LoadSpotConfiguration(SpotConfigureWidget, filePath):
+def LoadSpotConfiguration(SpotConfigureWidget, parser):
     clearSpotConfigureWidget(SpotConfigureWidget)
-    parser = ConfigParser.SafeConfigParser()
-    with open(filePath, 'r') as f:
-        parser.readfp(f)
     if parser.getboolean("Spot Configuration", "ifsmv1"):
         SpotConfigureWidget.ifsmv1_chk.toggle()
     if parser.getboolean("Spot Configuration", "ifsmv2"):
@@ -85,6 +86,10 @@ def LoadSpotConfiguration(SpotConfigureWidget, filePath):
         SpotConfigureWidget.star1ElementList[i][4].setText(parser.get(section, "longitude"))
         SpotConfigureWidget.star1ElementList[i][5].setText(parser.get(section, "angular radius"))
         SpotConfigureWidget.star1ElementList[i][6].setText(parser.get(section, "temperature factor"))
+        SpotConfigureWidget.star1ElementList[i][7].setText(parser.get(section, "onset start"))
+        SpotConfigureWidget.star1ElementList[i][8].setText(parser.get(section, "maximum start"))
+        SpotConfigureWidget.star1ElementList[i][9].setText(parser.get(section, "maximum end"))
+        SpotConfigureWidget.star1ElementList[i][10].setText(parser.get(section, "onset end"))
         i += 1
     i = 0
     while i < star2spotcount:
@@ -98,11 +103,13 @@ def LoadSpotConfiguration(SpotConfigureWidget, filePath):
         SpotConfigureWidget.star2ElementList[i][4].setText(parser.get(section, "longitude"))
         SpotConfigureWidget.star2ElementList[i][5].setText(parser.get(section, "angular radius"))
         SpotConfigureWidget.star2ElementList[i][6].setText(parser.get(section, "temperature factor"))
+        SpotConfigureWidget.star2ElementList[i][7].setText(parser.get(section, "onset start"))
+        SpotConfigureWidget.star2ElementList[i][8].setText(parser.get(section, "maximum start"))
+        SpotConfigureWidget.star2ElementList[i][9].setText(parser.get(section, "maximum end"))
+        SpotConfigureWidget.star2ElementList[i][10].setText(parser.get(section, "onset end"))
         i += 1
     SpotConfigureWidget.radioButtonGroupA.setExclusive(True)
     SpotConfigureWidget.radioButtonGroupB.setExclusive(True)
-    SpotConfigureWidget.spotconfigload_label.setText("Spot config loaded: " + filePath)
-    SpotConfigureWidget.spotconfigload_label.setToolTip("Spot config loaded: " + filePath)
 
 
 def clearSpotConfigureWidget(SpotConfigureWidget):
@@ -119,9 +126,9 @@ def clearSpotConfigureWidget(SpotConfigureWidget):
     SpotConfigureWidget.nomax_combobox.setCurrentIndex(0)
     # we'll just click every remove button
     for elementList in reversed(SpotConfigureWidget.star1ElementList):
-        elementList[7].click()
+        elementList[11].click()
     for elementList in reversed(SpotConfigureWidget.star2ElementList):
-        elementList[7].click()
+        elementList[11].click()
 
 
 def addSpotRow(SpotConfigureWidget, starNumber):
@@ -131,18 +138,18 @@ def addSpotRow(SpotConfigureWidget, starNumber):
         SpotConfigureWidget.star1RowCount += 1
         SpotConfigureWidget.star1ElementList.append([])
         xshiftAmount = 0
-        yshiftAmount = 30 * SpotConfigureWidget.star1RowCount
+        yshiftAmount = 60 * SpotConfigureWidget.star1RowCount
     if starNumber == 2:
         SpotConfigureWidget.star2RowCount += 1
         SpotConfigureWidget.star2ElementList.append([])
         xshiftAmount = 460
-        yshiftAmount = 30 * SpotConfigureWidget.star2RowCount
+        yshiftAmount = 60 * SpotConfigureWidget.star2RowCount
     resizeSpotConfigureWidget(SpotConfigureWidget, starNumber)
 
     # add elements
     # label
     label = QtGui.QLabel(SpotConfigureWidget)
-    label.setGeometry(10 + xshiftAmount, 130 + yshiftAmount, 45, 16)
+    label.setGeometry(10 + xshiftAmount, 100 + yshiftAmount, 45, 16)
     if starNumber == 1:
         label.setText("Spot " + str(SpotConfigureWidget.star1RowCount))
         label.setObjectName("star1spotlabel" + str(SpotConfigureWidget.star1RowCount - 1))
@@ -156,8 +163,8 @@ def addSpotRow(SpotConfigureWidget, starNumber):
     # radio buttons
     radioA = QtGui.QRadioButton(SpotConfigureWidget)
     radioB = QtGui.QRadioButton(SpotConfigureWidget)
-    radioA.setGeometry(60 + xshiftAmount, 130 + yshiftAmount, 20, 20)
-    radioB.setGeometry(90 + xshiftAmount, 130 + yshiftAmount, 20, 20)
+    radioA.setGeometry(60 + xshiftAmount, 100 + yshiftAmount, 20, 20)
+    radioB.setGeometry(90 + xshiftAmount, 100 + yshiftAmount, 20, 20)
     radioA.type = "A"
     radioB.type = "B"
     if starNumber == 1:
@@ -186,40 +193,72 @@ def addSpotRow(SpotConfigureWidget, starNumber):
     lon_input = QtGui.QLineEdit(SpotConfigureWidget)
     radsp_input = QtGui.QLineEdit(SpotConfigureWidget)
     temsp_input = QtGui.QLineEdit(SpotConfigureWidget)
-    lat_input.setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-    lon_input.setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-    radsp_input.setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-    temsp_input.setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 51, 20)
+    tstart_input = QtGui.QLineEdit(SpotConfigureWidget)
+    tmax1_input = QtGui.QLineEdit(SpotConfigureWidget)
+    tmax2_input = QtGui.QLineEdit(SpotConfigureWidget)
+    tend_input = QtGui.QLineEdit(SpotConfigureWidget)
+    lat_input.setGeometry(120 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+    lon_input.setGeometry(190 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+    radsp_input.setGeometry(260 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+    temsp_input.setGeometry(330 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+    tstart_input.setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+    tmax1_input.setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+    tmax2_input.setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+    tend_input.setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 50, 20)
     lat_input.setText("0")
     lon_input.setText("0")
     radsp_input.setText("0")
     temsp_input.setText("0")
+    tstart_input.setText("50800")
+    tmax1_input.setText("50900")
+    tmax2_input.setText("50930")
+    tend_input.setText("51100")
     if starNumber == 1:
         lat_input.setObjectName("star1lat_input" + str(SpotConfigureWidget.star1RowCount - 1))
         lon_input.setObjectName("star1lon_input" + str(SpotConfigureWidget.star1RowCount - 1))
         radsp_input.setObjectName("star1radsp_input" + str(SpotConfigureWidget.star1RowCount - 1))
         temsp_input.setObjectName("star1temsp_input" + str(SpotConfigureWidget.star1RowCount - 1))
+        tstart_input.setObjectName("star1tstart_input" + str(SpotConfigureWidget.star1RowCount - 1))
+        tmax1_input.setObjectName("star1tmax1_input" + str(SpotConfigureWidget.star1RowCount - 1))
+        tmax2_input.setObjectName("star1tmax2_input" + str(SpotConfigureWidget.star1RowCount - 1))
+        tend_input.setObjectName("star1tend_input" + str(SpotConfigureWidget.star1RowCount - 1))
         SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(lat_input)
         SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(lon_input)
         SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(radsp_input)
         SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(temsp_input)
+        SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(tstart_input)
+        SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(tmax1_input)
+        SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(tmax2_input)
+        SpotConfigureWidget.star1ElementList[SpotConfigureWidget.star1RowCount - 1].append(tend_input)
     if starNumber == 2:
         lat_input.setObjectName("star2lat_input" + str(SpotConfigureWidget.star2RowCount - 1))
         lon_input.setObjectName("star2lon_input" + str(SpotConfigureWidget.star2RowCount - 1))
         radsp_input.setObjectName("star2radsp_input" + str(SpotConfigureWidget.star2RowCount - 1))
         temsp_input.setObjectName("star2temsp_input" + str(SpotConfigureWidget.star2RowCount - 1))
+        tstart_input.setObjectName("star1tstart_input" + str(SpotConfigureWidget.star2RowCount - 1))
+        tmax1_input.setObjectName("star1tmax1_input" + str(SpotConfigureWidget.star2RowCount - 1))
+        tmax2_input.setObjectName("star1tmax2_input" + str(SpotConfigureWidget.star2RowCount - 1))
+        tend_input.setObjectName("star1tend_input" + str(SpotConfigureWidget.star2RowCount - 1))
         SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(lat_input)
         SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(lon_input)
         SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(radsp_input)
         SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(temsp_input)
+        SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(tstart_input)
+        SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(tmax1_input)
+        SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(tmax2_input)
+        SpotConfigureWidget.star2ElementList[SpotConfigureWidget.star2RowCount - 1].append(tend_input)
     lat_input.show()
     lon_input.show()
     radsp_input.show()
     temsp_input.show()
+    tstart_input.show()
+    tmax1_input.show()
+    tmax2_input.show()
+    tend_input.show()
 
     # remove button
     remove_button = QtGui.QPushButton(SpotConfigureWidget)
-    remove_button.setGeometry(390 + xshiftAmount, 129 + yshiftAmount, 61, 21)
+    remove_button.setGeometry(390 + xshiftAmount, 100 + yshiftAmount, 60, 50)
     remove_button.setText("Remove")
     if starNumber == 1:
         remove_button.setObjectName("star1remove_button" + str(SpotConfigureWidget.star1RowCount - 1))
@@ -246,27 +285,31 @@ def removeSpotRow(SpotConfigureWidget, removeButton, starNumber):
         i = 0
         for elementList in SpotConfigureWidget.star1ElementList:
             xshiftAmount = 0
-            yshiftAmount = 30 * (i + 1)
-            elementList[0].setGeometry(10 + xshiftAmount, 130 + yshiftAmount, 41, 16)
+            yshiftAmount = 60 * (i + 1)
+            elementList[0].setGeometry(10 + xshiftAmount, 100 + yshiftAmount, 45, 16)
             elementList[0].setText("Spot " + str(i + 1))
-            elementList[1].setGeometry(60 + xshiftAmount, 130 + yshiftAmount, 16, 17)
+            elementList[1].setGeometry(60 + xshiftAmount, 100 + yshiftAmount, 20, 20)
             elementList[1].row = i
             elementList[1].toggled.disconnect()
             elementList[1].toggled.connect(partial(
                 radioButtonSameSpotCheck, elementList[1], SpotConfigureWidget, starNumber))
-            elementList[2].setGeometry(90 + xshiftAmount, 130 + yshiftAmount, 16, 17)
+            elementList[2].setGeometry(90 + xshiftAmount, 100 + yshiftAmount, 20, 20)
             elementList[2].row = i
             elementList[2].toggled.disconnect()
             elementList[2].toggled.connect(partial(
                 radioButtonSameSpotCheck, elementList[2], SpotConfigureWidget, starNumber))
-            elementList[3].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[4].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[5].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[6].setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[7].setGeometry(390 + xshiftAmount, 129 + yshiftAmount, 61, 21)
-            elementList[7].row = int(i)
-            elementList[7].clicked.disconnect()
-            elementList[7].clicked.connect(partial(removeSpotRow, SpotConfigureWidget, elementList[7], starNumber))
+            elementList[3].setGeometry(120 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[4].setGeometry(190 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[5].setGeometry(260 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[6].setGeometry(330 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[7].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[8].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[9].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[10].setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[11].setGeometry(390 + xshiftAmount, 100 + yshiftAmount, 60, 50)
+            elementList[11].row = int(i)
+            elementList[11].clicked.disconnect()
+            elementList[11].clicked.connect(partial(removeSpotRow, SpotConfigureWidget, elementList[11], starNumber))
             i += 1
     if starNumber == 2:
         SpotConfigureWidget.star2RowCount -= 1
@@ -276,27 +319,31 @@ def removeSpotRow(SpotConfigureWidget, removeButton, starNumber):
         i = 0
         for elementList in SpotConfigureWidget.star2ElementList:
             xshiftAmount = 460
-            yshiftAmount = 30 * (i + 1)
-            elementList[0].setGeometry(10 + xshiftAmount, 130 + yshiftAmount, 41, 16)
+            yshiftAmount = 60 * (i + 1)
+            elementList[0].setGeometry(10 + xshiftAmount, 100 + yshiftAmount, 45, 16)
             elementList[0].setText("Spot " + str(i + 1))
-            elementList[1].setGeometry(60 + xshiftAmount, 130 + yshiftAmount, 16, 17)
+            elementList[1].setGeometry(60 + xshiftAmount, 100 + yshiftAmount, 20, 20)
             elementList[1].row = i
             elementList[1].toggled.disconnect()
             elementList[1].toggled.connect(partial(
                 radioButtonSameSpotCheck, elementList[1], SpotConfigureWidget, starNumber))
-            elementList[2].setGeometry(90 + xshiftAmount, 130 + yshiftAmount, 16, 17)
+            elementList[2].setGeometry(90 + xshiftAmount, 100 + yshiftAmount, 20, 20)
             elementList[2].row = i
             elementList[2].toggled.disconnect()
             elementList[2].toggled.connect(partial(
                 radioButtonSameSpotCheck, elementList[2], SpotConfigureWidget, starNumber))
-            elementList[3].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[4].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[5].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[6].setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 51, 20)
-            elementList[7].setGeometry(390 + xshiftAmount, 129 + yshiftAmount, 61, 21)
-            elementList[7].row = i
-            elementList[7].clicked.disconnect()
-            elementList[7].clicked.connect(partial(removeSpotRow, SpotConfigureWidget, elementList[7], starNumber))
+            elementList[3].setGeometry(120 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[4].setGeometry(190 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[5].setGeometry(260 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[6].setGeometry(330 + xshiftAmount, 100 + yshiftAmount, 50, 20)
+            elementList[7].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[8].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[9].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[10].setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[11].setGeometry(390 + xshiftAmount, 100 + yshiftAmount, 60, 50)
+            elementList[11].row = i
+            elementList[11].clicked.disconnect()
+            elementList[11].clicked.connect(partial(removeSpotRow, SpotConfigureWidget, elementList[11], starNumber))
             i += 1
 
     resizeSpotConfigureWidget(SpotConfigureWidget, starNumber)
@@ -305,21 +352,21 @@ def removeSpotRow(SpotConfigureWidget, removeButton, starNumber):
 def resizeSpotConfigureWidget(SpotConfigureWidget, starNumber):
     yshiftAmount = 0
     if SpotConfigureWidget.star1RowCount > SpotConfigureWidget.star2RowCount:
-        yshiftAmount = 30 * SpotConfigureWidget.star1RowCount
+        yshiftAmount = 60 * SpotConfigureWidget.star1RowCount
     if SpotConfigureWidget.star1RowCount < SpotConfigureWidget.star2RowCount:
-        yshiftAmount = 30 * SpotConfigureWidget.star2RowCount
+        yshiftAmount = 60 * SpotConfigureWidget.star2RowCount
     if SpotConfigureWidget.star1RowCount == SpotConfigureWidget.star2RowCount:
-        yshiftAmount = 30 * SpotConfigureWidget.star2RowCount
+        yshiftAmount = 60 * SpotConfigureWidget.star2RowCount
     if starNumber == 1:
-        y = SpotConfigureWidget.star1RowCount * 30
+        y = SpotConfigureWidget.star1RowCount * 60
         SpotConfigureWidget.addspot1_btn.setGeometry(10, y + 160, 442, 25)
     if starNumber == 2:
-        y = SpotConfigureWidget.star2RowCount * 30
+        y = SpotConfigureWidget.star2RowCount * 60
         SpotConfigureWidget.addspot2_btn.setGeometry(469, y + 160, 442, 25)
     SpotConfigureWidget.line_3.setGeometry(441, 130, 41, 61 + yshiftAmount)
     SpotConfigureWidget.setMaximumHeight(yshiftAmount + 200)
     SpotConfigureWidget.setMinimumHeight(yshiftAmount + 200)
-    SpotConfigureWidget.resize(920, yshiftAmount + 200)
+    SpotConfigureWidget.resize(925, yshiftAmount + 200)
 
 
 def radioButtonSameSpotCheck(radioButton, SpotConfigureWidget, starNumber):
@@ -1071,7 +1118,10 @@ def exportDc(MainWindow):
                                 formatInput(spot[4].text(), 9, 5, "F", isDeg=True) + \
                                 formatInput(spot[5].text(), 9, 5, "F", isDeg=True) + \
                                 formatInput(spot[6].text(), 9, 5, "F") + \
-                                "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
+                                formatInput(spot[7].text(), 14, 5, "F") + \
+                                formatInput(spot[8].text(), 14, 5, "F") + \
+                                formatInput(spot[9].text(), 14, 5, "F") + \
+                                formatInput(spot[10].text(), 14, 5, "F")  + "\n"
 
         if MainWindow.SpotConfigureWidget.star2RowCount != 0:
             star2spotparams = MainWindow.SpotConfigureWidget.star2ElementList
@@ -1081,7 +1131,10 @@ def exportDc(MainWindow):
                                 formatInput(spot[4].text(), 9, 5, "F", isDeg=True) + \
                                 formatInput(spot[5].text(), 9, 5, "F", isDeg=True) + \
                                 formatInput(spot[6].text(), 9, 5, "F") + \
-                                "   50800.00000   50900.00000   50930.00000   51100.00000\n"  # TODO implement in ui
+                                formatInput(spot[7].text(), 14, 5, "F") + \
+                                formatInput(spot[8].text(), 14, 5, "F") + \
+                                formatInput(spot[9].text(), 14, 5, "F") + \
+                                formatInput(spot[10].text(), 14, 5, "F")  + "\n"
         vc1dataline = ""
         if ifvc1 == "1":
             vc1prop = classes.Curve(MainWindow.LoadWidget.vcPropertiesList[0].FilePath)
