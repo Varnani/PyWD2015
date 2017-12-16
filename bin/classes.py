@@ -46,13 +46,13 @@ class CurveProperties:
         self.e2 = str(CurvePropertiesDialog.e2_ipt.text())
         self.e3 = str(CurvePropertiesDialog.e3_ipt.text())
         self.e4 = str(CurvePropertiesDialog.e4_ipt.text())
-        self.el3a = str(CurvePropertiesDialog.el3a_ipt.text())
+        self.wla = str(CurvePropertiesDialog.wla_ipt.text())
         self.opsf = str(CurvePropertiesDialog.opsf_ipt.text())
         self.sigma = str(CurvePropertiesDialog.sigma_ipt.text())
         if CurvePropertiesDialog.type == "lc":
             self.type = "lc"
             self.noise = self.noiseDict[str(CurvePropertiesDialog.noise_combobox.currentText())]
-            self.wla = str(CurvePropertiesDialog.wla_ipt.text())
+            self.el3a = str(CurvePropertiesDialog.el3a_ipt.text())
             self.aextinc = str(CurvePropertiesDialog.aextinc_ipt.text())
             self.xunit = str(CurvePropertiesDialog.xunit_ipt.text())
             self.calib = str(CurvePropertiesDialog.calib_ipt.text())

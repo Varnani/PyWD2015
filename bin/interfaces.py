@@ -251,10 +251,16 @@ class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget c
             curvedialog.label_53.setText("Load or edit a velocity curve")
             curvedialog.type = "vc"
             curvedialog.noise_combobox.setDisabled(True)
-            curvedialog.wla_ipt.setDisabled(True)
+            curvedialog.noise_combobox.addItem("N/A")
+            curvedialog.noise_combobox.setCurrentIndex(3)
+            curvedialog.el3a_ipt.setDisabled(True)
+            curvedialog.el3a_ipt.setText("N/A")
             curvedialog.aextinc_ipt.setDisabled(True)
+            curvedialog.aextinc_ipt.setText("N/A")
             curvedialog.calib_ipt.setDisabled(True)
+            curvedialog.calib_ipt.setText("N/A")
             curvedialog.xunit_ipt.setDisabled(True)
+            curvedialog.xunit_ipt.setText("N/A")
             return curvedialog
 
 
@@ -283,30 +289,9 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         else:
             self.filepath_label.setText(filePath)
             self.filepath_label.setToolTip(filePath)
-            self.band_box.setValue(7)
-            self.ksd_box.setValue(1)
-            self.l1_ipt.setText("0")
-            self.l2_ipt.setText("0")
-            self.x1_ipt.setText("0")
-            self.x2_ipt.setText("0")
-            self.y1_ipt.setText("0")
-            self.y2_ipt.setText("0")
-            self.e1_ipt.setText("0")
-            self.e2_ipt.setText("0")
-            self.e3_ipt.setText("0")
-            self.e4_ipt.setText("0")
-            self.el3a_ipt.setText("0")
-            self.opsf_ipt.setText("0")
-            self.sigma_ipt.setText("0")
             self.datawidget.clear()
             for x in curve.lines:
                 a = QtGui.QTreeWidgetItem(self.datawidget, x)
-            if self.type == "lc":
-                self.noise_combobox.setCurrentIndex(1)
-                self.wla_ipt.setText("0")
-                self.aextinc_ipt.setText("0")
-                self.xunit_ipt.setText("1.0000")
-                self.calib_ipt.setText("0")
 
     def populateFromObject(self, CurveProperties):
         curve = classes.Curve(CurveProperties.FilePath)
@@ -331,7 +316,7 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
             self.e2_ipt.setText(CurveProperties.e2)
             self.e3_ipt.setText(CurveProperties.e3)
             self.e4_ipt.setText(CurveProperties.e4)
-            self.el3a_ipt.setText(CurveProperties.el3a)
+            self.wla_ipt.setText(CurveProperties.wla)
             self.opsf_ipt.setText(CurveProperties.opsf)
             self.sigma_ipt.setText(CurveProperties.sigma)
             self.datawidget.clear()
@@ -339,7 +324,7 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
                 a = QtGui.QTreeWidgetItem(self.datawidget, x)
             if self.type == "lc":
                 self.noise_combobox.setCurrentIndex(int(CurveProperties.noise))
-                self.wla_ipt.setText(CurveProperties.wla)
+                self.el3a_ipt.setText(CurveProperties.el3a)
                 self.aextinc_ipt.setText(CurveProperties.aextinc)
                 self.xunit_ipt.setText(CurveProperties.xunit)
                 self.calib_ipt.setText(CurveProperties.calib)
