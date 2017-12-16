@@ -6,7 +6,7 @@ import platform
 
 # TODO add red emphasis on selected keeps and dels
 # TODO add tooltips, statustips and whatsthis on every parameter
-# TODO add tstart tend etc.. into ui and keeps
+# TODO add tstart tend etc.. into keeps
 
 def run():
     if platform.system() is "Windows":  # a quick hack to get app icon show up on taskbar in windows

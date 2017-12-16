@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EditLightCurveDialog</class>
- <widget class="QDialog" name="EditLightCurveDialog">
+ <class>CurvePropertiesDialog</class>
+ <widget class="QDialog" name="CurvePropertiesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Edit Light Curve</string>
+   <string>Curve Properties</string>
   </property>
   <widget class="QPushButton" name="accept_btn">
    <property name="geometry">
@@ -605,7 +605,7 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>631</width>
+     <width>621</width>
      <height>21</height>
     </rect>
    </property>
@@ -623,7 +623,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Load or modify light curve parameters:</string>
+    <string>TITLE/////////////////</string>
    </property>
   </widget>
   <widget class="Line" name="line_2">
