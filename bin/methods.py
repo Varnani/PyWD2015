@@ -5,6 +5,7 @@ from bin import classes
 import ConfigParser
 import numpy as np
 import itertools
+import StringIO
 
 
 def SaveSpotConfiguration(SpotConfigureWidget):
@@ -400,76 +401,57 @@ def radioButtonSameSpotCheck(radioButton, SpotConfigureWidget, starNumber):
 
 
 def addLightCurve(LoadWidget):
-    dialog = QtGui.QFileDialog(LoadWidget)
-    dialog.setAcceptMode(0)
-    returnCode = dialog.exec_()
-    filePath = (dialog.selectedFiles())[0]
-    if filePath != "" and returnCode != 0:
-        exitcode = 0
-        curve = classes.Curve(filePath)
-        if curve.hasError:
-            msg = QtGui.QMessageBox()
-            msg.setText(curve.error)
-            msg.setWindowTitle("PyWD - Error")
-            msg.exec_()
-        else:
-            LoadWidget.EditLightCurveDialog.load(filePath, curve)  # populate edit curve widget
-            LoadWidget.EditLightCurveDialog.setWindowTitle("Load Light Curve")
-            exitcode = LoadWidget.EditLightCurveDialog.exec_()  # wait for edit curve widget to finish
-            LoadWidget.EditLightCurveDialog.setWindowTitle("Edit Light Curve")
-            if exitcode == 1:
-                lcprop = classes.LightCurveProperties(LoadWidget.EditLightCurveDialog)
-                LoadWidget.lcPropertiesList.append(lcprop)  # store accepted lcprop
+    # start adding row
+    LoadWidget.lcElementList.append([])  # get a new row
+    LoadWidget.lcCount += 1  # increment lc count since we are adding a row
+    shiftAmount = (LoadWidget.lcCount * 40)  # shifting this number of pixels downwards
+    resizeLoadWidget(LoadWidget)
 
-                # start adding row
-                LoadWidget.lcElementList.append([])  # get a new row
-                LoadWidget.lcCount += 1  # increment lc count since we are adding a row
-                shiftAmount = (LoadWidget.lcCount * 40)  # shifting this number of pixels downwards
-                resizeLoadWidget(LoadWidget)
+    # add new elements
+    # label
+    label = QtGui.QLabel(LoadWidget)  # load element
+    label.setGeometry(40, 140 + shiftAmount, 90, 21)  # set geometry
+    label.setText("Light Curve " + str(LoadWidget.lcCount))  # set text
+    label.setObjectName("lclabel" + str(LoadWidget.lcCount))  # set object name
+    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(label)  # store element in the element list
+    label.show()  # show the element
 
-                # add new elements
-                # label
-                label = QtGui.QLabel(LoadWidget)  # load element
-                label.setGeometry(40, 140 + shiftAmount, 90, 21)  # set geometry
-                label.setText("Light Curve " + str(LoadWidget.lcCount))  # set text
-                label.setObjectName("lclabel" + str(LoadWidget.lcCount))  # set object name
-                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(label)  # store element in the element list
-                label.show()  # show the element
+    # file path
+    path = QtGui.QLineEdit(LoadWidget)  # load element
+    path.setGeometry(130, 140 + shiftAmount, 381, 20)  # set geometry
+    path.setText(LoadWidget.lcPropertiesList[-1].FilePath)  # set text
+    path.setObjectName("lcpath" + str(LoadWidget.lcCount))  # set object name
+    path.setReadOnly(True)  # set read only
+    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(path)  # store element in the element list
+    path.show()  # show the element
 
-                # file path
-                path = QtGui.QLineEdit(LoadWidget)  # load element
-                path.setGeometry(130, 140 + shiftAmount, 381, 20)  # set geometry
-                path.setText(filePath)  # set text
-                path.setObjectName("lcpath" + str(LoadWidget.lcCount))  # set object name
-                path.setReadOnly(True)  # set read only
-                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(path)  # store element in the element list
-                path.show()  # show the element
+    # edit button
+    row = LoadWidget.lcCount - 1  # current row index
+    edit = QtGui.QPushButton(LoadWidget)
+    edit.setGeometry(520, 140 + shiftAmount, 51, 21)
+    edit.setText("Edit")
+    edit.setObjectName("lcedit" + str(LoadWidget.lcCount))
+    edit.clicked.connect(partial(editLightCurve, LoadWidget, row))
+    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(edit)
+    edit.show()
 
-                # edit button
-                row = LoadWidget.lcCount - 1  # current row index
-                edit = QtGui.QPushButton(LoadWidget)
-                edit.setGeometry(520, 140 + shiftAmount, 51, 21)
-                edit.setText("Edit")
-                edit.setObjectName("lcedit" + str(LoadWidget.lcCount))
-                edit.clicked.connect(partial(editLightCurve, LoadWidget, row))
-                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(edit)
-                edit.show()
-
-                # remove button
-                remove = QtGui.QPushButton(LoadWidget)
-                remove.setGeometry(580, 140 + shiftAmount, 61, 21)
-                remove.setText("Remove")
-                remove.setObjectName("lcload" + str(LoadWidget.lcCount))
-                remove.clicked.connect(partial(removeLightCurve, LoadWidget, row))
-                LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(remove)
-                remove.show()
+    # remove button
+    remove = QtGui.QPushButton(LoadWidget)
+    remove.setGeometry(580, 140 + shiftAmount, 61, 21)
+    remove.setText("Remove")
+    remove.setObjectName("lcload" + str(LoadWidget.lcCount))
+    remove.clicked.connect(partial(removeLightCurve, LoadWidget, row))
+    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(remove)
+    remove.show()
 
 
 def editLightCurve(LoadWidget, buttonRow):
-    LoadWidget.EditLightCurveDialog.populate(LoadWidget.lcPropertiesList[buttonRow])  # populate ui from obj
-    exitcode = LoadWidget.EditLightCurveDialog.exec_()  # enter dialog loop
+    curvedialog = LoadWidget.createCurveDialog("lc")
+    curvedialog.populateFromObject(LoadWidget.lcPropertiesList[buttonRow])
+    exitcode = curvedialog.exec_()
     if exitcode == 1:  # if changes are accepted;
-        lcprop = classes.LightCurveProperties(LoadWidget.EditLightCurveDialog)  # create object
+        lcprop = classes.CurveProperties("lc")  # create object
+        lcprop.populateFromInterface(curvedialog)
         LoadWidget.lcPropertiesList[buttonRow] = lcprop  # assign it to the list
 
 
@@ -534,68 +516,40 @@ def resizeLoadWidget(LoadWidget):
 
 def editVelocityCurve(vcNumber, LoadWidget):
     if LoadWidget.vcPropertiesList[vcNumber - 1] is not 0:
-        if vcNumber == 1:
-            LoadWidget.EditVelocityCurveDialog.populate(LoadWidget.vcPropertiesList[0])
-            exitcode = LoadWidget.EditVelocityCurveDialog.exec_()
-            if exitcode == 1:
-                vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
-                LoadWidget.vcPropertiesList[0] = vcprop
-        if vcNumber == 2:
-            LoadWidget.EditVelocityCurveDialog.populate(LoadWidget.vcPropertiesList[1])
-            exitcode = LoadWidget.EditVelocityCurveDialog.exec_()
-            if exitcode == 1:
-                vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
-                LoadWidget.vcPropertiesList[1] = vcprop
+        curvedialog = LoadWidget.createCurveDialog("vc")
+        curvedialog.populateFromObject(LoadWidget.vcPropertiesList[vcNumber - 1])
+        returncode = curvedialog.exec_()
+        if returncode == 1:
+            vcprop = classes.CurveProperties("vc")
+            vcprop.populateFromInterface(curvedialog)
+            LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
 
 
 def removeVelocityCurve(vcNumber, LoadWidget):
+    LoadWidget.vcPropertiesList[vcNumber - 1] = 0
     if vcNumber == 1:
-        LoadWidget.vcPropertiesList[0] = 0
         LoadWidget.vc1load_btn.setText("Load")
         LoadWidget.vc1load_btn.clicked.disconnect()
-        LoadWidget.vc1load_btn.clicked.connect(partial(loadVelocityCurve, 1, LoadWidget))
+        LoadWidget.vc1load_btn.clicked.connect(partial(LoadWidget.loadCurveDialog, "vc", vcNumber))
         LoadWidget.vc1_fileline.setText("Load a file...")
     if vcNumber == 2:
-        LoadWidget.vcPropertiesList[1] = 0
         LoadWidget.vc2load_btn.setText("Load")
         LoadWidget.vc2load_btn.clicked.disconnect()
-        LoadWidget.vc2load_btn.clicked.connect(partial(loadVelocityCurve, 2, LoadWidget))
+        LoadWidget.vc2load_btn.clicked.connect(partial(LoadWidget.loadCurveDialog, "vc", vcNumber))
         LoadWidget.vc2_fileline.setText("Load a file...")
 
 
 def loadVelocityCurve(vcNumber, LoadWidget):
-    dialog = QtGui.QFileDialog(LoadWidget)
-    dialog.setAcceptMode(0)
-    returnCode = dialog.exec_()
-    fileName = (dialog.selectedFiles())[0]
-    if fileName != "" and returnCode != 0:
-        exitcode = 0
-        curve = classes.Curve(fileName)
-        if curve.hasError:
-            msg = QtGui.QMessageBox()
-            msg.setText(curve.error)
-            msg.setWindowTitle("PyWD - Error")
-            msg.exec_()
-        else:
-            LoadWidget.EditVelocityCurveDialog.load(fileName, curve)
-            LoadWidget.EditVelocityCurveDialog.setWindowTitle("Load Velocity Curve")
-            exitcode = LoadWidget.EditVelocityCurveDialog.exec_()
-            LoadWidget.EditVelocityCurveDialog.setWindowTitle("Edit Velocity Curve")
-            if exitcode == 1:
-                if vcNumber == 1:
-                    vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
-                    LoadWidget.vcPropertiesList[0] = vcprop
-                    LoadWidget.vc1_fileline.setText(fileName)
-                    LoadWidget.vc1load_btn.clicked.disconnect()
-                    LoadWidget.vc1load_btn.clicked.connect(partial(removeVelocityCurve, 1, LoadWidget))
-                    LoadWidget.vc1load_btn.setText("Remove")
-                if vcNumber == 2:
-                    vcprop = classes.VelocityCurveProperties(LoadWidget.EditVelocityCurveDialog)
-                    LoadWidget.vcPropertiesList[1] = vcprop
-                    LoadWidget.vc2_fileline.setText(fileName)
-                    LoadWidget.vc2load_btn.clicked.disconnect()
-                    LoadWidget.vc2load_btn.clicked.connect(partial(removeVelocityCurve, 2, LoadWidget))
-                    LoadWidget.vc2load_btn.setText("Remove")
+    if vcNumber == 1:
+        LoadWidget.vc1_fileline.setText(LoadWidget.vcPropertiesList[vcNumber-1].FilePath)
+        LoadWidget.vc1load_btn.clicked.disconnect()
+        LoadWidget.vc1load_btn.clicked.connect(partial(removeVelocityCurve, 1, LoadWidget))
+        LoadWidget.vc1load_btn.setText("Remove")
+    if vcNumber == 2:
+        LoadWidget.vc2_fileline.setText(LoadWidget.vcPropertiesList[vcNumber-1].FilePath)
+        LoadWidget.vc2load_btn.clicked.disconnect()
+        LoadWidget.vc2load_btn.clicked.connect(partial(removeVelocityCurve, 2, LoadWidget))
+        LoadWidget.vc2load_btn.setText("Remove")
 
 
 def loadEclipseTimings(EclipseWidget):
@@ -1216,161 +1170,164 @@ def exportDc(MainWindow):
     return dcin
 
 
-def saveProject(MainWindow, filePath):
-    parser = ConfigParser.SafeConfigParser()
+def saveProject(MainWindow):
+    MainWindowParameters = ConfigParser.SafeConfigParser()
     # info
-    parser.add_section("Info")
-    parser.set("Info", "version", "2015")
+    MainWindowParameters.add_section("Info")
+    MainWindowParameters.set("Info", "version", "2015")
     # main tab
-    parser.add_section("Main")
-    parser.set("Main", "operation mode", str(MainWindow.mode_combobox.currentIndex()))
-    parser.set("Main", "jdphs", str(MainWindow.jdphs_combobox.currentIndex()))
-    parser.set("Main", "maglite", str(MainWindow.maglite_combobox.currentIndex()))
-    parser.set("Main", "isym", str(MainWindow.isym_combobox.currentIndex()))
+    MainWindowParameters.add_section("Main")
+    MainWindowParameters.set("Main", "operation mode", str(MainWindow.mode_combobox.currentIndex()))
+    MainWindowParameters.set("Main", "jdphs", str(MainWindow.jdphs_combobox.currentIndex()))
+    MainWindowParameters.set("Main", "maglite", str(MainWindow.maglite_combobox.currentIndex()))
+    MainWindowParameters.set("Main", "isym", str(MainWindow.isym_combobox.currentIndex()))
     # system tab
-    parser.add_section("System")
-    parser.set("System", "jd0", str(MainWindow.jd0_ipt.text()))
-    parser.set("System", "p0", str(MainWindow.p0_ipt.text()))
-    parser.set("System", "dpdt", str(MainWindow.dpdt_ipt.text()))
-    parser.set("System", "pshift", str(MainWindow.pshift_ipt.text()))
-    parser.set("System", "delph", str(MainWindow.delph_ipt.text()))
-    parser.set("System", "a", str(MainWindow.a_ipt.text()))
-    parser.set("System", "e", str(MainWindow.e_ipt.text()))
-    parser.set("System", "perr0", str(MainWindow.perr0_ipt.text()))
-    parser.set("System", "dperdt", str(MainWindow.dperdt_ipt.text()))
-    parser.set("System", "xincl", str(MainWindow.xincl_ipt.text()))
-    parser.set("System", "vgam", str(MainWindow.vgam_ipt.text()))
-    parser.set("System", "rm", str(MainWindow.rm_ipt.text()))
-    parser.set("System", "abunin", str(MainWindow.abunin_ipt.text()))
-    parser.set("System", "tavh", str(MainWindow.tavh_ipt.text()))
-    parser.set("System", "tavc", str(MainWindow.tavc_ipt.text()))
-    parser.set("System", "pot1", str(MainWindow.phsv_ipt.text()))
-    parser.set("System", "pot2", str(MainWindow.pcsv_ipt.text()))
-    parser.set("System", "f1", str(MainWindow.f1_ipt.text()))
-    parser.set("System", "f2", str(MainWindow.f2_ipt.text()))
-    parser.set("System", "th e", str(MainWindow.the_ipt.text()))
-    parser.set("System", "vunit", str(MainWindow.vunit_ipt.text()))
-    parser.set("System", "dpclog", str(MainWindow.dpclog_ipt.text()))
-    parser.set("System", "nga", str(MainWindow.nga_spinbox.value()))
+    MainWindowParameters.add_section("System")
+    MainWindowParameters.set("System", "jd0", str(MainWindow.jd0_ipt.text()))
+    MainWindowParameters.set("System", "p0", str(MainWindow.p0_ipt.text()))
+    MainWindowParameters.set("System", "dpdt", str(MainWindow.dpdt_ipt.text()))
+    MainWindowParameters.set("System", "pshift", str(MainWindow.pshift_ipt.text()))
+    MainWindowParameters.set("System", "delph", str(MainWindow.delph_ipt.text()))
+    MainWindowParameters.set("System", "a", str(MainWindow.a_ipt.text()))
+    MainWindowParameters.set("System", "e", str(MainWindow.e_ipt.text()))
+    MainWindowParameters.set("System", "perr0", str(MainWindow.perr0_ipt.text()))
+    MainWindowParameters.set("System", "dperdt", str(MainWindow.dperdt_ipt.text()))
+    MainWindowParameters.set("System", "xincl", str(MainWindow.xincl_ipt.text()))
+    MainWindowParameters.set("System", "vgam", str(MainWindow.vgam_ipt.text()))
+    MainWindowParameters.set("System", "rm", str(MainWindow.rm_ipt.text()))
+    MainWindowParameters.set("System", "abunin", str(MainWindow.abunin_ipt.text()))
+    MainWindowParameters.set("System", "tavh", str(MainWindow.tavh_ipt.text()))
+    MainWindowParameters.set("System", "tavc", str(MainWindow.tavc_ipt.text()))
+    MainWindowParameters.set("System", "pot1", str(MainWindow.phsv_ipt.text()))
+    MainWindowParameters.set("System", "pot2", str(MainWindow.pcsv_ipt.text()))
+    MainWindowParameters.set("System", "f1", str(MainWindow.f1_ipt.text()))
+    MainWindowParameters.set("System", "f2", str(MainWindow.f2_ipt.text()))
+    MainWindowParameters.set("System", "th e", str(MainWindow.the_ipt.text()))
+    MainWindowParameters.set("System", "vunit", str(MainWindow.vunit_ipt.text()))
+    MainWindowParameters.set("System", "dpclog", str(MainWindow.dpclog_ipt.text()))
+    MainWindowParameters.set("System", "nga", str(MainWindow.nga_spinbox.value()))
     # surface tab
-    parser.add_section("Surface")
-    parser.set("Surface", "ifat1", str(MainWindow.ifat1_combobox.currentIndex()))
-    parser.set("Surface", "ifat2", str(MainWindow.ifat2_combobox.currentIndex()))
-    parser.set("Surface", "alb1", str(MainWindow.alb1_spinbox.value()))
-    parser.set("Surface", "alb2", str(MainWindow.alb2_spinbox.value()))
-    parser.set("Surface", "gr1", str(MainWindow.gr1_spinbox.value()))
-    parser.set("Surface", "gr2", str(MainWindow.gr2_spinbox.value()))
-    parser.set("Surface", "ld1", str(MainWindow.ld1_combobox.currentIndex()))
-    parser.set("Surface", "ld2", str(MainWindow.ld2_combobox.currentIndex()))
-    parser.set("Surface", "ld1_fixed", str(MainWindow.ld1_chk.isChecked()))
-    parser.set("Surface", "ld2_fixed", str(MainWindow.ld2_chk.isChecked()))
-    parser.set("Surface", "xbol1", str(MainWindow.xbol1_ipt.text()))
-    parser.set("Surface", "xbol2", str(MainWindow.xbol2_ipt.text()))
-    parser.set("Surface", "ybol1", str(MainWindow.ybol1_ipt.text()))
-    parser.set("Surface", "ybol2", str(MainWindow.ybol2_ipt.text()))
-    parser.set("Surface", "n1", str(MainWindow.n1_spinbox.value()))
-    parser.set("Surface", "n2", str(MainWindow.n2_spinbox.value()))
-    parser.set("Surface", "n1l", str(MainWindow.n1l_spinbox.value()))
-    parser.set("Surface", "n2l", str(MainWindow.n2l_spinbox.value()))
-    parser.set("Surface", "mref", str(MainWindow.mref_chk.isChecked()))
-    parser.set("Surface", "nref", str(MainWindow.nref_spinbox.value()))
-    parser.set("Surface", "ipb", str(MainWindow.ipb_chk.isChecked()))
+    MainWindowParameters.add_section("Surface")
+    MainWindowParameters.set("Surface", "ifat1", str(MainWindow.ifat1_combobox.currentIndex()))
+    MainWindowParameters.set("Surface", "ifat2", str(MainWindow.ifat2_combobox.currentIndex()))
+    MainWindowParameters.set("Surface", "alb1", str(MainWindow.alb1_spinbox.value()))
+    MainWindowParameters.set("Surface", "alb2", str(MainWindow.alb2_spinbox.value()))
+    MainWindowParameters.set("Surface", "gr1", str(MainWindow.gr1_spinbox.value()))
+    MainWindowParameters.set("Surface", "gr2", str(MainWindow.gr2_spinbox.value()))
+    MainWindowParameters.set("Surface", "ld1", str(MainWindow.ld1_combobox.currentIndex()))
+    MainWindowParameters.set("Surface", "ld2", str(MainWindow.ld2_combobox.currentIndex()))
+    MainWindowParameters.set("Surface", "ld1_fixed", str(MainWindow.ld1_chk.isChecked()))
+    MainWindowParameters.set("Surface", "ld2_fixed", str(MainWindow.ld2_chk.isChecked()))
+    MainWindowParameters.set("Surface", "xbol1", str(MainWindow.xbol1_ipt.text()))
+    MainWindowParameters.set("Surface", "xbol2", str(MainWindow.xbol2_ipt.text()))
+    MainWindowParameters.set("Surface", "ybol1", str(MainWindow.ybol1_ipt.text()))
+    MainWindowParameters.set("Surface", "ybol2", str(MainWindow.ybol2_ipt.text()))
+    MainWindowParameters.set("Surface", "n1", str(MainWindow.n1_spinbox.value()))
+    MainWindowParameters.set("Surface", "n2", str(MainWindow.n2_spinbox.value()))
+    MainWindowParameters.set("Surface", "n1l", str(MainWindow.n1l_spinbox.value()))
+    MainWindowParameters.set("Surface", "n2l", str(MainWindow.n2l_spinbox.value()))
+    MainWindowParameters.set("Surface", "mref", str(MainWindow.mref_chk.isChecked()))
+    MainWindowParameters.set("Surface", "nref", str(MainWindow.nref_spinbox.value()))
+    MainWindowParameters.set("Surface", "ipb", str(MainWindow.ipb_chk.isChecked()))
     # 3rd body tab
-    parser.add_section("Third Body")
-    parser.set("Third Body", "if3b", str(MainWindow.if3b_chk.isChecked()))
-    parser.set("Third Body", "a3b", str(MainWindow.a3b_ipt.text()))
-    parser.set("Third Body", "p3b", str(MainWindow.p3b_ipt.text()))
-    parser.set("Third Body", "xinc3b", str(MainWindow.xinc3b_ipt.text()))
-    parser.set("Third Body", "e3b", str(MainWindow.e3b_ipt.text()))
-    parser.set("Third Body", "perr3b", str(MainWindow.perr3b_ipt.text()))
-    parser.set("Third Body", "tc3b", str(MainWindow.tc3b_ipt.text()))
+    MainWindowParameters.add_section("Third Body")
+    MainWindowParameters.set("Third Body", "if3b", str(MainWindow.if3b_chk.isChecked()))
+    MainWindowParameters.set("Third Body", "a3b", str(MainWindow.a3b_ipt.text()))
+    MainWindowParameters.set("Third Body", "p3b", str(MainWindow.p3b_ipt.text()))
+    MainWindowParameters.set("Third Body", "xinc3b", str(MainWindow.xinc3b_ipt.text()))
+    MainWindowParameters.set("Third Body", "e3b", str(MainWindow.e3b_ipt.text()))
+    MainWindowParameters.set("Third Body", "perr3b", str(MainWindow.perr3b_ipt.text()))
+    MainWindowParameters.set("Third Body", "tc3b", str(MainWindow.tc3b_ipt.text()))
     # del tab
-    parser.add_section("DEL's")
-    parser.set("DEL's", "del_s1lat", str(MainWindow.del_s1lat_ipt.text()))
-    parser.set("DEL's", "del_s1lng", str(MainWindow.del_s1lng_ipt.text()))
-    parser.set("DEL's", "del_s1rad", str(MainWindow.del_s1agrad_ipt.text()))
-    parser.set("DEL's", "del_s1tmp", str(MainWindow.del_s1tmpf_ipt.text()))
-    parser.set("DEL's", "del_s2lat", str(MainWindow.del_s2lat_ipt.text()))
-    parser.set("DEL's", "del_s2lng", str(MainWindow.del_s2lng_ipt.text()))
-    parser.set("DEL's", "del_s2rad", str(MainWindow.del_s2agrad_ipt.text()))
-    parser.set("DEL's", "del_s2tmp", str(MainWindow.del_s2tmpf_ipt.text()))
-    parser.set("DEL's", "del_a", str(MainWindow.del_a_ipt.text()))
-    parser.set("DEL's", "del_e", str(MainWindow.del_e_ipt.text()))
-    parser.set("DEL's", "del_f1", str(MainWindow.del_f1_ipt.text()))
-    parser.set("DEL's", "del_f2", str(MainWindow.del_f2_ipt.text()))
-    parser.set("DEL's", "del_pshift", str(MainWindow.del_pshift_ipt.text()))
-    parser.set("DEL's", "del_perr0", str(MainWindow.del_perr0_ipt.text()))
-    parser.set("DEL's", "del_incl", str(MainWindow.del_i_ipt.text()))
-    parser.set("DEL's", "del_rm", str(MainWindow.del_q_ipt.text()))
-    parser.set("DEL's", "del_g1", str(MainWindow.del_g1_ipt.text()))
-    parser.set("DEL's", "del_g2", str(MainWindow.del_g2_ipt.text()))
-    parser.set("DEL's", "del_tavh", str(MainWindow.del_t1_ipt.text()))
-    parser.set("DEL's", "del_tavc", str(MainWindow.del_t2_ipt.text()))
-    parser.set("DEL's", "del_alb1", str(MainWindow.del_alb1_ipt.text()))
-    parser.set("DEL's", "del_alb2", str(MainWindow.del_alb2_ipt.text()))
-    parser.set("DEL's", "del_pot1", str(MainWindow.del_pot1_ipt.text()))
-    parser.set("DEL's", "del_pot2", str(MainWindow.del_pot2_ipt.text()))
-    parser.set("DEL's", "del_l1", str(MainWindow.del_l1_ipt.text()))
-    parser.set("DEL's", "del_l2", str(MainWindow.del_l2_ipt.text()))
-    parser.set("DEL's", "del_xbol1", str(MainWindow.del_x1_ipt.text()))
-    parser.set("DEL's", "del_xbol2", str(MainWindow.del_x2_ipt.text()))
+    MainWindowParameters.add_section("DEL's")
+    MainWindowParameters.set("DEL's", "del_s1lat", str(MainWindow.del_s1lat_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_s1lng", str(MainWindow.del_s1lng_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_s1rad", str(MainWindow.del_s1agrad_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_s1tmp", str(MainWindow.del_s1tmpf_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_s2lat", str(MainWindow.del_s2lat_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_s2lng", str(MainWindow.del_s2lng_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_s2rad", str(MainWindow.del_s2agrad_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_s2tmp", str(MainWindow.del_s2tmpf_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_a", str(MainWindow.del_a_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_e", str(MainWindow.del_e_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_f1", str(MainWindow.del_f1_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_f2", str(MainWindow.del_f2_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_pshift", str(MainWindow.del_pshift_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_perr0", str(MainWindow.del_perr0_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_incl", str(MainWindow.del_i_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_rm", str(MainWindow.del_q_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_g1", str(MainWindow.del_g1_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_g2", str(MainWindow.del_g2_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_tavh", str(MainWindow.del_t1_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_tavc", str(MainWindow.del_t2_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_alb1", str(MainWindow.del_alb1_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_alb2", str(MainWindow.del_alb2_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_pot1", str(MainWindow.del_pot1_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_pot2", str(MainWindow.del_pot2_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_l1", str(MainWindow.del_l1_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_l2", str(MainWindow.del_l2_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_xbol1", str(MainWindow.del_x1_ipt.text()))
+    MainWindowParameters.set("DEL's", "del_xbol2", str(MainWindow.del_x2_ipt.text()))
     # keep tab
-    parser.add_section("KEEP's")
-    parser.set("KEEP's", "jd0", str(MainWindow.jd0_chk.isChecked()))
-    parser.set("KEEP's", "p0", str(MainWindow.p0_chk.isChecked()))
-    parser.set("KEEP's", "dpdt", str(MainWindow.dpdt_chk.isChecked()))
-    parser.set("KEEP's", "perr0", str(MainWindow.perr0_chk.isChecked()))
-    parser.set("KEEP's", "dperdt", str(MainWindow.dperdt_chk.isChecked()))
-    parser.set("KEEP's", "pshift", str(MainWindow.pshift_chk.isChecked()))
-    parser.set("KEEP's", "a", str(MainWindow.a_chk.isChecked()))
-    parser.set("KEEP's", "e", str(MainWindow.e_chk.isChecked()))
-    parser.set("KEEP's", "logd", str(MainWindow.logd_chk.isChecked()))
-    parser.set("KEEP's", "vgam", str(MainWindow.vgam_chk.isChecked()))
-    parser.set("KEEP's", "incl", str(MainWindow.incl_chk.isChecked()))
-    parser.set("KEEP's", "rm", str(MainWindow.q_chk.isChecked()))
-    parser.set("KEEP's", "tavh", str(MainWindow.t1_chk.isChecked()))
-    parser.set("KEEP's", "tavc", str(MainWindow.t2_chk.isChecked()))
-    parser.set("KEEP's", "g1", str(MainWindow.g1_chk.isChecked()))
-    parser.set("KEEP's", "g2", str(MainWindow.g2_chk.isChecked()))
-    parser.set("KEEP's", "alb1", str(MainWindow.alb1_chk.isChecked()))
-    parser.set("KEEP's", "alb2", str(MainWindow.alb2_chk.isChecked()))
-    parser.set("KEEP's", "desext", str(MainWindow.desextinc_chk.isChecked()))
-    parser.set("KEEP's", "f1", str(MainWindow.f1_chk.isChecked()))
-    parser.set("KEEP's", "f2", str(MainWindow.f2_chk.isChecked()))
-    parser.set("KEEP's", "l1", str(MainWindow.l1_chk.isChecked()))
-    parser.set("KEEP's", "l2", str(MainWindow.l2_chk.isChecked()))
-    parser.set("KEEP's", "xbol1", str(MainWindow.x1_chk.isChecked()))
-    parser.set("KEEP's", "xbol2", str(MainWindow.x2_chk.isChecked()))
-    parser.set("KEEP's", "pot1", str(MainWindow.pot1_chk.isChecked()))
-    parser.set("KEEP's", "pot2", str(MainWindow.pot2_chk.isChecked()))
-    parser.set("KEEP's", "a3b", str(MainWindow.a3b_chk.isChecked()))
-    parser.set("KEEP's", "p3b", str(MainWindow.p3b_chk.isChecked()))
-    parser.set("KEEP's", "xinc3b", str(MainWindow.xinc3b_chk.isChecked()))
-    parser.set("KEEP's", "e3b", str(MainWindow.e3b_chk.isChecked()))
-    parser.set("KEEP's", "tc3b", str(MainWindow.tc3b_chk.isChecked()))
-    parser.set("KEEP's", "perr3b", str(MainWindow.perr3b_chk.isChecked()))
-    parser.set("KEEP's", "el3", str(MainWindow.el3_chk.isChecked()))
-    parser.set("KEEP's", "s1lat", str(MainWindow.s1lat_chk.isChecked()))
-    parser.set("KEEP's", "s1lng", str(MainWindow.s1long_chk.isChecked()))
-    parser.set("KEEP's", "s1rad", str(MainWindow.s1rad_chk.isChecked()))
-    parser.set("KEEP's", "s1temp", str(MainWindow.s1temp_chk.isChecked()))
-    parser.set("KEEP's", "s2lat", str(MainWindow.s2lat_chk.isChecked()))
-    parser.set("KEEP's", "s2lng", str(MainWindow.s2long_chk.isChecked()))
-    parser.set("KEEP's", "s2rad", str(MainWindow.s2rad_chk.isChecked()))
-    parser.set("KEEP's", "s2temp", str(MainWindow.s2temp_chk.isChecked()))
+    MainWindowParameters.add_section("KEEP's")
+    MainWindowParameters.set("KEEP's", "jd0", str(MainWindow.jd0_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "p0", str(MainWindow.p0_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "dpdt", str(MainWindow.dpdt_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "perr0", str(MainWindow.perr0_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "dperdt", str(MainWindow.dperdt_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "pshift", str(MainWindow.pshift_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "a", str(MainWindow.a_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "e", str(MainWindow.e_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "logd", str(MainWindow.logd_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "vgam", str(MainWindow.vgam_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "incl", str(MainWindow.incl_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "rm", str(MainWindow.q_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "tavh", str(MainWindow.t1_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "tavc", str(MainWindow.t2_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "g1", str(MainWindow.g1_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "g2", str(MainWindow.g2_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "alb1", str(MainWindow.alb1_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "alb2", str(MainWindow.alb2_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "desext", str(MainWindow.desextinc_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "f1", str(MainWindow.f1_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "f2", str(MainWindow.f2_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "l1", str(MainWindow.l1_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "l2", str(MainWindow.l2_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "xbol1", str(MainWindow.x1_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "xbol2", str(MainWindow.x2_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "pot1", str(MainWindow.pot1_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "pot2", str(MainWindow.pot2_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "a3b", str(MainWindow.a3b_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "p3b", str(MainWindow.p3b_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "xinc3b", str(MainWindow.xinc3b_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "e3b", str(MainWindow.e3b_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "tc3b", str(MainWindow.tc3b_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "perr3b", str(MainWindow.perr3b_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "el3", str(MainWindow.el3_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s1lat", str(MainWindow.s1lat_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s1lng", str(MainWindow.s1long_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s1rad", str(MainWindow.s1rad_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s1temp", str(MainWindow.s1temp_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s2lat", str(MainWindow.s2lat_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s2lng", str(MainWindow.s2long_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s2rad", str(MainWindow.s2rad_chk.isChecked()))
+    MainWindowParameters.set("KEEP's", "s2temp", str(MainWindow.s2temp_chk.isChecked()))
     # misc tab
-    parser.add_section("Miscellaneous")
-    parser.set("Miscellaneous", "icor1", str(MainWindow.icor1_chk.isChecked()))
-    parser.set("Miscellaneous", "icor2", str(MainWindow.icor2_chk.isChecked()))
-    parser.set("Miscellaneous", "ifoc", str(MainWindow.ifoc_chk.isChecked()))
-    parser.set("Miscellaneous", "ifcgs", str(MainWindow.ifcgs_chk.isChecked()))
-    parser.set("Miscellaneous", "ifder", str(MainWindow.ifder_chk.isChecked()))
-    parser.set("Miscellaneous", "iflcin", str(MainWindow.ifder_chk.isChecked()))
-    parser.set("Miscellaneous", "linkext", str(MainWindow.linkext_spinbox.value()))
-    parser.set("Miscellaneous", "desextinc", str(MainWindow.desextinc_ipt.text()))
-    # write file
-    with open(filePath, "w") as f:
-        parser.write(f)
+    MainWindowParameters.add_section("Miscellaneous")
+    MainWindowParameters.set("Miscellaneous", "icor1", str(MainWindow.icor1_chk.isChecked()))
+    MainWindowParameters.set("Miscellaneous", "icor2", str(MainWindow.icor2_chk.isChecked()))
+    MainWindowParameters.set("Miscellaneous", "ifoc", str(MainWindow.ifoc_chk.isChecked()))
+    MainWindowParameters.set("Miscellaneous", "ifcgs", str(MainWindow.ifcgs_chk.isChecked()))
+    MainWindowParameters.set("Miscellaneous", "ifder", str(MainWindow.ifder_chk.isChecked()))
+    MainWindowParameters.set("Miscellaneous", "iflcin", str(MainWindow.ifder_chk.isChecked()))
+    MainWindowParameters.set("Miscellaneous", "linkext", str(MainWindow.linkext_spinbox.value()))
+    MainWindowParameters.set("Miscellaneous", "desextinc", str(MainWindow.desextinc_ipt.text()))
+
+    Project = StringIO.StringIO()
+    MainWindowParameters.write(Project)
+    SpotConfiguration = SaveSpotConfiguration(MainWindow.SpotConfigureWidget)
+    SpotConfiguration.write(Project)
+    return Project.getvalue()
 
 
 def loadProject(MainWindow, filePath):
