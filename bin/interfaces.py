@@ -69,7 +69,10 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
             answer = QtGui.QMessageBox.question(self, title, text, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if answer == QtGui.QMessageBox.Yes:
                 try:
-                    methods.loadProject(self, filePath)
+                    parser = ConfigParser.SafeConfigParser()
+                    with open(filePath, "r") as f:
+                        parser.readfp(f)
+                    methods.loadProject(self, parser)
                     msg.setText("Project file \"" + fi.fileName() + "\" loaded.")
                     msg.setWindowTitle("PyWD - Project Loaded")
                     msg.exec_()

@@ -17,7 +17,7 @@ class CurveProperties:
         self.e2 = ""
         self.e3 = ""
         self.e4 = ""
-        self.el3a = ""
+        self.wla = ""
         self.opsf = ""
         self.sigma = ""
         if type == "lc":
@@ -27,7 +27,7 @@ class CurveProperties:
                 "Linear": "2"
             }
             self.noise = ""
-            self.wla = ""
+            self.el3a = ""
             self.aextinc = ""
             self.xunit = ""
             self.calib = ""
@@ -119,7 +119,7 @@ class Curve:
             self.error = "File is not a valid data source:\n" + filePath
         except IOError as ex:
             self.hasError = True
-            self.error = "An IO error has been caught:\n" + ex.strerror + filePath
+            self.error = "An IO error has been caught:\n" + ex.strerror + " " + filePath
 
 
 if __name__ == "__main__":
