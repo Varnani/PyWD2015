@@ -228,16 +228,19 @@ class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget c
             try:
                 curvedialog = self.createCurveDialog(type)
                 curvedialog.populateFromFile(filePath)
-                result = curvedialog.exec_()
-                if result == 1:
-                    curveprop = classes.CurveProperties(type)
-                    curveprop.populateFromInterface(curvedialog)
-                    if type == "lc":
-                        self.lcPropertiesList.append(curveprop)
-                        methods.addLightCurve(self)  # actually just adds a row to the ui
-                    if type == "vc":
-                        self.vcPropertiesList[vcNumber-1] = curveprop
-                        methods.loadVelocityCurve(vcNumber, self)
+                if curvedialog.hasError:
+                    pass
+                else:
+                    result = curvedialog.exec_()
+                    if result == 1:
+                        curveprop = classes.CurveProperties(type)
+                        curveprop.populateFromInterface(curvedialog)
+                        if type == "lc":
+                            self.lcPropertiesList.append(curveprop)
+                            methods.addLightCurve(self)  # actually just adds a row to the ui
+                        if type == "vc":
+                            self.vcPropertiesList[vcNumber-1] = curveprop
+                            methods.loadVelocityCurve(vcNumber, self)
             except:
                 msg = QtGui.QMessageBox()
                 msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))

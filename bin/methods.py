@@ -448,11 +448,14 @@ def addLightCurve(LoadWidget):
 def editLightCurve(LoadWidget, buttonRow):
     curvedialog = LoadWidget.createCurveDialog("lc")
     curvedialog.populateFromObject(LoadWidget.lcPropertiesList[buttonRow])
-    exitcode = curvedialog.exec_()
-    if exitcode == 1:  # if changes are accepted;
-        lcprop = classes.CurveProperties("lc")  # create object
-        lcprop.populateFromInterface(curvedialog)
-        LoadWidget.lcPropertiesList[buttonRow] = lcprop  # assign it to the list
+    if curvedialog.hasError:
+        pass
+    else:
+        exitcode = curvedialog.exec_()
+        if exitcode == 1:  # if changes are accepted;
+            lcprop = classes.CurveProperties("lc")  # create object
+            lcprop.populateFromInterface(curvedialog)
+            LoadWidget.lcPropertiesList[buttonRow] = lcprop  # assign it to the list
 
 
 def removeLightCurve(LoadWidget, buttonRow):
@@ -518,12 +521,15 @@ def editVelocityCurve(vcNumber, LoadWidget):
     if LoadWidget.vcPropertiesList[vcNumber - 1] is not 0:
         curvedialog = LoadWidget.createCurveDialog("vc")
         curvedialog.populateFromObject(LoadWidget.vcPropertiesList[vcNumber - 1])
-        returncode = curvedialog.exec_()
-        if returncode == 1:
-            vcprop = classes.CurveProperties("vc")
-            vcprop.populateFromInterface(curvedialog)
-            vcprop.star = vcNumber
-            LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
+        if curvedialog.hasError:
+            pass
+        else:
+            returncode = curvedialog.exec_()
+            if returncode == 1:
+                vcprop = classes.CurveProperties("vc")
+                vcprop.populateFromInterface(curvedialog)
+                vcprop.star = vcNumber
+                LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
 
 
 def removeVelocityCurve(vcNumber, LoadWidget):
@@ -1079,7 +1085,7 @@ def exportDc(MainWindow):
                                 formatInput(spot[7].text(), 14, 5, "F") + \
                                 formatInput(spot[8].text(), 14, 5, "F") + \
                                 formatInput(spot[9].text(), 14, 5, "F") + \
-                                formatInput(spot[10].text(), 14, 5, "F")  + "\n"
+                                formatInput(spot[10].text(), 14, 5, "F") + "\n"
 
         if MainWindow.SpotConfigureWidget.star2RowCount != 0:
             star2spotparams = MainWindow.SpotConfigureWidget.star2ElementList
@@ -1092,7 +1098,7 @@ def exportDc(MainWindow):
                                 formatInput(spot[7].text(), 14, 5, "F") + \
                                 formatInput(spot[8].text(), 14, 5, "F") + \
                                 formatInput(spot[9].text(), 14, 5, "F") + \
-                                formatInput(spot[10].text(), 14, 5, "F")  + "\n"
+                                formatInput(spot[10].text(), 14, 5, "F") + "\n"
         vc1dataline = ""
         if ifvc1 == "1":
             vc1prop = classes.Curve(MainWindow.LoadWidget.vcPropertiesList[0].FilePath)
@@ -1569,6 +1575,22 @@ def loadCurveParameters(MainWindow, parser):
         i = i + 1
 
 
+def loadEclipseParameters(MainWindow, parser):
+    MainWindow.EclipseWidget.filepath_label.setText(parser.get("Eclipse Timing", "filepath"))
+    MainWindow.EclipseWidget.filepath_label.setToolTip(parser.get("Eclipse Timing", "filepath"))
+    MainWindow.EclipseWidget.iftime_chk.setChecked(parser.getboolean("Eclipse Timing", "iftime"))
+    MainWindow.EclipseWidget.ksd_box.setValue(parser.getint("Eclipse Timing", "ksd"))
+    MainWindow.EclipseWidget.sigma_ipt.setText(parser.get("Eclipse Timing", "sigma"))
+    if parser.get("Eclipse Timing", "filepath") != "None":
+        curve = classes.Curve(parser.get("Eclipse Timing", "filepath"))
+        if curve.hasError:
+            raise ValueError("Eclipse timings caught an error:" + curve.error)
+        else:
+            MainWindow.EclipseWidget.datawidget.clear()
+            for x in curve.lines:
+                a = QtGui.QTreeWidgetItem(MainWindow.EclipseWidget.datawidget, x)
+
+
 def loadProject(MainWindow, parser):
     # check version
     if parser.get("Info", "version") != "2015":
@@ -1576,9 +1598,33 @@ def loadProject(MainWindow, parser):
                            "Current Version: 2015\n" + "Project File Version: " +
                            parser.get("Info", "version"))
     else:
-        loadMainWindowParameters(MainWindow, parser)
-        LoadSpotConfiguration(MainWindow.SpotConfigureWidget, parser)
-        loadCurveParameters(MainWindow, parser)
+        # check for filepaths before modifying ui
+        eclipsePath = parser.get("Eclipse Timing", "filepath")
+        import os
+        if os.path.isfile(eclipsePath) is not True and eclipsePath != "None":
+            raise RuntimeError("Can't read eclipse data, file does not exists: " + eclipsePath)
+        else:
+            lcCount = parser.getint("Curve Count", "light curves")
+            vcCount = parser.getint("Curve Count", "velocity Curves")
+            i = 0
+            while i < vcCount:
+                section = "Velocity Curve " + str(i + 1)
+                filepath = parser.get(section, "filepath")
+                if os.path.isfile(filepath) is not True:
+                    raise RuntimeError("Can't read velocity curve data, file does not exist: " + filepath)
+                i = i + 1
+            i = 0
+            while i < vcCount:
+                section = "Light Curve " + str(i + 1)
+                filepath = parser.get(section, "filepath")
+                if os.path.isfile(filepath) is not True:
+                    raise RuntimeError("Can't read light curve data, file does not exist: " + filepath)
+                i = i + 1
+            # modify the ui
+            loadMainWindowParameters(MainWindow, parser)
+            LoadSpotConfiguration(MainWindow.SpotConfigureWidget, parser)
+            loadCurveParameters(MainWindow, parser)
+            loadEclipseParameters(MainWindow, parser)
 
 
 if __name__ == "__main__":
