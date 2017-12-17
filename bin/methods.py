@@ -522,6 +522,7 @@ def editVelocityCurve(vcNumber, LoadWidget):
         if returncode == 1:
             vcprop = classes.CurveProperties("vc")
             vcprop.populateFromInterface(curvedialog)
+            vcprop.star = vcNumber
             LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
 
 
@@ -541,12 +542,14 @@ def removeVelocityCurve(vcNumber, LoadWidget):
 
 def loadVelocityCurve(vcNumber, LoadWidget):
     if vcNumber == 1:
-        LoadWidget.vc1_fileline.setText(LoadWidget.vcPropertiesList[vcNumber-1].FilePath)
+        LoadWidget.vcPropertiesList[vcNumber - 1].star = vcNumber
+        LoadWidget.vc1_fileline.setText(LoadWidget.vcPropertiesList[vcNumber - 1].FilePath)
         LoadWidget.vc1load_btn.clicked.disconnect()
         LoadWidget.vc1load_btn.clicked.connect(partial(removeVelocityCurve, 1, LoadWidget))
         LoadWidget.vc1load_btn.setText("Remove")
     if vcNumber == 2:
-        LoadWidget.vc2_fileline.setText(LoadWidget.vcPropertiesList[vcNumber-1].FilePath)
+        LoadWidget.vcPropertiesList[vcNumber - 1].star = vcNumber
+        LoadWidget.vc2_fileline.setText(LoadWidget.vcPropertiesList[vcNumber - 1].FilePath)
         LoadWidget.vc2load_btn.clicked.disconnect()
         LoadWidget.vc2load_btn.clicked.connect(partial(removeVelocityCurve, 2, LoadWidget))
         LoadWidget.vc2load_btn.setText("Remove")
@@ -731,7 +734,8 @@ def exportDc(MainWindow):
         if vunit != float(1):
             warning = "VUnit parameter is different than 1:" + \
                       "\nVGamma, velocity curve sigmas and all velocity observations " + \
-                      "will be divided by VUnit, as it is required by DC program."
+                      "will be divided by VUnit, as it is required by DC program.\n" + \
+                      "Make sure you provide these parameters normally, not in [Parameter/VUnit] format."
             dcin.addWarning(warning)
 
         line1 = " {0} {1} {2} {3} {4} {5} {6} {7}\n".format(
@@ -980,7 +984,7 @@ def exportDc(MainWindow):
             warning = "Entered surface temperature value is lower than 1000 Kelvin:" + \
                       "\nKeep in mind that surface temperature parameters will be " + \
                       "divided by 10,000 before writing into dcin.active file, as it is required by DC program." + \
-                      "\nMake sure you provide surface temperatures as it is, not in [T/10,000] format."
+                      "\nMake sure you provide surface temperatures normally, not in [T/10,000] format."
             dcin.addWarning(warning)
 
         line11 = formatInput(float(MainWindow.tavh_ipt.text()) / 10000.0, 7, 4, "F") + \
@@ -1221,10 +1225,12 @@ def saveCurveParameters(MainWindow):
             parser.set(section, "sigma", prop.sigma)
             if prop.type == "lc":
                 parser.set(section, "noise", prop.noise)
-                parser.set(section, "el3", prop.el3a)
+                parser.set(section, "el3a", prop.el3a)
                 parser.set(section, "aextinc", prop.aextinc)
-                parser.set(section, "prop.xunit", prop.xunit)
-                parser.set(section, "prop.calib", prop.calib)
+                parser.set(section, "xunit", prop.xunit)
+                parser.set(section, "calib", prop.calib)
+            if prop.type == "vc":
+                parser.set(section, "star", str(prop.star))
     parser.set("Curve Count", "velocity curves", str(vcCount))
     parser.set("Curve Count", "light curves", str(lcCount))
     return parser
@@ -1540,6 +1546,29 @@ def loadMainWindowParameters(MainWindow, parser):
     MainWindow.desextinc_ipt.setText(parser.get("Miscellaneous", "desextinc"))
 
 
+def loadCurveParameters(MainWindow, parser):
+    vcCount = parser.getint("Curve Count", "velocity curves")
+    lcCount = parser.getint("Curve Count", "light curves")
+
+    i = 0
+    while i < vcCount:
+        section = "Velocity Curve " + str(i + 1)
+        vcprop = classes.CurveProperties("vc")
+        vcprop.populateFromParserSection(parser, section)
+        vcNumber = vcprop.star
+        MainWindow.LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
+        loadVelocityCurve(vcNumber, MainWindow.LoadWidget)
+        i = i + 1
+    i = 0
+    while i < lcCount:
+        section = "Light Curve " + str(i + 1)
+        lcprop = classes.CurveProperties("lc")
+        lcprop.populateFromParserSection(parser, section)
+        MainWindow.LoadWidget.lcPropertiesList.append(lcprop)
+        addLightCurve(MainWindow.LoadWidget)
+        i = i + 1
+
+
 def loadProject(MainWindow, parser):
     # check version
     if parser.get("Info", "version") != "2015":
@@ -1549,7 +1578,7 @@ def loadProject(MainWindow, parser):
     else:
         loadMainWindowParameters(MainWindow, parser)
         LoadSpotConfiguration(MainWindow.SpotConfigureWidget, parser)
-        # TODO continue implementing
+        loadCurveParameters(MainWindow, parser)
 
 
 if __name__ == "__main__":

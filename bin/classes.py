@@ -31,6 +31,8 @@ class CurveProperties:
             self.aextinc = ""
             self.xunit = ""
             self.calib = ""
+        if type == "vc":
+            self.star = 0
 
     def populateFromInterface(self, CurvePropertiesDialog):
         self.FilePath = str(CurvePropertiesDialog.filepath_label.text())
@@ -56,11 +58,34 @@ class CurveProperties:
             self.aextinc = str(CurvePropertiesDialog.aextinc_ipt.text())
             self.xunit = str(CurvePropertiesDialog.xunit_ipt.text())
             self.calib = str(CurvePropertiesDialog.calib_ipt.text())
-        else:
+        if CurvePropertiesDialog.type == "vc":
             self.type = "vc"
 
-    def populateFromProjectFile(self, project):
-        pass
+    def populateFromParserSection(self, parser, section):
+        self.FilePath = parser.get(section, "filepath")
+        self.band = parser.get(section, "band")
+        self.ksd = parser.get(section, "ksd")
+        self.l1 = parser.get(section, "l1")
+        self.l2 = parser.get(section, "l2")
+        self.x1 = parser.get(section, "x1")
+        self.x2 = parser.get(section, "x2")
+        self.y1 = parser.get(section, "y1")
+        self.y2 = parser.get(section, "y2")
+        self.e1 = parser.get(section, "e1")
+        self.e2 = parser.get(section, "e2")
+        self.e3 = parser.get(section, "e3")
+        self.e4 = parser.get(section, "e4")
+        self.wla = parser.get(section, "wla")
+        self.opsf = parser.get(section, "opsf")
+        self.sigma = parser.get(section, "sigma")
+        if self.type == "lc":
+            self.noise = parser.get(section, "noise")
+            self.el3a = parser.get(section, "el3a")
+            self.aextinc = parser.get(section, "aextinc")
+            self.xunit = parser.get(section, "xunit")
+            self.calib = parser.get(section, "calib")
+        if self.type == "vc":
+            self.star = parser.getint(section, "star")
 
 
 class dcin:
