@@ -1,8 +1,9 @@
-from PyQt4 import QtGui
-from gui import mainwindow, loadwidget, spotconfigurewidget, \
-    editlightcurvedialog, editvelocitycurvedialog, eclipsewidget
+from PyQt4 import QtGui, QtCore
+from gui import mainwindow, loadwidget, spotconfigurewidget, eclipsewidget, curvepropertiesdialog
 from functools import partial
-from bin import methods
+from bin import methods, classes
+import sys
+import ConfigParser
 
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
@@ -27,11 +28,62 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.clearkeeps_btn.clicked.connect(self.clearKeeps)
         self.setkeepdefaults_btn.clicked.connect(self.setKeepDefaults)
         self.eclipsewidget_btn.clicked.connect(self.EclipseWidget.show)
+        self.saveproject_btn.clicked.connect(self.saveProjectDialog)
+        self.loadproject_btn.clicked.connect(self.loadProjectDialog)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadWidget.close()  # close loadwidget if we exit
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
         self.EclipseWidget.close()
+
+    def saveProjectDialog(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("pywdproject")
+        dialog.setNameFilter("PyWD2015 Project File (*pywdproject)")
+        dialog.setAcceptMode(1)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        if filePath != "" and returnCode != 0:
+            try:
+                project = methods.saveProject(self)
+                with open(filePath, "w") as f:
+                    f.write(project)
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+
+    def loadProjectDialog(self):
+        msg = QtGui.QMessageBox()
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("pywdproject")
+        dialog.setNameFilter("PyWD2015 Project File (*pywdproject)")
+        dialog.setAcceptMode(0)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        fi = QtCore.QFileInfo(filePath)
+        if filePath != "" and returnCode != 0:
+            title = "PyWD - Warning"
+            text = "Loading a project file will erase all unsaved changes. Do you want to load \"" + \
+                   fi.fileName() + "\" ?"
+            answer = QtGui.QMessageBox.question(self, title, text, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if answer == QtGui.QMessageBox.Yes:
+                try:
+                    parser = ConfigParser.SafeConfigParser()
+                    with open(filePath, "r") as f:
+                        parser.readfp(f)
+                    methods.loadProject(self, parser)
+                    msg.setText("Project file \"" + fi.fileName() + "\" loaded.")
+                    msg.setWindowTitle("PyWD - Project Loaded")
+                    msg.exec_()
+                except RuntimeError as ex:
+                    msg.setText(ex.message)
+                    msg.setWindowTitle("PyWD - Wrong File Version")
+                    msg.exec_()
+                except:
+                    msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                    msg.exec_()
+
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
@@ -138,12 +190,6 @@ class EclipseWiget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
         super(EclipseWiget, self).__init__()
         self.setupUi(self)  # setup ui from eclipsewidget.py
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
-        # setup variables
-        self.timeList = []
-        self.typeList = []
-        self.weightList = []
-        self.lines = []
-        #
         self.connectSignals()
 
     def connectSignals(self):
@@ -162,193 +208,132 @@ class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget c
         # [[label], [filepath], [edit_button], [remove_button]]
         self.lcPropertiesList = []  # a list to hold lc property objects
         self.vcPropertiesList = [0, 0]  # a list to hold vc property objects
-        self.EditLightCurveDialog = EditLightCurveDialog()  # get light curve edit widget
-        self.EditVelocityCurveDialog = EditVelocityCurveDialog()  # get velocity curve edit widget
+        # self.EditLightCurveDialog = EditLightCurveDialog()  # get light curve edit widget
+        # self.EditVelocityCurveDialog = EditVelocityCurveDialog()  # get velocity curve edit widget
         self.connectSignals()  # connect signals
 
     def connectSignals(self):
-        self.lcadd_btn.clicked.connect(partial(methods.addLightCurve, self))
-        self.vc1load_btn.clicked.connect(partial(methods.loadVelocityCurve, 1, self))
-        self.vc2load_btn.clicked.connect(partial(methods.loadVelocityCurve, 2, self))
+        self.lcadd_btn.clicked.connect(partial(self.loadCurveDialog, "lc", -1))
+        self.vc1load_btn.clicked.connect(partial(self.loadCurveDialog, "vc", 1))
+        self.vc2load_btn.clicked.connect(partial(self.loadCurveDialog, "vc", 2))
         self.vc1edit_btn.clicked.connect(partial(methods.editVelocityCurve, 1, self))
         self.vc2edit_btn.clicked.connect(partial(methods.editVelocityCurve, 2, self))
 
-    def closeEvent(self, *args, **kwargs):  # overriding QWidget's closeEvent
-        self.EditLightCurveDialog.close()  # close curve edit widget if we exit
-        self.EditVelocityCurveDialog.close()  # close curve edit widget if we exit
+    def loadCurveDialog(self, type, vcNumber):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setAcceptMode(0)
+        returnCode = dialog.exec_()
+        filePath = (dialog.selectedFiles())[0]
+        if filePath != "" and returnCode != 0:
+            try:
+                curvedialog = self.createCurveDialog(type)
+                curvedialog.populateFromFile(filePath)
+                if curvedialog.hasError:
+                    pass
+                else:
+                    result = curvedialog.exec_()
+                    if result == 1:
+                        curveprop = classes.CurveProperties(type)
+                        curveprop.populateFromInterface(curvedialog)
+                        if type == "lc":
+                            self.lcPropertiesList.append(curveprop)
+                            methods.addLightCurve(self)  # actually just adds a row to the ui
+                        if type == "vc":
+                            self.vcPropertiesList[vcNumber-1] = curveprop
+                            methods.loadVelocityCurve(vcNumber, self)
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+
+    def createCurveDialog(self, type):
+        curvedialog = CurvePropertiesDialog()
+        curvedialog.type = type
+        if type == "lc":
+            curvedialog.label_53.setText("Load or edit a light curve")
+            curvedialog.type = "lc"
+            return curvedialog
+        if type == "vc":
+            curvedialog.label_53.setText("Load or edit a velocity curve")
+            curvedialog.type = "vc"
+            curvedialog.noise_combobox.setDisabled(True)
+            curvedialog.noise_combobox.addItem("N/A")
+            curvedialog.noise_combobox.setCurrentIndex(3)
+            curvedialog.el3a_ipt.setDisabled(True)
+            curvedialog.el3a_ipt.setText("N/A")
+            curvedialog.aextinc_ipt.setDisabled(True)
+            curvedialog.aextinc_ipt.setText("N/A")
+            curvedialog.calib_ipt.setDisabled(True)
+            curvedialog.calib_ipt.setText("N/A")
+            curvedialog.xunit_ipt.setDisabled(True)
+            curvedialog.xunit_ipt.setText("N/A")
+            return curvedialog
 
 
-class EditLightCurveDialog(QtGui.QDialog, editlightcurvedialog.Ui_EditLightCurveDialog):
-    def __init__(self):  # consturctor
-        super(EditLightCurveDialog, self).__init__()
-        self.setupUi(self)  # setup ui from editcurvewidget.py
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
-        self.timeList = []
-        self.observationList = []
-        self.weightList = []
-        self.lines = []
-        self.connectSignals()  # connect signals
-
-    def connectSignals(self):
-        self.accept_btn.clicked.connect(self.acceptChanges)
-        self.discard_btn.clicked.connect(self.discardChanges)
-        self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
-
-    def populate(self, LightCurveProperties):  # populate ui from a lcprop obj
-        self.filepath_label.setText(LightCurveProperties.FilePath)
-        self.filepath_label.setToolTip(LightCurveProperties.FilePath)
-        self.band_box.setValue(int(LightCurveProperties.band))
-        self.ksd_box.setValue(int(LightCurveProperties.ksd))
-        self.l1_ipt.setText(LightCurveProperties.l1)
-        self.l2_ipt.setText(LightCurveProperties.l2)
-        self.x1_ipt.setText(LightCurveProperties.x1)
-        self.x2_ipt.setText(LightCurveProperties.x2)
-        self.y1_ipt.setText(LightCurveProperties.y1)
-        self.y2_ipt.setText(LightCurveProperties.y2)
-        self.e1_ipt.setText(LightCurveProperties.e1)
-        self.e2_ipt.setText(LightCurveProperties.e2)
-        self.e3_ipt.setText(LightCurveProperties.e3)
-        self.e4_ipt.setText(LightCurveProperties.e4)
-        self.el3a_ipt.setText(LightCurveProperties.el3a)
-        self.opsf_ipt.setText(LightCurveProperties.opsf)
-        self.sigma_ipt.setText(LightCurveProperties.sigma)
-        self.noise_combobox.setCurrentIndex(int(LightCurveProperties.noise))
-        self.wla_ipt.setText(LightCurveProperties.wla)
-        self.aextinc_ipt.setText(LightCurveProperties.aextinc)
-        self.xunit_ipt.setText(LightCurveProperties.xunit)
-        self.calib_ipt.setText(LightCurveProperties.calib)
-        self.lines = LightCurveProperties.lines
-        self.timeList = LightCurveProperties.timeList
-        self.observationList = LightCurveProperties.observationList
-        self.weightList = LightCurveProperties.weightList
-        self.datawidget.clear()
-        for x in self.lines:
-            a = QtGui.QTreeWidgetItem(self.datawidget, x)
-
-    def load(self, filePath):  # populate ui from a file
-        self.filepath_label.setText(filePath)
-        self.filepath_label.setToolTip(filePath)
-        self.band_box.setValue(7)
-        self.ksd_box.setValue(1)
-        self.l1_ipt.setText("0")
-        self.l2_ipt.setText("0")
-        self.x1_ipt.setText("0")
-        self.x2_ipt.setText("0")
-        self.y1_ipt.setText("0")
-        self.y2_ipt.setText("0")
-        self.e1_ipt.setText("0")
-        self.e2_ipt.setText("0")
-        self.e3_ipt.setText("0")
-        self.e4_ipt.setText("0")
-        self.el3a_ipt.setText("0")
-        self.opsf_ipt.setText("0")
-        self.sigma_ipt.setText("0")
-        self.noise_combobox.setCurrentIndex(1)
-        self.wla_ipt.setText("0")
-        self.aextinc_ipt.setText("0")
-        self.xunit_ipt.setText("1.0000")
-        self.calib_ipt.setText("0")
-        lines = []
-        with open(filePath) as f:
-            for line in f:
-                i = line.split()
-                if i.__len__() is not 0:
-                    lines.append(i)
-                    # lines.append([str(x) for x in line.split()])
-        self.timeList = [x[0] for x in lines]
-        self.observationList = [x[1] for x in lines]
-        self.weightList = [x[2] for x in lines]
-        self.datawidget.clear()
-        for x in lines:
-            a = QtGui.QTreeWidgetItem(self.datawidget, x)
-        self.lines = lines
-
-    def acceptChanges(self):
-        self.done(1)
-
-    def discardChanges(self):
-        self.done(0)
-
-
-class EditVelocityCurveDialog(QtGui.QDialog, editvelocitycurvedialog.Ui_EditVelocityCurveDialog):
+class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropertiesDialog):
     def __init__(self):
-        super(EditVelocityCurveDialog, self).__init__()
-        self.setupUi(self)  # setup ui from editcurvewidget.py
-        self.timeList = []
-        self.observationList = []
-        self.weightList = []
-        self.lines = []
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
+        super(CurvePropertiesDialog, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.type = ""
+        self.hasError = False
         self.connectSignals()
 
     def connectSignals(self):
-        self.accept_btn.clicked.connect(self.acceptChanges)
-        self.discard_btn.clicked.connect(self.discardChanges)
+        self.accept_btn.clicked.connect(partial(self.done, 1))
+        self.discard_btn.clicked.connect(partial(self.done, 2))
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
 
-    def populate(self, VelocityCurveProperties):  # populate ui from a lcprop obj
-        self.filepath_label.setText(VelocityCurveProperties.FilePath)
-        self.filepath_label.setToolTip(VelocityCurveProperties.FilePath)
-        self.band_box.setValue(int(VelocityCurveProperties.band))
-        self.ksd_box.setValue(int(VelocityCurveProperties.ksd))
-        self.l1_ipt.setText(VelocityCurveProperties.l1)
-        self.l2_ipt.setText(VelocityCurveProperties.l2)
-        self.x1_ipt.setText(VelocityCurveProperties.x1)
-        self.x2_ipt.setText(VelocityCurveProperties.x2)
-        self.y1_ipt.setText(VelocityCurveProperties.y1)
-        self.y2_ipt.setText(VelocityCurveProperties.y2)
-        self.e1_ipt.setText(VelocityCurveProperties.e1)
-        self.e2_ipt.setText(VelocityCurveProperties.e2)
-        self.e3_ipt.setText(VelocityCurveProperties.e3)
-        self.e4_ipt.setText(VelocityCurveProperties.e4)
-        self.wla_ipt.setText(VelocityCurveProperties.wla)
-        self.opsf_ipt.setText(VelocityCurveProperties.opsf)
-        self.sigma_ipt.setText(VelocityCurveProperties.sigma)
-        self.lines = VelocityCurveProperties.lines
-        self.timeList = VelocityCurveProperties.timeList
-        self.observationList = VelocityCurveProperties.observationList
-        self.weightList = VelocityCurveProperties.weightList
-        self.datawidget.clear()
-        for x in self.lines:
-            a = QtGui.QTreeWidgetItem(self.datawidget, x)
+    def populateFromFile(self, filePath):
+        curve = classes.Curve(filePath)
+        if curve.hasError:
+            self.hasError = True
+            msg = QtGui.QMessageBox()
+            msg.setText(curve.error)
+            msg.setWindowTitle("PyWD - Error")
+            msg.exec_()
+        else:
+            self.filepath_label.setText(filePath)
+            self.filepath_label.setToolTip(filePath)
+            self.datawidget.clear()
+            for x in curve.lines:
+                a = QtGui.QTreeWidgetItem(self.datawidget, x)
 
-    def load(self, filePath):
-        self.filepath_label.setText(filePath)
-        self.filepath_label.setToolTip(filePath)
-        self.band_box.setValue(7)
-        self.ksd_box.setValue(1)
-        self.l1_ipt.setText("0")
-        self.l2_ipt.setText("0")
-        self.x1_ipt.setText("0")
-        self.x2_ipt.setText("0")
-        self.y1_ipt.setText("0")
-        self.y2_ipt.setText("0")
-        self.e1_ipt.setText("0")
-        self.e2_ipt.setText("0")
-        self.e3_ipt.setText("0")
-        self.e4_ipt.setText("0")
-        self.wla_ipt.setText("0")
-        self.opsf_ipt.setText("0")
-        self.sigma_ipt.setText("0")
-        lines = []
-        with open(filePath) as f:
-            for line in f:
-                i = line.split()
-                if i.__len__() is not 0:
-                    lines.append(i)
-        self.timeList = [x[0] for x in lines]
-        self.observationList = [x[1] for x in lines]
-        self.weightList = [x[2] for x in lines]
-        self.datawidget.clear()
-        for x in lines:
-            a = QtGui.QTreeWidgetItem(self.datawidget, x)
-        self.lines = lines
-
-    def acceptChanges(self):
-        self.done(1)
-
-    def discardChanges(self):
-        self.done(0)
+    def populateFromObject(self, CurveProperties):
+        curve = classes.Curve(CurveProperties.FilePath)
+        if curve.hasError:
+            self.hasError = True
+            msg = QtGui.QMessageBox()
+            msg.setText(curve.error)
+            msg.setWindowTitle("PyWD - Error")
+            msg.exec_()
+        else:
+            self.filepath_label.setText(CurveProperties.FilePath)
+            self.filepath_label.setToolTip(CurveProperties.FilePath)
+            self.band_box.setValue(int(CurveProperties.band))
+            self.ksd_box.setValue(int(CurveProperties.ksd))
+            self.l1_ipt.setText(CurveProperties.l1)
+            self.l2_ipt.setText(CurveProperties.l2)
+            self.x1_ipt.setText(CurveProperties.x1)
+            self.x2_ipt.setText(CurveProperties.x2)
+            self.y1_ipt.setText(CurveProperties.y1)
+            self.y2_ipt.setText(CurveProperties.y2)
+            self.e1_ipt.setText(CurveProperties.e1)
+            self.e2_ipt.setText(CurveProperties.e2)
+            self.e3_ipt.setText(CurveProperties.e3)
+            self.e4_ipt.setText(CurveProperties.e4)
+            self.wla_ipt.setText(CurveProperties.wla)
+            self.opsf_ipt.setText(CurveProperties.opsf)
+            self.sigma_ipt.setText(CurveProperties.sigma)
+            self.datawidget.clear()
+            for x in curve.lines:
+                a = QtGui.QTreeWidgetItem(self.datawidget, x)
+            if self.type == "lc":
+                self.noise_combobox.setCurrentIndex(int(CurveProperties.noise))
+                self.el3a_ipt.setText(CurveProperties.el3a)
+                self.aextinc_ipt.setText(CurveProperties.aextinc)
+                self.xunit_ipt.setText(CurveProperties.xunit)
+                self.calib_ipt.setText(CurveProperties.calib)
 
 
 class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWidget):
@@ -370,9 +355,45 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
     def connectSignals(self):
         self.addspot1_btn.clicked.connect(partial(methods.addSpotRow, self, 1))
         self.addspot2_btn.clicked.connect(partial(methods.addSpotRow, self, 2))
-        self.spotconfigsave_btn.clicked.connect(partial(methods.SaveSpotConfiguration, self))
-        self.spotconfigload_btn.clicked.connect(partial(methods.LoadSpotConfiguration, self))
+        self.spotconfigsave_btn.clicked.connect(self.saveSpotConfigDialog)
+        self.spotconfigload_btn.clicked.connect(self.loadSpotConfigDialog)
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
+
+    def saveSpotConfigDialog(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("spotconfig")
+        dialog.setNameFilter("Spot Configuration File (*.spotconfig)")
+        dialog.setAcceptMode(1)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        if filePath != "" and returnCode != 0:
+            try:
+                parser = methods.SaveSpotConfiguration(self)
+                with open(filePath, 'w') as f:
+                    parser.write(f)
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+
+    def loadSpotConfigDialog(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setAcceptMode(0)
+        dialog.setDefaultSuffix("spotconfig")
+        dialog.setNameFilter("Spot Configuration File (*.spotconfig)")
+        returnCode = dialog.exec_()
+        filePath = (dialog.selectedFiles())[0]
+        if filePath != "" and returnCode != 0:
+            try:
+                parser = ConfigParser.SafeConfigParser()
+                with open(filePath, 'r') as f:
+                    parser.readfp(f)
+                methods.LoadSpotConfiguration(self, parser)
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+                methods.clearSpotConfigureWidget(self)
 
 
 if __name__ == "__main__":

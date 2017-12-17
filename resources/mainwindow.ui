@@ -72,12 +72,12 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>752</width>
-        <height>308</height>
+        <width>800</width>
+        <height>400</height>
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_7">
        <attribute name="title">
@@ -367,7 +367,7 @@
          <rect>
           <x>270</x>
           <y>50</y>
-          <width>21</width>
+          <width>31</width>
           <height>191</height>
          </rect>
         </property>
@@ -666,12 +666,18 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>51</width>
+          <width>91</width>
           <height>21</height>
          </rect>
         </property>
-        <property name="text">
+        <property name="toolTip">
+         <string>Ephemeris time of the eclipsing system in JD time</string>
+        </property>
+        <property name="statusTip">
          <string>JD0</string>
+        </property>
+        <property name="text">
+         <string>Ephemeris</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="tavh_ipt">
@@ -827,8 +833,11 @@
         <property name="toolTip">
          <string>Period</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>P0</string>
+        </property>
+        <property name="text">
+         <string>Period</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_71">
@@ -844,7 +853,7 @@
          <string>Mean effective temperature for star 1, re-radiation or spots not included</string>
         </property>
         <property name="text">
-         <string>TAVH</string>
+         <string>T1</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_56">
@@ -972,7 +981,7 @@
          <string>Mean effective temperature for star 2, re-radiation or spots not included</string>
         </property>
         <property name="text">
-         <string>TAVC</string>
+         <string>T2</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_64">
@@ -3911,6 +3920,32 @@ the triple system barycenter, in the adopted time system</string>
          <string>Miscellaneous Settings - Various parameters that does not fit into a particular group.</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="saveproject_btn">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>220</y>
+          <width>161</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save Project</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="loadproject_btn">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>220</y>
+          <width>161</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Load Project</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -3923,8 +3958,8 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>752</width>
-        <height>308</height>
+        <width>800</width>
+        <height>400</height>
        </rect>
       </property>
       <property name="currentIndex">
