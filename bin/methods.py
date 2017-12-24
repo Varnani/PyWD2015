@@ -831,11 +831,17 @@ def exportDc(MainWindow):
         block9 = "{0}{1}{2}{3}{4}".format(
             _formatKeeps(MainWindow.logd_chk),
             _formatKeeps(MainWindow.desextinc_chk),
-            "1",  # will implement later
-            "1",
-            "1",
+            _formatKeeps(MainWindow.s1tstart_chk),
+            _formatKeeps(MainWindow.s1tmax1_chk),
+            _formatKeeps(MainWindow.s1tmax2_chk),
         )
-        block10 = "11111"  # will implement later
+        block10 = "{0}{1}{2}{3}{4}".format(
+            _formatKeeps(MainWindow.s1tend_chk),
+            _formatKeeps(MainWindow.s2tstart_chk),
+            _formatKeeps(MainWindow.s2tmax1_chk),
+            _formatKeeps(MainWindow.s2tmax2_chk),
+            _formatKeeps(MainWindow.s2tend_chk)
+        )
         block11 = "11111"  # unused block
         block12 = "{0}{1}{2}{3}{4}".format(
             _formatKeeps(MainWindow.l1_chk),
@@ -844,9 +850,11 @@ def exportDc(MainWindow):
             _formatKeeps(MainWindow.x2_chk),
             _formatKeeps(MainWindow.el3_chk)
         )
+        marqmul = ("0" * (2 - len(str(MainWindow.marqmul_spinbox.value())))) + str(MainWindow.marqmul_spinbox.value())
         line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
                 " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
-                " " + block11 + " " + block12 + " 01 1.000d-05 1.000\n"
+                " " + block11 + " " + block12 + " 01 1.000d-" + marqmul + \
+                formatInput(MainWindow.vlr_spinbox.value(), 6, 3, "F") + "\n"
         spot1 = "  0  0"
         spot2 = "  0  0"
         if len(MainWindow.SpotConfigureWidget.star1ElementList) != 0:
@@ -1160,7 +1168,7 @@ def exportDc(MainWindow):
 
         dcin.output = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \
                       + vclines + lclines + eclipseline + lcextralines + \
-                      "300.00000\n" + star1spotline + "300.00000\n" + star2spotline + \
+                      star1spotline + "300.00000\n" + star2spotline + "300.00000\n" + \
                       "150.\n" + vc1dataline + vc2dataline + lcdataline + \
                       ecdataline + " 2\n"
         if vc1dataline == "" and vc2dataline == "":
@@ -1395,6 +1403,7 @@ def saveMainWindowParameters(MainWindow):
     parser.set("KEEP's", "s2lng", str(MainWindow.s2long_chk.isChecked()))
     parser.set("KEEP's", "s2rad", str(MainWindow.s2rad_chk.isChecked()))
     parser.set("KEEP's", "s2temp", str(MainWindow.s2temp_chk.isChecked()))
+    # TODO add spot keeps
     # misc tab
     parser.add_section("Miscellaneous")
     parser.set("Miscellaneous", "icor1", str(MainWindow.icor1_chk.isChecked()))
@@ -1603,28 +1612,27 @@ def loadProject(MainWindow, parser):
         import os
         if os.path.isfile(eclipsePath) is not True and eclipsePath != "None":
             raise RuntimeError("Can't read eclipse data, file does not exists: " + eclipsePath)
-        else:
-            lcCount = parser.getint("Curve Count", "light curves")
-            vcCount = parser.getint("Curve Count", "velocity Curves")
-            i = 0
-            while i < vcCount:
-                section = "Velocity Curve " + str(i + 1)
-                filepath = parser.get(section, "filepath")
-                if os.path.isfile(filepath) is not True:
-                    raise RuntimeError("Can't read velocity curve data, file does not exist: " + filepath)
-                i = i + 1
-            i = 0
-            while i < vcCount:
-                section = "Light Curve " + str(i + 1)
-                filepath = parser.get(section, "filepath")
-                if os.path.isfile(filepath) is not True:
-                    raise RuntimeError("Can't read light curve data, file does not exist: " + filepath)
-                i = i + 1
-            # modify the ui
-            loadMainWindowParameters(MainWindow, parser)
-            LoadSpotConfiguration(MainWindow.SpotConfigureWidget, parser)
-            loadCurveParameters(MainWindow, parser)
-            loadEclipseParameters(MainWindow, parser)
+        lcCount = parser.getint("Curve Count", "light curves")
+        vcCount = parser.getint("Curve Count", "velocity Curves")
+        i = 0
+        while i < vcCount:
+            section = "Velocity Curve " + str(i + 1)
+            filepath = parser.get(section, "filepath")
+            if os.path.isfile(filepath) is not True:
+                raise RuntimeError("Can't read velocity curve data, file does not exist: " + filepath)
+            i = i + 1
+        i = 0
+        while i < lcCount:
+            section = "Light Curve " + str(i + 1)
+            filepath = parser.get(section, "filepath")
+            if os.path.isfile(filepath) is not True:
+                raise RuntimeError("Can't read light curve data, file does not exist: " + filepath)
+            i = i + 1
+        # modify the ui
+        loadMainWindowParameters(MainWindow, parser)
+        LoadSpotConfiguration(MainWindow.SpotConfigureWidget, parser)
+        loadCurveParameters(MainWindow, parser)
+        loadEclipseParameters(MainWindow, parser)
 
 
 if __name__ == "__main__":

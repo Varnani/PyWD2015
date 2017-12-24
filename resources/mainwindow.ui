@@ -48,7 +48,7 @@
      <string>?</string>
     </property>
    </widget>
-   <widget class="QTabWidget" name="tabWidget_2">
+   <widget class="QTabWidget" name="maintabwidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -65,9 +65,9 @@
     </property>
     <widget class="QWidget" name="tab_8">
      <attribute name="title">
-      <string>DC2015</string>
+      <string>Input</string>
      </attribute>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="inputtabwidget">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -77,7 +77,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_7">
        <attribute name="title">
@@ -86,8 +86,8 @@
        <widget class="QPushButton" name="spotconfigure_btn">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>189</y>
+          <x>520</x>
+          <y>200</y>
           <width>201</width>
           <height>51</height>
          </rect>
@@ -107,7 +107,7 @@
        <widget class="QPushButton" name="loadwidget_btn">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>520</x>
           <y>50</y>
           <width>201</width>
           <height>51</height>
@@ -122,45 +122,14 @@
          <string>Load light and velocity curves.</string>
         </property>
         <property name="text">
-         <string>Observations</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="export_btn">
-        <property name="geometry">
-         <rect>
-          <x>540</x>
-          <y>50</y>
-          <width>181</width>
-          <height>191</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>15</pointsize>
-          <weight>75</weight>
-          <italic>false</italic>
-          <bold>true</bold>
-          <underline>false</underline>
-          <strikeout>false</strikeout>
-          <stylestrategy>PreferDefault</stylestrategy>
-          <kerning>true</kerning>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>ArrowCursor</cursorShape>
-        </property>
-        <property name="toolTip">
-         <string>Write dcin.active file and run DC program.</string>
-        </property>
-        <property name="text">
-         <string>RUN DC2015</string>
+         <string>Light / Velocity Curves</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_48">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>50</y>
+          <x>220</x>
+          <y>60</y>
           <width>131</width>
           <height>31</height>
          </rect>
@@ -168,18 +137,21 @@
         <property name="toolTip">
          <string>Sets predefined constraints for different conditions</string>
         </property>
+        <property name="statusTip">
+         <string>MODE</string>
+        </property>
         <property name="whatsThis">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode -1:&lt;/span&gt; This mode is for X-ray binaries for which the eclipse duration of a compact object is known from X-ray observations. The compact star must be star 1. The applied constraint is that the surface potential of the ordinary star (star 2) must be such as to produce the observed X-ray eclipse duration.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode 0:&lt;/span&gt; No constraints are applied in mode 0, and the component luminosity ratio is not even required to be consistent with the surface temperatures.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode 1:&lt;/span&gt; This is a mode for overcontact binaries, such as W UMa stars. Six or seven constraints are applied, depending on whether fixed or computed limb darkening is specified.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode 2:&lt;/span&gt; This mode is for detached binaries with no constraints on the potentials. The only constraint is that the secondary luminosity, L2, is computed from the other parameters via the specified radiation prescription (blackbody or stellar atmosphere).&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode 3:&lt;/span&gt; This mode is for overcontact binaries and is like mode 1 except that the constraints on g2, T2, A2, x2, and y2 are not applied. The other two mode 1 constraints (on Ω1 and L2) are applied in mode 3, but T2, A2, g2, x2, and y2 are free.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode 4:&lt;/span&gt; This mode is for semi-detached binaries with star 1 accurately filling its limiting lobe, which is the classical Roche lobe for synchronous rotation and a circular orbit, but differs from the classical Roche lobe for non-synchronous and eccentric cases.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode 5:&lt;/span&gt; The same as mode 4, except that it is star 2 that fills its limiting lobe. This is the usual mode for Algol-type binaries.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mode 6:&lt;/span&gt; This mode is for double contact binaries, in which both stars accurately fill their limiting lobes. Astrophysically this makes sense only if at least one of the stars rotates non-synchronously. Mode 6 applies the surface potential constraints of modes 4 and 5 together.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Operation [MODE]:</string>
+         <string>Operation Mode</string>
         </property>
        </widget>
        <widget class="QComboBox" name="mode_combobox">
         <property name="geometry">
          <rect>
-          <x>150</x>
-          <y>50</y>
+          <x>370</x>
+          <y>60</y>
           <width>121</width>
           <height>31</height>
          </rect>
@@ -228,63 +200,30 @@
          </property>
         </item>
        </widget>
-       <widget class="QComboBox" name="isym_combobox">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>210</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>Symmetrical</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Asymmetrical</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QLabel" name="label_50">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>210</y>
-          <width>101</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Carry out solution with asymmetrical or symmetrical derivatives. Symmetrical derivatives are more reliable but take twice as long to compute</string>
-        </property>
-        <property name="text">
-         <string>ISYM:</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_54">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>105</y>
-          <width>91</width>
+          <x>220</x>
+          <y>110</y>
+          <width>141</width>
           <height>31</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Set whether time or phase is the independent variable</string>
         </property>
+        <property name="statusTip">
+         <string>JDPHS</string>
+        </property>
         <property name="text">
-         <string>JDPHS:</string>
+         <string>Independent Variable</string>
         </property>
        </widget>
        <widget class="QComboBox" name="jdphs_combobox">
         <property name="geometry">
          <rect>
-          <x>150</x>
-          <y>105</y>
+          <x>370</x>
+          <y>110</y>
           <width>121</width>
           <height>31</height>
          </rect>
@@ -300,42 +239,6 @@
          </property>
         </item>
        </widget>
-       <widget class="QComboBox" name="maglite_combobox">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>160</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>Flux</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Magnitude</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QLabel" name="label_41">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>160</y>
-          <width>91</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Input unit</string>
-        </property>
-        <property name="text">
-         <string>MAGLITE:</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_53">
         <property name="geometry">
          <rect>
@@ -346,7 +249,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>DC2015 - Observation, spot, calculation and general configuration</string>
+         <string>Input - Observation, spot, calculation and general configuration</string>
         </property>
        </widget>
        <widget class="Line" name="line_12">
@@ -365,10 +268,10 @@
        <widget class="Line" name="line_5">
         <property name="geometry">
          <rect>
-          <x>270</x>
+          <x>490</x>
           <y>50</y>
           <width>31</width>
-          <height>191</height>
+          <height>201</height>
          </rect>
         </property>
         <property name="orientation">
@@ -378,8 +281,8 @@
        <widget class="QPushButton" name="eclipsewidget_btn">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>120</y>
+          <x>520</x>
+          <y>125</y>
           <width>201</width>
           <height>51</height>
          </rect>
@@ -399,14 +302,97 @@
        <widget class="Line" name="line_13">
         <property name="geometry">
          <rect>
-          <x>510</x>
+          <x>185</x>
           <y>50</y>
-          <width>21</width>
-          <height>191</height>
+          <width>31</width>
+          <height>201</height>
          </rect>
         </property>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="loadproject_btn">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>80</y>
+          <width>150</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Load Project</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="saveproject_btn">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>170</y>
+          <width>150</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save Project</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="icor2_chk">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>220</y>
+          <width>261</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Enable proximity and eclipse corrections for RV's of star 2.</string>
+        </property>
+        <property name="statusTip">
+         <string>ICOR2</string>
+        </property>
+        <property name="text">
+         <string>Proximity RV correction for star 2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="icor1_chk">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>190</y>
+          <width>261</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Enable proximity and eclipse corrections for RV's of star 1.</string>
+        </property>
+        <property name="statusTip">
+         <string>ICOR1</string>
+        </property>
+        <property name="text">
+         <string>Proximity RV correction for star 1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="ifcgs_chk">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>160</y>
+          <width>91</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If absolute solution with flux unit erg s&lt;span style=&quot; vertical-align:super;&quot;&gt;−1&lt;/span&gt; cm&lt;span style=&quot; vertical-align:super;&quot;&gt;−3&lt;/span&gt; is desired, check this box. Uncheck this box for a conventional solution in arbitrarily scaled flux.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="statusTip">
+         <string>IFCGS</string>
+        </property>
+        <property name="text">
+         <string>Use CGS</string>
         </property>
        </widget>
       </widget>
@@ -424,7 +410,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>System Parameters - Eclipsing system's orbital and physical values.</string>
+         <string>System Parameters - Eclipsing system's orbital and physical values</string>
         </property>
        </widget>
        <widget class="Line" name="line_11">
@@ -461,7 +447,7 @@
          <rect>
           <x>10</x>
           <y>150</y>
-          <width>51</width>
+          <width>111</width>
           <height>16</height>
          </rect>
         </property>
@@ -469,10 +455,10 @@
          <string>Mass ratio of binary components, M2/M1</string>
         </property>
         <property name="statusTip">
-         <string/>
+         <string>RM</string>
         </property>
         <property name="text">
-         <string>RM</string>
+         <string>Q (M2/M1)</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_61">
@@ -480,7 +466,7 @@
          <rect>
           <x>130</x>
           <y>200</y>
-          <width>51</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
@@ -525,15 +511,18 @@
          <rect>
           <x>250</x>
           <y>100</y>
-          <width>51</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Initial argument of periastron for star 1 in radians, the argument of periastron for star 2 differs by π radians</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>PERR0</string>
+        </property>
+        <property name="text">
+         <string>Omega (ω)</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_60">
@@ -541,7 +530,7 @@
          <rect>
           <x>10</x>
           <y>200</y>
-          <width>51</width>
+          <width>101</width>
           <height>21</height>
          </rect>
         </property>
@@ -550,38 +539,6 @@
         </property>
         <property name="text">
          <string>F1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_42">
-        <property name="geometry">
-         <rect>
-          <x>610</x>
-          <y>200</y>
-          <width>46</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Number of Gaussian abscissas in the Gaussian quadrature of time/phase smearing, set 1 for no smearing</string>
-        </property>
-        <property name="text">
-         <string>NGA</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="nga_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>610</x>
-          <y>220</y>
-          <width>51</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>10</number>
         </property>
        </widget>
        <widget class="QLineEdit" name="tavc_ipt">
@@ -594,7 +551,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -621,15 +578,18 @@
          <rect>
           <x>370</x>
           <y>50</y>
-          <width>71</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Constant shift to be applied to computed phases; Phase Shift</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>PSHIFT</string>
+        </property>
+        <property name="text">
+         <string>Phase Shift</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_74">
@@ -637,15 +597,18 @@
          <rect>
           <x>490</x>
           <y>150</y>
-          <width>51</width>
+          <width>101</width>
           <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>The potential for star 1, as defined by Kopal (1954) for synchronous, circular orbit case</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>PHSV</string>
+        </property>
+        <property name="text">
+         <string>Pot1</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="jd0_ipt">
@@ -690,7 +653,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -706,7 +669,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -717,15 +680,18 @@
          <rect>
           <x>250</x>
           <y>200</y>
-          <width>51</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Semi-duration of primary eclipses in phase units, applied only in Mode -1</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>TH E</string>
+        </property>
+        <property name="text">
+         <string>Eclipse semi-dur.</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="f1_ipt">
@@ -754,7 +720,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -770,7 +736,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -810,15 +776,18 @@
          <rect>
           <x>10</x>
           <y>100</y>
-          <width>51</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Semi-major axis</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>a</string>
+        </property>
+        <property name="text">
+         <string>Semi-major axis</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_44">
@@ -845,12 +814,15 @@
          <rect>
           <x>250</x>
           <y>150</y>
-          <width>51</width>
+          <width>101</width>
           <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Mean effective temperature for star 1, re-radiation or spots not included</string>
+        </property>
+        <property name="statusTip">
+         <string>TAVH</string>
         </property>
         <property name="text">
          <string>T1</string>
@@ -861,15 +833,18 @@
          <rect>
           <x>370</x>
           <y>100</y>
-          <width>51</width>
+          <width>101</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>First time derivative of omega</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>dPERdt</string>
+        </property>
+        <property name="text">
+         <string>dω/dt</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="phsv_ipt">
@@ -882,7 +857,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -893,15 +868,18 @@
          <rect>
           <x>490</x>
           <y>50</y>
-          <width>51</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Duration of light curve observation for phase smearing computation</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>DELPH</string>
+        </property>
+        <property name="text">
+         <string>Duration of Obs.</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_62">
@@ -909,15 +887,18 @@
          <rect>
           <x>130</x>
           <y>100</y>
-          <width>51</width>
+          <width>101</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>First time derivative of omega</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>e</string>
+        </property>
+        <property name="text">
+         <string>Eccentricity</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_45">
@@ -933,7 +914,7 @@
          <string>First time derivative of period</string>
         </property>
         <property name="text">
-         <string>dPdt</string>
+         <string>dP/dt</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="e_ipt">
@@ -957,15 +938,18 @@
          <rect>
           <x>610</x>
           <y>100</y>
-          <width>51</width>
+          <width>111</width>
           <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>V Gamma</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>VGAM</string>
+        </property>
+        <property name="text">
+         <string>V Gamma</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_70">
@@ -973,12 +957,15 @@
          <rect>
           <x>370</x>
           <y>150</y>
-          <width>51</width>
+          <width>111</width>
           <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Mean effective temperature for star 2, re-radiation or spots not included</string>
+        </property>
+        <property name="statusTip">
+         <string>TAVC</string>
         </property>
         <property name="text">
          <string>T2</string>
@@ -989,15 +976,18 @@
          <rect>
           <x>490</x>
           <y>100</y>
-          <width>51</width>
+          <width>101</width>
           <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Binary system orbital inclination, XINCL</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>INCL</string>
+        </property>
+        <property name="text">
+         <string>Inclination</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="dpdt_ipt">
@@ -1023,7 +1013,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -1060,18 +1050,18 @@
          <rect>
           <x>490</x>
           <y>200</y>
-          <width>71</width>
-          <height>16</height>
+          <width>101</width>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Base 10 logarithm of distance in parsecs</string>
         </property>
         <property name="statusTip">
-         <string/>
+         <string>DPCLOG</string>
         </property>
         <property name="text">
-         <string>DPCLOG</string>
+         <string>Log(distance)</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_58">
@@ -1079,15 +1069,18 @@
          <rect>
           <x>370</x>
           <y>200</y>
-          <width>51</width>
+          <width>101</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Radial velocity input in km/s</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>VUNIT</string>
+        </property>
+        <property name="text">
+         <string>V Unit</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_67">
@@ -1095,15 +1088,18 @@
          <rect>
           <x>130</x>
           <y>150</y>
-          <width>61</width>
+          <width>101</width>
           <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
          <string> System metallicity as usually defined logarithmically, relative to the Sun</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>ABUNIN</string>
+        </property>
+        <property name="text">
+         <string>Metallicity</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="perr0_ipt">
@@ -1132,7 +1128,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>1.83714</string>
@@ -1143,15 +1139,18 @@
          <rect>
           <x>610</x>
           <y>150</y>
-          <width>51</width>
+          <width>111</width>
           <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>The potential for star 2, as defined by Kopal (1954) for synchronous, circular orbit case</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>PCSV</string>
+        </property>
+        <property name="text">
+         <string>Pot2</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="f2_ipt">
@@ -1168,6 +1167,41 @@
         </property>
         <property name="text">
          <string>1</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_42">
+        <property name="geometry">
+         <rect>
+          <x>610</x>
+          <y>50</y>
+          <width>121</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Number of Gaussian abscissas in the Gaussian quadrature of time/phase smearing, set 1 for no smearing</string>
+        </property>
+        <property name="statusTip">
+         <string>NGA</string>
+        </property>
+        <property name="text">
+         <string>Gaussian abscissas</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="nga_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>610</x>
+          <y>70</y>
+          <width>50</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10</number>
         </property>
        </widget>
       </widget>
@@ -1373,7 +1407,7 @@
        <widget class="QLabel" name="label_2">
         <property name="geometry">
          <rect>
-          <x>480</x>
+          <x>460</x>
           <y>40</y>
           <width>51</width>
           <height>16</height>
@@ -1386,7 +1420,7 @@
        <widget class="QLabel" name="label_35">
         <property name="geometry">
          <rect>
-          <x>580</x>
+          <x>520</x>
           <y>210</y>
           <width>51</width>
           <height>21</height>
@@ -1524,7 +1558,7 @@
        <widget class="QCheckBox" name="ipb_chk">
         <property name="geometry">
          <rect>
-          <x>600</x>
+          <x>540</x>
           <y>180</y>
           <width>51</width>
           <height>21</height>
@@ -1543,7 +1577,7 @@
        <widget class="QLabel" name="label_95">
         <property name="geometry">
          <rect>
-          <x>480</x>
+          <x>475</x>
           <y>60</y>
           <width>21</width>
           <height>21</height>
@@ -1703,7 +1737,7 @@
        <widget class="QCheckBox" name="mref_chk">
         <property name="geometry">
          <rect>
-          <x>530</x>
+          <x>470</x>
           <y>180</y>
           <width>71</width>
           <height>21</height>
@@ -1779,7 +1813,7 @@
        <widget class="QSpinBox" name="nref_spinbox">
         <property name="geometry">
          <rect>
-          <x>530</x>
+          <x>470</x>
           <y>210</y>
           <width>42</width>
           <height>20</height>
@@ -1792,7 +1826,7 @@
        <widget class="QLabel" name="label_3">
         <property name="geometry">
          <rect>
-          <x>480</x>
+          <x>460</x>
           <y>150</y>
           <width>151</width>
           <height>21</height>
@@ -1917,7 +1951,7 @@
        <widget class="QLabel" name="label_92">
         <property name="geometry">
          <rect>
-          <x>480</x>
+          <x>475</x>
           <y>100</y>
           <width>21</width>
           <height>21</height>
@@ -1983,10 +2017,10 @@
        <widget class="QLabel" name="label_104">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>150</x>
           <y>40</y>
           <width>71</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2004,8 +2038,8 @@
          <rect>
           <x>20</x>
           <y>60</y>
-          <width>71</width>
-          <height>20</height>
+          <width>115</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2018,10 +2052,10 @@
        <widget class="QLabel" name="label_105">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>280</x>
           <y>40</y>
           <width>71</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2037,10 +2071,10 @@
        <widget class="QLineEdit" name="perr3b_ipt">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>150</x>
           <y>110</y>
-          <width>71</width>
-          <height>20</height>
+          <width>115</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2053,10 +2087,10 @@
        <widget class="QLabel" name="label_106">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>280</x>
           <y>90</y>
           <width>71</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2075,8 +2109,8 @@ the triple system barycenter, in the adopted time system</string>
          <rect>
           <x>20</x>
           <y>110</y>
-          <width>71</width>
-          <height>20</height>
+          <width>115</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2089,10 +2123,10 @@ the triple system barycenter, in the adopted time system</string>
        <widget class="QLineEdit" name="tc3b_ipt">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>280</x>
           <y>110</y>
-          <width>71</width>
-          <height>20</height>
+          <width>115</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2108,7 +2142,7 @@ the triple system barycenter, in the adopted time system</string>
           <x>20</x>
           <y>40</y>
           <width>61</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2121,10 +2155,10 @@ the triple system barycenter, in the adopted time system</string>
        <widget class="QLineEdit" name="p3b_ipt">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>150</x>
           <y>60</y>
-          <width>71</width>
-          <height>20</height>
+          <width>115</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2137,10 +2171,10 @@ the triple system barycenter, in the adopted time system</string>
        <widget class="QLabel" name="label_108">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>150</x>
           <y>90</y>
           <width>71</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2159,7 +2193,7 @@ the triple system barycenter, in the adopted time system</string>
           <x>20</x>
           <y>90</y>
           <width>51</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2172,10 +2206,10 @@ the triple system barycenter, in the adopted time system</string>
        <widget class="QLineEdit" name="xinc3b_ipt">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>280</x>
           <y>60</y>
-          <width>71</width>
-          <height>20</height>
+          <width>115</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -2197,8 +2231,11 @@ the triple system barycenter, in the adopted time system</string>
         <property name="toolTip">
          <string>Include light time effect from a 3rd body</string>
         </property>
+        <property name="statusTip">
+         <string>IF3B</string>
+        </property>
         <property name="text">
-         <string>IF3B - Enable third body parameters. </string>
+         <string>Enable third body parameters.</string>
         </property>
        </widget>
        <widget class="Line" name="line_10">
@@ -2215,888 +2252,679 @@ the triple system barycenter, in the adopted time system</string>
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_5">
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_9">
+     <attribute name="title">
+      <string>LC2015</string>
+     </attribute>
+     <widget class="QLineEdit" name="phasestop_ipt">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>210</y>
+        <width>85</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="jdstop_ipt">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>160</y>
+        <width>115</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_73">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>95</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>A seed number that determines individual noise excursions of output light or RV points.</string>
+      </property>
+      <property name="statusTip">
+       <string>SEED</string>
+      </property>
+      <property name="text">
+       <string>Seed</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_285">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>240</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Estimated spectral temperature</string>
+      </property>
+      <property name="statusTip">
+       <string>PHOBS</string>
+      </property>
+      <property name="text">
+       <string>Spectral Temp.</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="defaultseed_btn">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>95</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Default</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_15">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>711</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_283">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>240</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Star number for estimation</string>
+      </property>
+      <property name="statusTip">
+       <string>LSP</string>
+      </property>
+      <property name="text">
+       <string>Star #</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_68">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>711</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>LC2015 - Configure standard LC program parameters and compute synthetic data points</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="tobs_ipt">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>260</y>
+        <width>115</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_76">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>140</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Stop time of output points.</string>
+      </property>
+      <property name="statusTip">
+       <string>HJDSP</string>
+      </property>
+      <property name="text">
+       <string>JD Stop</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="randomizeseed_btn">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>95</y>
+        <width>81</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Randomize</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="seed_spinbox">
+      <property name="geometry">
+       <rect>
+        <x>104</x>
+        <y>95</y>
+        <width>101</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::NoButtons</enum>
+      </property>
+      <property name="decimals">
+       <number>1</number>
+      </property>
+      <property name="minimum">
+       <double>100000001.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>200000002.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>138472375.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="stdev_ipt">
+      <property name="geometry">
+       <rect>
+        <x>104</x>
+        <y>60</y>
+        <width>101</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_286">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>190</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Phase of normalization for columns of normalized light and set magnitude.</string>
+      </property>
+      <property name="statusTip">
+       <string>PHN</string>
+      </property>
+      <property name="text">
+       <string>Phase Norm.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_279">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>240</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Phase of spectral temperature estimation</string>
+      </property>
+      <property name="statusTip">
+       <string>TOBS</string>
+      </property>
+      <property name="text">
+       <string>Spec. Temp. Phs.</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="jdincrement_ipt">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>160</y>
+        <width>115</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_284">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>190</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Start phase of output points.</string>
+      </property>
+      <property name="statusTip">
+       <string>PHSTRT</string>
+      </property>
+      <property name="text">
+       <string>Phase Start</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="phaasenorm_ipt">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>210</y>
+        <width>85</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="jdstart_ipt">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>160</y>
+        <width>115</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_282">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>190</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Increment for phase of output points.</string>
+      </property>
+      <property name="statusTip">
+       <string>PHIN</string>
+      </property>
+      <property name="text">
+       <string>Phase Incr.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_281">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>190</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Stop phase for output points.</string>
+      </property>
+      <property name="statusTip">
+       <string>PHSTOP</string>
+      </property>
+      <property name="text">
+       <string>Phase Stop</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="phasestart_ipt">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>210</y>
+        <width>85</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="phobs_ipt">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>260</y>
+        <width>115</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_278">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>140</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Increment for times of output points.</string>
+      </property>
+      <property name="statusTip">
+       <string>HJDIN</string>
+      </property>
+      <property name="text">
+       <string>JD Increment</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="phaseincrement_ipt">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>210</y>
+        <width>85</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_280">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>140</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Start time of output points.</string>
+      </property>
+      <property name="statusTip">
+       <string>HJDST</string>
+      </property>
+      <property name="text">
+       <string>JD Start</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_69">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Fractional standard deviation of simulated scatter in output light or RV. Enter
+zero for zero output noise.</string>
+      </property>
+      <property name="statusTip">
+       <string>STDEV</string>
+      </property>
+      <property name="text">
+       <string>Fract. Sd.</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_18">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>120</y>
+        <width>361</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_19">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>60</y>
+        <width>21</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="lc_lightcurve_btn">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>60</y>
+        <width>230</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Compute synthetic light curves and plot them with observations, if any.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 1</string>
+      </property>
+      <property name="text">
+       <string>Synthetic Light Curves</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="lc_velocitycurve_btn">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>100</y>
+        <width>230</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Compute synthetic velocity curves and plot them with observations, if any.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 2</string>
+      </property>
+      <property name="text">
+       <string>Synthetic Velocity Curves</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="lc_speclineprof_btn">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>140</y>
+        <width>230</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Generate spectral line profiles.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 3</string>
+      </property>
+      <property name="text">
+       <string>Spectral Line Profiles</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="lc_stardimphase_btn">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>180</y>
+        <width>230</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Generate relative star dimensions vs. phase.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 4</string>
+      </property>
+      <property name="text">
+       <string>Star Dimensions</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="lc_coordinates_btn">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>220</y>
+        <width>230</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Draw star positions as they appear in the sky.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 5</string>
+      </property>
+      <property name="text">
+       <string>Sky Coordinates</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="lc_conjunction_btn">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>260</y>
+        <width>230</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Compute conjunction times or calculate O - C from input eclipse timings.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 6</string>
+      </property>
+      <property name="text">
+       <string>Conjunction Times</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="lsp_spinbox">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>260</y>
+        <width>51</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::UpDownArrows</enum>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>2</number>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="lcnoise_combobox">
+      <property name="geometry">
+       <rect>
+        <x>275</x>
+        <y>60</y>
+        <width>111</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>None</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Square Root</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Linear</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_72">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>60</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set how observational scatter scales with the light level. [?]</string>
+      </property>
+      <property name="statusTip">
+       <string>NOISE</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;NOISE&lt;/span&gt; should be set to 1 for scatter that scales with the square root of the light level, such as counting statistics, and to 2 for scatter that scales with the light level, such as scintillation noise or fluctuations in sky transparency. If &lt;span style=&quot; font-weight:600;&quot;&gt;NOISE&lt;/span&gt; is set to 0, no level-dependent weighting is applied. &lt;/p&gt;&lt;p&gt;As a side note, level-dependent weighting does not apply to velocity curves.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Noise</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_11">
+     <attribute name="title">
+      <string>DC2015</string>
+     </attribute>
+     <widget class="QTabWidget" name="dctabwidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>752</width>
+        <height>308</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_14">
        <attribute name="title">
-        <string>DEL's</string>
+        <string>Main</string>
        </attribute>
-       <widget class="QLineEdit" name="del_s2tmpf_ipt">
-        <property name="geometry">
-         <rect>
-          <x>652</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_pshift_ipt">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.002</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_t1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_27">
-        <property name="geometry">
-         <rect>
-          <x>286</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Average surface temperature in 10000K</string>
-        </property>
-        <property name="text">
-         <string>T2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_5">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Latitude</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S1 LAT</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_f1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>194</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s1lng_ipt">
-        <property name="geometry">
-         <rect>
-          <x>104</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_16">
-        <property name="geometry">
-         <rect>
-          <x>286</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Ratio of axial rotation rate vs. mean orbital rate</string>
-        </property>
-        <property name="text">
-         <string>F2</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s2lat_ipt">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_7">
-        <property name="geometry">
-         <rect>
-          <x>194</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Ratio of axial rotation rate vs. mean orbital rate</string>
-        </property>
-        <property name="text">
-         <string>F1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_6">
-        <property name="geometry">
-         <rect>
-          <x>194</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Angular Radius</string>
-        </property>
-        <property name="text">
-         <string>S1 RAD</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_15">
-        <property name="geometry">
-         <rect>
-          <x>104</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Orbit eccentricity</string>
-        </property>
-        <property name="text">
-         <string>e</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_f2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>286</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_g1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_i_ipt">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_8">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Latitude</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 LAT</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_28">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Gravity darkening exponent</string>
-        </property>
-        <property name="text">
-         <string>G2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_19">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Surface potential</string>
-        </property>
-        <property name="text">
-         <string>POT1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_20">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Bolometric Albedo</string>
-        </property>
-        <property name="text">
-         <string>ALB2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_10">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Inclination</string>
-        </property>
-        <property name="text">
-         <string>i</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_21">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Bolometric Albedo</string>
-        </property>
-        <property name="text">
-         <string>ALB1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_18">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Gravity darkening exponent</string>
-        </property>
-        <property name="text">
-         <string>G1</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s2agrad_ipt">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.0001</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_22">
-        <property name="geometry">
-         <rect>
-          <x>650</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Mass ratio, star 2/star 1</string>
-        </property>
-        <property name="text">
-         <string>Q</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s1agrad_ipt">
-        <property name="geometry">
-         <rect>
-          <x>192</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.001</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_11">
-        <property name="geometry">
-         <rect>
-          <x>104</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Longitude</string>
-        </property>
-        <property name="text">
-         <string>S1 LON</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s2lng_ipt">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.001</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_23">
-        <property name="geometry">
-         <rect>
-          <x>652</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Surface potential</string>
-        </property>
-        <property name="text">
-         <string>POT2</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_a_ipt">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.05</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_perr0_ipt">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_9">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Phase Shift</string>
-        </property>
-        <property name="text">
-         <string>PSHIFT</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_alb2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.05</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_13">
-        <property name="geometry">
-         <rect>
-          <x>652</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Temperature Factor</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 TF</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_q_ipt">
-        <property name="geometry">
-         <rect>
-          <x>650</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.003</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_12">
-        <property name="geometry">
-         <rect>
-          <x>286</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Temperature Factor</string>
-        </property>
-        <property name="text">
-         <string>S1 TF</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_14">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Longitude</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 LON</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s1lat_ipt">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_pot2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>652</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_17">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Semi-major axis</string>
-        </property>
-        <property name="text">
-         <string>a</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_t2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>286</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_alb1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.05</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_24">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>-5</y>
-          <width>521</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>DEL's - Parameter increments for approximating derivatives in finite differences. </string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s1tmpf_ipt">
-        <property name="geometry">
-         <rect>
-          <x>286</x>
-          <y>60</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_e_ipt">
-        <property name="geometry">
-         <rect>
-          <x>104</x>
-          <y>110</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.001</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_pot1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_25">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>90</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>V Gamma</string>
-        </property>
-        <property name="text">
-         <string>PERR0</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_29">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>140</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Average surface temperature in 10000K</string>
-        </property>
-        <property name="text">
-         <string>T1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_26">
-        <property name="geometry">
-         <rect>
-          <x>560</x>
-          <y>40</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Angular Radius</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 RAD</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_g2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>160</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_l2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>210</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_l1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>210</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_30">
-        <property name="geometry">
-         <rect>
-          <x>192</x>
-          <y>190</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Limb darkening coefficient</string>
-        </property>
-        <property name="text">
-         <string>X1</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_x1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>192</x>
-          <y>210</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_31">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>190</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Limb darkening coefficient</string>
-        </property>
-        <property name="text">
-         <string>X2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_32">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>190</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Relative monochromatic luminosity</string>
-        </property>
-        <property name="text">
-         <string>L2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_33">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>190</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Relative monochromatic luminosity</string>
-        </property>
-        <property name="text">
-         <string>L1</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_x2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>286</x>
-          <y>210</y>
-          <width>71</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_7">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>711</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="setdeldefaults_btn">
-        <property name="geometry">
-         <rect>
-          <x>590</x>
-          <y>200</y>
-          <width>131</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Set Defaults</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_6">
-       <attribute name="title">
-        <string>KEEP's</string>
-       </attribute>
-       <widget class="QLabel" name="label_37">
+       <widget class="QLabel" name="label_49">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3106,10 +2934,10 @@ the triple system barycenter, in the adopted time system</string>
          </rect>
         </property>
         <property name="text">
-         <string>KEEP's - Select which parameters to be adjusted.</string>
+         <string>DC2015 - Configure base set DC parameters and do diferential corrections on inputs</string>
         </property>
        </widget>
-       <widget class="Line" name="line_6">
+       <widget class="Line" name="line_8">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3120,6 +2948,473 @@ the triple system barycenter, in the adopted time system</string>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="isym_combobox">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>100</y>
+          <width>121</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string>Symmetrical</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Asymmetrical</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QCheckBox" name="ifoc_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>140</y>
+          <width>171</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Write extra two columns of &quot;observed&quot; and &quot;computed&quot; data in dcout file.</string>
+        </property>
+        <property name="statusTip">
+         <string>IFOC</string>
+        </property>
+        <property name="text">
+         <string>Output O - C</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="iflcin_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>220</y>
+          <width>171</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Write an input file for the LC program, from DC INPUT parameters.</string>
+        </property>
+        <property name="statusTip">
+         <string>IFLCIN</string>
+        </property>
+        <property name="text">
+         <string>Generate lcin.active</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_50">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>110</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Carry out solution with asymmetrical or symmetrical derivatives. Symmetrical derivatives are more reliable but take twice as long to compute</string>
+        </property>
+        <property name="statusTip">
+         <string>ISYM</string>
+        </property>
+        <property name="text">
+         <string>Derivative Type</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="dc_rundc_btn">
+        <property name="geometry">
+         <rect>
+          <x>550</x>
+          <y>60</y>
+          <width>180</width>
+          <height>180</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+          <underline>false</underline>
+          <strikeout>false</strikeout>
+          <stylestrategy>PreferDefault</stylestrategy>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="toolTip">
+         <string>Write dcin.active file and run DC program.</string>
+        </property>
+        <property name="text">
+         <string>RUN DC2015</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="ifder_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>180</y>
+          <width>161</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Write matrix of parameter derivatives and residuals, or observational equations. [?]</string>
+        </property>
+        <property name="statusTip">
+         <string>IFDER</string>
+        </property>
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write control integer IFDER is set to 1 for “yes, write” or to 0 for “do not write.” It decides whether the matrix of parameter derivatives and residuals, or observational equations (both the unweighted and the weighted versions), are written. Since the observational equations for the first iteration pertain to the input parameters (and they change only a little for subsequent iterations), they are written only for the base set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Output derivatives</string>
+        </property>
+       </widget>
+       <widget class="Line" name="line_16">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>50</y>
+          <width>30</width>
+          <height>201</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+       <widget class="Line" name="line_17">
+        <property name="geometry">
+         <rect>
+          <x>520</x>
+          <y>50</y>
+          <width>30</width>
+          <height>200</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_39">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>190</y>
+          <width>51</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Designated band for interstellar extinction. Set 0 if there isn't one.</string>
+        </property>
+        <property name="statusTip">
+         <string>LINKEXT</string>
+        </property>
+        <property name="text">
+         <string>Band #</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="linkext_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>475</x>
+          <y>190</y>
+          <width>50</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="maximum">
+         <number>9</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_40">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>160</y>
+          <width>141</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Interstellar extinction in the designated band, in magnitude</string>
+        </property>
+        <property name="statusTip">
+         <string>DESEXTINC</string>
+        </property>
+        <property name="text">
+         <string>Designated Extinction</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="desextinc_ipt">
+        <property name="geometry">
+         <rect>
+          <x>424</x>
+          <y>160</y>
+          <width>101</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="maglite_combobox">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>60</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string>Flux</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Magnitude</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="label_41">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Input unit</string>
+        </property>
+        <property name="statusTip">
+         <string>MAGLITE</string>
+        </property>
+        <property name="text">
+         <string>Input Unit</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_77">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>105</y>
+          <width>171</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>The fraction of DC’s output corrections to be applied to the input parameters to form the output parameters.</string>
+        </property>
+        <property name="statusTip">
+         <string>VLR</string>
+        </property>
+        <property name="text">
+         <string>Vector Lenght Reduction</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_78">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>65</y>
+          <width>141</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>λ to be used in the Levenberg-Marquardt method.</string>
+        </property>
+        <property name="statusTip">
+         <string>XLAMDA</string>
+        </property>
+        <property name="text">
+         <string>Marquardt multiplier</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="marqmul_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>475</x>
+          <y>62</y>
+          <width>51</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="value">
+         <number>5</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_79">
+        <property name="geometry">
+         <rect>
+          <x>410</x>
+          <y>65</y>
+          <width>61</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>1.000D −</string>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="vlr_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>445</x>
+          <y>100</y>
+          <width>81</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_15">
+       <attribute name="title">
+        <string>Base Set Parameters</string>
+       </attribute>
+       <widget class="QCheckBox" name="g1_chk">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>110</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>G1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="l1_chk">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>140</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>L1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="e_chk">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>80</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>e</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2temp_chk">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>230</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 TEMP</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="x1_chk">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>140</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>X1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="logd_chk">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>80</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>logD</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="t1_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>110</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>T1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="xinc3b_chk">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>170</y>
+          <width>81</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>XINC3B</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="clearkeeps_btn">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>50</y>
+          <width>150</width>
+          <height>35</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Clear</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="pshift_chk">
@@ -3135,6 +3430,214 @@ the triple system barycenter, in the adopted time system</string>
          <string>PSHIFT</string>
         </property>
        </widget>
+       <widget class="QCheckBox" name="incl_chk">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>80</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>INCL</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2rad_chk">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>230</y>
+          <width>81</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 RAD</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="l2_chk">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>140</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>L2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="jd0_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>JD0</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="perr3b_chk">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>170</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>PERR3B</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="t2_chk">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>110</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>T2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="tc3b_chk">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>170</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TC3B</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2long_chk">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>230</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 LONG</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="perr0_chk">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>50</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>PERR0</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="e3b_chk">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>170</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>E3B</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="alb1_chk">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>110</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>ALB1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="dperdt_chk">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>50</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>dPERdt</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2lat_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>230</y>
+          <width>81</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 LAT</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="dpdt_chk">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>50</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>dPdt</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="p0_chk">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>50</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>P0</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="g2_chk">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>110</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>G2</string>
+        </property>
+       </widget>
        <widget class="QCheckBox" name="f2_chk">
         <property name="geometry">
          <rect>
@@ -3148,17 +3651,150 @@ the triple system barycenter, in the adopted time system</string>
          <string>F2</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="e_chk">
+       <widget class="QCheckBox" name="s1lat_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>200</y>
+          <width>81</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S1 LAT</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s1long_chk">
         <property name="geometry">
          <rect>
           <x>100</x>
-          <y>80</y>
+          <y>200</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S1 LONG</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="pot2_chk">
+        <property name="geometry">
+         <rect>
+          <x>660</x>
+          <y>140</y>
+          <width>61</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>POT2</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="setkeepdefaults_btn">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>90</y>
+          <width>150</width>
+          <height>35</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Set Defaults</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s1temp_chk">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>200</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S1 TEMP</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="x2_chk">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>140</y>
           <width>70</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>e</string>
+         <string>X2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="a3b_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>170</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>A3B</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="f1_chk">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>140</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>F1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="el3_chk">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>170</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>EL3</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="p3b_chk">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>170</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>P3B</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_37">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>0</y>
+          <width>711</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>KEEP's - Select which parameters to be adjusted for the base set. You can add subsets from Run DC menu.</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="a_chk">
@@ -3187,84 +3823,6 @@ the triple system barycenter, in the adopted time system</string>
          <string>S1 RAD</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="perr0_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>PERR0</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="alb2_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>ALB2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1long_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>200</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 LONG</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="g1_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>G1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="a3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>A3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="g2_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>G2</string>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="q_chk">
         <property name="geometry">
          <rect>
@@ -3278,124 +3836,17 @@ the triple system barycenter, in the adopted time system</string>
          <string>Q</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="s1temp_chk">
+       <widget class="Line" name="line_6">
         <property name="geometry">
          <rect>
-          <x>290</x>
-          <y>200</y>
-          <width>91</width>
-          <height>17</height>
+          <x>10</x>
+          <y>20</y>
+          <width>711</width>
+          <height>20</height>
          </rect>
         </property>
-        <property name="text">
-         <string>S1 TEMP</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2long_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>230</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 LONG</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="dpdt_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>dPdt</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="tc3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>TC3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="pot1_chk">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>POT1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="l2_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>L2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="l1_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>L1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="el3_chk">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>EL3</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="pot2_chk">
-        <property name="geometry">
-         <rect>
-          <x>650</x>
-          <y>140</y>
-          <width>61</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>POT2</string>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
        <widget class="QCheckBox" name="vgam_chk">
@@ -3411,258 +3862,11 @@ the triple system barycenter, in the adopted time system</string>
          <string>VGAM</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="p0_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>P0</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2lat_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>230</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 LAT</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="alb1_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>ALB1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="x1_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>X1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1lat_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>200</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 LAT</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="t2_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>T2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2temp_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>230</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 TEMP</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="logd_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>logD</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="incl_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>INCL</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="f1_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>F1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="perr3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>170</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>PERR3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="p3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>P3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="x2_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>X2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="t1_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>T1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="e3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>E3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="jd0_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>JD0</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2rad_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>230</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 RAD</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="xinc3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>170</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>XINC3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="dperdt_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>dPERdt</string>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="desextinc_chk">
         <property name="geometry">
          <rect>
-          <x>570</x>
-          <y>110</y>
+          <x>660</x>
+          <y>170</y>
           <width>70</width>
           <height>17</height>
          </rect>
@@ -3674,334 +3878,1013 @@ the triple system barycenter, in the adopted time system</string>
          <string>DEXT</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="setkeepdefaults_btn">
+       <widget class="QCheckBox" name="alb2_chk">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>110</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>ALB2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="pot1_chk">
         <property name="geometry">
          <rect>
           <x>570</x>
+          <y>140</y>
+          <width>70</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>POT1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s1tstart_chk">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>200</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S1 Tstart</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s1tmax1_chk">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>200</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S1 Tmax1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s1tmax2_chk">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>200</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S1 Tmax2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s1tend_chk">
+        <property name="geometry">
+         <rect>
+          <x>660</x>
+          <y>200</y>
+          <width>81</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S1 Tend</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2tmax1_chk">
+        <property name="geometry">
+         <rect>
+          <x>480</x>
+          <y>230</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 Tmax1</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2tend_chk">
+        <property name="geometry">
+         <rect>
+          <x>660</x>
+          <y>230</y>
+          <width>81</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 Tend</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2tmax2_chk">
+        <property name="geometry">
+         <rect>
+          <x>570</x>
+          <y>230</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 Tmax2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="s2tstart_chk">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>230</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>S2 Tstart</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_16">
+       <attribute name="title">
+        <string>Parameter DEL's</string>
+       </attribute>
+       <widget class="QLineEdit" name="del_s1tmpf_ipt">
+        <property name="geometry">
+         <rect>
+          <x>284</x>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.02</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_10">
+        <property name="geometry">
+         <rect>
+          <x>558</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Inclination</string>
+        </property>
+        <property name="text">
+         <string>i</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_g2_ipt">
+        <property name="geometry">
+         <rect>
+          <x>98</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_s2tmpf_ipt">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.02</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_t1_ipt">
+        <property name="geometry">
+         <rect>
+          <x>188</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.02</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_f2_ipt">
+        <property name="geometry">
+         <rect>
+          <x>284</x>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_x2_ipt">
+        <property name="geometry">
+         <rect>
+          <x>284</x>
+          <y>220</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_26">
+        <property name="geometry">
+         <rect>
+          <x>558</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 2 Angular Radius</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>S2 RAD</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_27">
+        <property name="geometry">
+         <rect>
+          <x>284</x>
+          <y>150</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Average surface temperature in 10000K</string>
+        </property>
+        <property name="text">
+         <string>T2</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_perr0_ipt">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_l2_ipt">
+        <property name="geometry">
+         <rect>
+          <x>98</x>
+          <y>220</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_alb2_ipt">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.05</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_pot2_ipt">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.02</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_14">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 2 Longitude</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>S2 LON</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_pshift_ipt">
+        <property name="geometry">
+         <rect>
+          <x>376</x>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.002</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_s2agrad_ipt">
+        <property name="geometry">
+         <rect>
+          <x>558</x>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.0001</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_x1_ipt">
+        <property name="geometry">
+         <rect>
+          <x>190</x>
+          <y>220</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_g1_ipt">
+        <property name="geometry">
+         <rect>
+          <x>8</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_9">
+        <property name="geometry">
+         <rect>
+          <x>376</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Phase Shift</string>
+        </property>
+        <property name="text">
+         <string>PSHIFT</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_7">
+        <property name="geometry">
+         <rect>
+          <x>192</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Ratio of axial rotation rate vs. mean orbital rate</string>
+        </property>
+        <property name="text">
+         <string>F1</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_s1lng_ipt">
+        <property name="geometry">
+         <rect>
+          <x>102</x>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.02</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="setdeldefaults_btn">
+        <property name="geometry">
+         <rect>
+          <x>559</x>
           <y>210</y>
-          <width>131</width>
-          <height>31</height>
+          <width>165</width>
+          <height>35</height>
          </rect>
         </property>
         <property name="text">
          <string>Set Defaults</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="clearkeeps_btn">
+       <widget class="QLineEdit" name="del_t2_ipt">
         <property name="geometry">
          <rect>
-          <x>410</x>
-          <y>210</y>
-          <width>131</width>
-          <height>31</height>
+          <x>284</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="text">
-         <string>Clear</string>
+         <string>0.02</string>
         </property>
        </widget>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Miscellaneous</string>
-       </attribute>
-       <widget class="QSpinBox" name="linkext_spinbox">
+       <widget class="QLabel" name="label_32">
+        <property name="geometry">
+         <rect>
+          <x>98</x>
+          <y>200</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Relative monochromatic luminosity</string>
+        </property>
+        <property name="text">
+         <string>L2</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_5">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 1 Latitude</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>S1 LAT</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_17">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Semi-major axis</string>
+        </property>
+        <property name="text">
+         <string>a</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_pot1_ipt">
+        <property name="geometry">
+         <rect>
+          <x>558</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.02</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_29">
+        <property name="geometry">
+         <rect>
+          <x>188</x>
+          <y>150</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Average surface temperature in 10000K</string>
+        </property>
+        <property name="text">
+         <string>T1</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_13">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 2 Temperature Factor</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>S2 TF</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_23">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>150</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Surface potential</string>
+        </property>
+        <property name="text">
+         <string>POT2</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_i_ipt">
+        <property name="geometry">
+         <rect>
+          <x>558</x>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.2</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_20">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>150</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Bolometric Albedo</string>
+        </property>
+        <property name="text">
+         <string>ALB2</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_q_ipt">
+        <property name="geometry">
+         <rect>
+          <x>648</x>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.003</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_s2lat_ipt">
+        <property name="geometry">
+         <rect>
+          <x>376</x>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.02</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_30">
         <property name="geometry">
          <rect>
           <x>190</x>
-          <y>50</y>
-          <width>61</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="maximum">
-         <number>9</number>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="icor1_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>70</width>
-          <height>21</height>
+          <y>200</y>
+          <width>51</width>
+          <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Should computed RV's include proximity and eclipse corrections for star 1?</string>
+         <string>Limb darkening coefficient</string>
         </property>
         <property name="text">
-         <string>ICOR1</string>
+         <string>X1</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_40">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>80</y>
-          <width>81</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Interstellar extinction in the designated band, in magnitude</string>
-        </property>
-        <property name="text">
-         <string>DESEXTINC</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_39">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>50</y>
-          <width>81</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Designated band for interstellar extinction. Set 0 if there isn't one.</string>
-        </property>
-        <property name="text">
-         <string>LINKEXT</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="icor2_chk">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>50</y>
-          <width>70</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Should computed RV's include proximity and eclipse corrections for star 2?</string>
-        </property>
-        <property name="text">
-         <string>ICOR2</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="desextinc_ipt">
+       <widget class="QLineEdit" name="del_s1agrad_ipt">
         <property name="geometry">
          <rect>
           <x>190</x>
-          <y>80</y>
-          <width>91</width>
-          <height>20</height>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="text">
-         <string>0</string>
+         <string>0.001</string>
         </property>
        </widget>
-       <widget class="QComboBox" name="theme_combobox">
+       <widget class="QLabel" name="label_22">
         <property name="geometry">
          <rect>
-          <x>130</x>
+          <x>648</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Mass ratio, star 2/star 1</string>
+        </property>
+        <property name="text">
+         <string>Q</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_28">
+        <property name="geometry">
+         <rect>
+          <x>98</x>
           <y>150</y>
-          <width>131</width>
-          <height>22</height>
+          <width>51</width>
+          <height>16</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Gravity darkening exponent</string>
+        </property>
+        <property name="text">
+         <string>G2</string>
+        </property>
        </widget>
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="label_19">
         <property name="geometry">
          <rect>
-          <x>20</x>
+          <x>558</x>
           <y>150</y>
-          <width>111</width>
-          <height>21</height>
+          <width>51</width>
+          <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>You can change theme if current one is causing problems. [?]</string>
-        </property>
-        <property name="whatsThis">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Possible themes are indexed here automatically. They are dependent on your OS, desktop manager and Qt installation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>Surface potential</string>
         </property>
         <property name="text">
-         <string>Change Theme:</string>
+         <string>POT1</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="ifoc_chk">
+       <widget class="QLabel" name="label_16">
+        <property name="geometry">
+         <rect>
+          <x>284</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Ratio of axial rotation rate vs. mean orbital rate</string>
+        </property>
+        <property name="text">
+         <string>F2</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_11">
+        <property name="geometry">
+         <rect>
+          <x>102</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 1 Longitude</string>
+        </property>
+        <property name="text">
+         <string>S1 LON</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_f1_ipt">
+        <property name="geometry">
+         <rect>
+          <x>192</x>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_15">
+        <property name="geometry">
+         <rect>
+          <x>102</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Orbit eccentricity</string>
+        </property>
+        <property name="text">
+         <string>e</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_24">
+        <property name="geometry">
+         <rect>
+          <x>8</x>
+          <y>-5</y>
+          <width>521</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>DEL's - Parameter increments for approximating derivatives in finite differences. </string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_12">
+        <property name="geometry">
+         <rect>
+          <x>284</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 1 Temperature Factor</string>
+        </property>
+        <property name="text">
+         <string>S1 TF</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_s1lat_ipt">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>80</y>
-          <width>70</width>
-          <height>21</height>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Write extra two columns of &quot;observed&quot; and &quot;computed&quot; data in dcout file.</string>
+         <string/>
         </property>
         <property name="text">
-         <string>IFOC</string>
+         <string>0.02</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="ifder_chk">
+       <widget class="QLineEdit" name="del_a_ipt">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
-          <width>70</width>
-          <height>21</height>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.05</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_s2lng_ipt">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>70</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.001</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_25">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>100</y>
+          <width>51</width>
+          <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Write matrix of parameter derivatives and residuals, or observational equations. [?]</string>
-        </property>
-        <property name="whatsThis">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write control integer IFDER is set to 1 for “yes, write” or to 0 for “do not write.” It decides whether the matrix of parameter derivatives and residuals, or observational equations (both the unweighted and the weighted versions), are written. Since the observational equations for the first iteration pertain to the input parameters (and they change only a little for subsequent iterations), they are written only for the base set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>V Gamma</string>
         </property>
         <property name="text">
-         <string>IFDER</string>
+         <string>PERR0</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="iflcin_chk">
+       <widget class="QLineEdit" name="del_l1_ipt">
         <property name="geometry">
          <rect>
-          <x>90</x>
-          <y>110</y>
-          <width>70</width>
-          <height>21</height>
+          <x>8</x>
+          <y>220</y>
+          <width>75</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.01</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_31">
+        <property name="geometry">
+         <rect>
+          <x>282</x>
+          <y>200</y>
+          <width>51</width>
+          <height>16</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Write an input file for the LC program, from DC INPUT parameters. [?]</string>
-        </property>
-        <property name="whatsThis">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>Limb darkening coefficient</string>
         </property>
         <property name="text">
-         <string>IFLCIN</string>
+         <string>X2</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="ifcgs_chk">
+       <widget class="Line" name="line_7">
         <property name="geometry">
          <rect>
-          <x>90</x>
-          <y>80</y>
-          <width>79</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If absolute solution with flux unit erg s&lt;span style=&quot; vertical-align:super;&quot;&gt;−1&lt;/span&gt; cm&lt;span style=&quot; vertical-align:super;&quot;&gt;−3&lt;/span&gt; is desired, check this box. Uncheck this box for a conventional solution in arbitrarily scaled flux.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>IFCGS</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_8">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
+          <x>8</x>
           <y>20</y>
           <width>711</width>
-          <height>20</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
-       <widget class="QLabel" name="label_49">
+       <widget class="QLabel" name="label_6">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>0</y>
-          <width>711</width>
-          <height>31</height>
+          <x>192</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 1 Angular Radius</string>
+        </property>
+        <property name="text">
+         <string>S1 RAD</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_8">
+        <property name="geometry">
+         <rect>
+          <x>376</x>
+          <y>50</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Spot 2 Latitude</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>S2 LAT</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_21">
+        <property name="geometry">
+         <rect>
+          <x>376</x>
+          <y>150</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Bolometric Albedo</string>
+        </property>
+        <property name="text">
+         <string>ALB1</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="del_e_ipt">
+        <property name="geometry">
+         <rect>
+          <x>102</x>
+          <y>120</y>
+          <width>75</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="text">
-         <string>Miscellaneous Settings - Various parameters that does not fit into a particular group.</string>
+         <string>0.001</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="saveproject_btn">
+       <widget class="QLineEdit" name="del_alb1_ipt">
         <property name="geometry">
          <rect>
-          <x>400</x>
-          <y>220</y>
-          <width>161</width>
-          <height>41</height>
+          <x>376</x>
+          <y>170</y>
+          <width>75</width>
+          <height>25</height>
          </rect>
         </property>
         <property name="text">
-         <string>Save Project</string>
+         <string>0.05</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="loadproject_btn">
+       <widget class="QLabel" name="label_18">
         <property name="geometry">
          <rect>
-          <x>570</x>
-          <y>220</y>
-          <width>161</width>
-          <height>41</height>
+          <x>8</x>
+          <y>150</y>
+          <width>51</width>
+          <height>16</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Gravity darkening exponent</string>
+        </property>
         <property name="text">
-         <string>Load Project</string>
+         <string>G1</string>
         </property>
        </widget>
-      </widget>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_9">
-     <attribute name="title">
-      <string>LC2015</string>
-     </attribute>
-     <widget class="QTabWidget" name="tabWidget_3">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>800</width>
-        <height>400</height>
-       </rect>
-      </property>
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="tab_12">
-       <attribute name="title">
-        <string>Main</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_13">
-       <attribute name="title">
-        <string>Example</string>
-       </attribute>
-      </widget>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_11">
-     <attribute name="title">
-      <string>Analyze</string>
-     </attribute>
-     <widget class="QTabWidget" name="tabWidget_4">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>752</width>
-        <height>308</height>
-       </rect>
-      </property>
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="tab_14">
-       <attribute name="title">
-        <string>Main</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_15">
-       <attribute name="title">
-        <string>Example</string>
-       </attribute>
+       <widget class="QLabel" name="label_33">
+        <property name="geometry">
+         <rect>
+          <x>8</x>
+          <y>200</y>
+          <width>51</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Relative monochromatic luminosity</string>
+        </property>
+        <property name="text">
+         <string>L1</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -4025,7 +4908,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QLineEdit" name="lineEdit_2">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>160</x>
         <y>250</y>
         <width>231</width>
         <height>31</height>
@@ -4041,7 +4924,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QLabel" name="label_65">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>50</x>
         <y>250</y>
         <width>111</width>
         <height>31</height>
@@ -4067,7 +4950,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QLineEdit" name="lineEdit">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>160</x>
         <y>210</y>
         <width>231</width>
         <height>31</height>
@@ -4083,7 +4966,7 @@ the triple system barycenter, in the adopted time system</string>
      <widget class="QLabel" name="label_66">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>50</x>
         <y>210</y>
         <width>101</width>
         <height>31</height>
@@ -4103,7 +4986,7 @@ the triple system barycenter, in the adopted time system</string>
        </rect>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;PyWD2015&lt;/span&gt; (or pywd for short) is a graphical user interface for generating input files to be used in Wilson - Devinney's DC/LC programs for eclipsing binary modeling and analyzing resulting output files, targeting specifically the 2015 version. &lt;/p&gt;&lt;p&gt;Manual is available at the GitHub wiki. You can also reach the authors from there.&lt;/p&gt;&lt;p&gt;For information about DC/LC programs itself, please refer to the WD Homepage.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;PyWD2015&lt;/span&gt; is a graphical user interface wrapping and adding convenience features to Wilson - Devinney's DC/LC programs for eclipsing binary system modeling, targeting specifically the 2015 version. &lt;/p&gt;&lt;p&gt;Manual is available at the GitHub wiki. You can also reach the authors from there.&lt;/p&gt;&lt;p&gt;For information about DC/LC programs itself, please refer to the WD Homepage.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="textFormat">
        <enum>Qt::RichText</enum>
@@ -4116,6 +4999,35 @@ the triple system barycenter, in the adopted time system</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="theme_combobox">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>235</y>
+        <width>131</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>235</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>You can change theme if current one is causing problems. [?]</string>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Possible themes are indexed here automatically. They are dependent on your OS, desktop manager and Qt installation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Change Theme:</string>
       </property>
      </widget>
     </widget>
