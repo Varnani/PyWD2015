@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from gui import mainwindow, loadwidget, spotconfigurewidget, eclipsewidget, curvepropertiesdialog
+from gui import mainwindow, loadwidget, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, dcwidget
 from functools import partial
 from bin import methods, classes
 import sys
@@ -14,6 +14,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.LoadWidget = LoadWidget()  # get loadwidget
         self.SpotConfigureWidget = SpotConfigureWidget()  # get spotconfigurewidget
         self.EclipseWidget = EclipseWiget()
+        self.DCWidget = DCWidget()
+        self.DCWidget.MainWindow = self
         self.populateStyles()  # populate theme combobox
         self.setKeepDefaults()  # set keeps to their defaults
         self.connectSignals()  # connect events with methods
@@ -22,7 +24,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
         self.loadwidget_btn.clicked.connect(self.LoadWidget.show)  # opens loadwidget
         self.spotconfigure_btn.clicked.connect(self.SpotConfigureWidget.show)  # opens spotconfigurewidget
-        self.dc_rundc_btn.clicked.connect(partial(methods.runDc, self))
+        self.dc_rundc_btn.clicked.connect(partial(self.DCWidget.show))
         self.theme_combobox.currentIndexChanged.connect(self.changeStyle)
         self.setdeldefaults_btn.clicked.connect(self.setDelDefaults)
         self.clearkeeps_btn.clicked.connect(self.clearKeeps)
@@ -402,6 +404,22 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
                 msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
                 msg.exec_()
                 methods.clearSpotConfigureWidget(self)
+
+
+class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
+    def __init__(self):
+        super(DCWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        # variables
+        self.MainWindow = None
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.rundc2015_btn.clicked.connect(self.runDc)
+
+    def runDc(self):  # TODO refactor this after implementing methods.runDc()
+        methods.runDc(self.MainWindow)
 
 
 if __name__ == "__main__":

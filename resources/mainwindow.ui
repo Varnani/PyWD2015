@@ -88,7 +88,7 @@
          <rect>
           <x>520</x>
           <y>200</y>
-          <width>201</width>
+          <width>211</width>
           <height>51</height>
          </rect>
         </property>
@@ -109,7 +109,7 @@
          <rect>
           <x>520</x>
           <y>50</y>
-          <width>201</width>
+          <width>211</width>
           <height>51</height>
          </rect>
         </property>
@@ -283,7 +283,7 @@
          <rect>
           <x>520</x>
           <y>125</y>
-          <width>201</width>
+          <width>211</width>
           <height>51</height>
          </rect>
         </property>
@@ -315,9 +315,9 @@
        <widget class="QPushButton" name="loadproject_btn">
         <property name="geometry">
          <rect>
-          <x>30</x>
-          <y>80</y>
-          <width>150</width>
+          <x>8</x>
+          <y>90</y>
+          <width>181</width>
           <height>50</height>
          </rect>
         </property>
@@ -328,9 +328,9 @@
        <widget class="QPushButton" name="saveproject_btn">
         <property name="geometry">
          <rect>
-          <x>30</x>
-          <y>170</y>
-          <width>150</width>
+          <x>8</x>
+          <y>160</y>
+          <width>181</width>
           <height>50</height>
          </rect>
         </property>
@@ -3030,18 +3030,17 @@ zero for zero output noise.</string>
        <widget class="QPushButton" name="dc_rundc_btn">
         <property name="geometry">
          <rect>
-          <x>550</x>
-          <y>60</y>
-          <width>180</width>
-          <height>180</height>
+          <x>545</x>
+          <y>90</y>
+          <width>190</width>
+          <height>50</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <pointsize>15</pointsize>
-          <weight>75</weight>
+          <weight>50</weight>
           <italic>false</italic>
-          <bold>true</bold>
+          <bold>false</bold>
           <underline>false</underline>
           <strikeout>false</strikeout>
           <stylestrategy>PreferDefault</stylestrategy>
@@ -3052,10 +3051,10 @@ zero for zero output noise.</string>
          <cursorShape>ArrowCursor</cursorShape>
         </property>
         <property name="toolTip">
-         <string>Write dcin.active file and run DC program.</string>
+         <string>Do differential corrections on input parameters</string>
         </property>
         <property name="text">
-         <string>RUN DC2015</string>
+         <string>Differential Corrections</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="ifder_chk">
@@ -3098,7 +3097,7 @@ zero for zero output noise.</string>
          <rect>
           <x>520</x>
           <y>50</y>
-          <width>30</width>
+          <width>31</width>
           <height>200</height>
          </rect>
         </property>
@@ -3293,6 +3292,22 @@ zero for zero output noise.</string>
         </property>
         <property name="value">
          <double>1.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="analysistool_btn">
+        <property name="geometry">
+         <rect>
+          <x>545</x>
+          <y>160</y>
+          <width>190</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Analyze saved differential correction results</string>
+        </property>
+        <property name="text">
+         <string>Analysis Tool</string>
         </property>
        </widget>
       </widget>
