@@ -4,6 +4,7 @@ from functools import partial
 from bin import methods, classes
 import sys
 import ConfigParser
+import os
 
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
@@ -17,7 +18,6 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget = DCWidget()
         self.DCWidget.MainWindow = self
         self.populateStyles()  # populate theme combobox
-        self.setKeepDefaults()  # set keeps to their defaults
         self.connectSignals()  # connect events with methods
 
     def connectSignals(self):
@@ -26,9 +26,6 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.spotconfigure_btn.clicked.connect(self.SpotConfigureWidget.show)  # opens spotconfigurewidget
         self.dc_rundc_btn.clicked.connect(partial(self.DCWidget.show))
         self.theme_combobox.currentIndexChanged.connect(self.changeStyle)
-        self.setdeldefaults_btn.clicked.connect(self.setDelDefaults)
-        self.clearkeeps_btn.clicked.connect(self.clearKeeps)
-        self.setkeepdefaults_btn.clicked.connect(self.setKeepDefaults)
         self.eclipsewidget_btn.clicked.connect(self.EclipseWidget.show)
         self.saveproject_btn.clicked.connect(self.saveProjectDialog)
         self.loadproject_btn.clicked.connect(self.loadProjectDialog)
@@ -37,6 +34,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.LoadWidget.close()  # close loadwidget if we exit
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
         self.EclipseWidget.close()
+        self.DCWidget.close()
 
     def saveProjectDialog(self):
         dialog = QtGui.QFileDialog(self)
@@ -418,8 +416,44 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
     def connectSignals(self):
         self.rundc2015_btn.clicked.connect(self.runDc)
 
-    def runDc(self):  # TODO refactor this after implementing methods.runDc()
-        methods.runDc(self.MainWindow)
+    def runDc(self):
+        dcin = classes.dcin()
+        dcin.fill(self.MainWindow)
+        msg = QtGui.QMessageBox(self)
+        if dcin.hasError:
+            msg.setWindowTitle("PyWD - Fatal Error")
+            msg.setText("There were errors while parsing inputs:\n" + dcin.error + "\n")
+            if dcin.hasWarning:
+                msg.setText(msg.text() + "\nPlus, warnings were encountered: \n" + dcin.warning)
+            msg.exec_()
+        else:
+            answer = 0
+            if dcin.hasWarning:
+                title = "PyWD - Warning"
+                text = "Warnings are encountered while parsing inputs: \n" + dcin.warning + \
+                       "\nDo you still want to run the DC Program?"
+                answer = QtGui.QMessageBox.question(self, title, text, QtGui.QMessageBox.Yes,
+                                                    QtGui.QMessageBox.No)
+            if answer == QtGui.QMessageBox.Yes or dcin.hasWarning is False:
+                try:
+                    output_dir = os.path.join(os.getcwd(), "output")
+                    if not os.path.isdir(output_dir):
+                        os.mkdir(output_dir)
+                    filepath = os.path.join(output_dir, "dcin.active")
+                    with open(filepath, "w") as f:
+                        f.write(dcin.output)
+                    msg.setText("file written")
+                    msg.setWindowTitle("PyWD - Success")
+                    msg.exec_()
+                    # TODO continue implementing
+                except IOError as ex:
+                    msg.setWindowTitle("PyWD - IO Error")
+                    msg.setText("An IO error has been caught:\n" + ex.message)
+                    msg.exec_()
+                except:
+                    msg.setWindowTitle("PyWD - Unknown Exception")
+                    msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
+                    msg.exec_()
 
 
 if __name__ == "__main__":

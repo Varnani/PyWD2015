@@ -72,8 +72,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>800</width>
-        <height>400</height>
+        <width>750</width>
+        <height>307</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -88,8 +88,8 @@
          <rect>
           <x>520</x>
           <y>200</y>
-          <width>211</width>
-          <height>51</height>
+          <width>210</width>
+          <height>50</height>
          </rect>
         </property>
         <property name="font">
@@ -109,8 +109,8 @@
          <rect>
           <x>520</x>
           <y>50</y>
-          <width>211</width>
-          <height>51</height>
+          <width>210</width>
+          <height>50</height>
          </rect>
         </property>
         <property name="font">
@@ -128,7 +128,7 @@
        <widget class="QLabel" name="label_48">
         <property name="geometry">
          <rect>
-          <x>220</x>
+          <x>240</x>
           <y>60</y>
           <width>131</width>
           <height>31</height>
@@ -150,7 +150,7 @@
        <widget class="QComboBox" name="mode_combobox">
         <property name="geometry">
          <rect>
-          <x>370</x>
+          <x>380</x>
           <y>60</y>
           <width>121</width>
           <height>31</height>
@@ -203,7 +203,7 @@
        <widget class="QLabel" name="label_54">
         <property name="geometry">
          <rect>
-          <x>220</x>
+          <x>240</x>
           <y>110</y>
           <width>141</width>
           <height>31</height>
@@ -222,7 +222,7 @@
        <widget class="QComboBox" name="jdphs_combobox">
         <property name="geometry">
          <rect>
-          <x>370</x>
+          <x>380</x>
           <y>110</y>
           <width>121</width>
           <height>31</height>
@@ -268,9 +268,9 @@
        <widget class="Line" name="line_5">
         <property name="geometry">
          <rect>
-          <x>490</x>
+          <x>500</x>
           <y>50</y>
-          <width>31</width>
+          <width>21</width>
           <height>201</height>
          </rect>
         </property>
@@ -283,8 +283,8 @@
          <rect>
           <x>520</x>
           <y>125</y>
-          <width>211</width>
-          <height>51</height>
+          <width>210</width>
+          <height>50</height>
          </rect>
         </property>
         <property name="font">
@@ -302,9 +302,9 @@
        <widget class="Line" name="line_13">
         <property name="geometry">
          <rect>
-          <x>185</x>
+          <x>220</x>
           <y>50</y>
-          <width>31</width>
+          <width>21</width>
           <height>201</height>
          </rect>
         </property>
@@ -316,8 +316,8 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>90</y>
-          <width>181</width>
+          <y>125</y>
+          <width>210</width>
           <height>50</height>
          </rect>
         </property>
@@ -329,8 +329,8 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>160</y>
-          <width>181</width>
+          <y>200</y>
+          <width>210</width>
           <height>50</height>
          </rect>
         </property>
@@ -341,7 +341,7 @@
        <widget class="QCheckBox" name="icor2_chk">
         <property name="geometry">
          <rect>
-          <x>220</x>
+          <x>240</x>
           <y>220</y>
           <width>261</width>
           <height>21</height>
@@ -360,7 +360,7 @@
        <widget class="QCheckBox" name="icor1_chk">
         <property name="geometry">
          <rect>
-          <x>220</x>
+          <x>240</x>
           <y>190</y>
           <width>261</width>
           <height>21</height>
@@ -379,7 +379,7 @@
        <widget class="QCheckBox" name="ifcgs_chk">
         <property name="geometry">
          <rect>
-          <x>220</x>
+          <x>240</x>
           <y>160</y>
           <width>91</width>
           <height>18</height>
@@ -393,6 +393,35 @@
         </property>
         <property name="text">
          <string>Use CGS</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_8">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Name of the binary system</string>
+        </property>
+        <property name="text">
+         <string>System Name</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="systemname_ipt">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>80</y>
+          <width>211</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -1235,25 +1264,6 @@
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
-       <widget class="QSpinBox" name="n2l_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>610</x>
-          <y>100</y>
-          <width>61</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>15</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_98">
         <property name="geometry">
          <rect>
@@ -1264,7 +1274,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>The coefficient of cos γ in the bolometric limb darkening law, for star 1</string>
+         <string>The coefficient of cos γ in the bolometric limb darkening law, for star 1. Only used with detailed reflection (MREF = 1).</string>
         </property>
         <property name="text">
          <string>XBOL1</string>
@@ -1274,7 +1284,7 @@
         <property name="geometry">
          <rect>
           <x>70</x>
-          <y>60</y>
+          <y>70</y>
           <width>151</width>
           <height>22</height>
          </rect>
@@ -1335,7 +1345,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>60</y>
+          <y>70</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -1357,7 +1367,7 @@
         <property name="geometry">
          <rect>
           <x>340</x>
-          <y>60</y>
+          <y>70</y>
           <width>31</width>
           <height>21</height>
          </rect>
@@ -1385,29 +1395,10 @@
          <string>0</string>
         </property>
        </widget>
-       <widget class="QSpinBox" name="n1l_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>610</x>
-          <y>60</y>
-          <width>61</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>15</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_2">
         <property name="geometry">
          <rect>
-          <x>460</x>
+          <x>470</x>
           <y>40</y>
           <width>51</width>
           <height>16</height>
@@ -1421,16 +1412,19 @@
         <property name="geometry">
          <rect>
           <x>520</x>
-          <y>210</y>
-          <width>51</width>
+          <y>225</y>
+          <width>201</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Number of reflections in detailed reflection computation</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>NREF</string>
+        </property>
+        <property name="text">
+         <string>Number of reflections</string>
         </property>
        </widget>
        <widget class="QComboBox" name="ifat2_combobox">
@@ -1452,22 +1446,6 @@
           <string>Blackbody</string>
          </property>
         </item>
-       </widget>
-       <widget class="QLabel" name="label_91">
-        <property name="geometry">
-         <rect>
-          <x>580</x>
-          <y>100</y>
-          <width>31</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Coarse grid size integers of star 2, used in certain derivatives to save computation time</string>
-        </property>
-        <property name="text">
-         <string>N2L</string>
-        </property>
        </widget>
        <widget class="QDoubleSpinBox" name="gr2_spinbox">
         <property name="geometry">
@@ -1536,58 +1514,29 @@
          <string>Limb Darkening</string>
         </property>
        </widget>
-       <widget class="QSpinBox" name="n1_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>500</x>
-          <y>60</y>
-          <width>61</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>30</number>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="ipb_chk">
         <property name="geometry">
          <rect>
-          <x>540</x>
-          <y>180</y>
-          <width>51</width>
+          <x>470</x>
+          <y>175</y>
+          <width>261</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Check the box to set L2 manually</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If unchecked, input L2 values will be used instead of calculating from radiation laws.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="text">
+        <property name="statusTip">
          <string>IPB</string>
         </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_95">
-        <property name="geometry">
-         <rect>
-          <x>475</x>
-          <y>60</y>
-          <width>21</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Grid size integers (number of latitude rows per hemisphere) of star 1</string>
-        </property>
         <property name="text">
-         <string>N1</string>
+         <string>Calculate L2 from T1 and T2</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_97">
@@ -1600,7 +1549,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>The coefficient of cos γ in the bolometric limb darkening law, for star 2</string>
+         <string>The coefficient of cos γ in the bolometric limb darkening law, for star 2. Only used with detailed reflection (MREF = 1).</string>
         </property>
         <property name="text">
          <string>XBOL2</string>
@@ -1639,7 +1588,7 @@
         <property name="geometry">
          <rect>
           <x>370</x>
-          <y>60</y>
+          <y>70</y>
           <width>71</width>
           <height>22</height>
          </rect>
@@ -1738,16 +1687,22 @@
         <property name="geometry">
          <rect>
           <x>470</x>
-          <y>180</y>
-          <width>71</width>
+          <y>200</y>
+          <width>261</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Use detailed reflection computation</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use detailed reflection computation as described in [Wilson 1990].[?]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="statusTip">
+         <string>MREF</string>
+        </property>
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The reflection effect can be handled either in detail &lt;span style=&quot; font-weight:600;&quot;&gt;(viz. Wilson 1990)&lt;/span&gt; or by the inverse square law, with corrections for penumbral and ellipsoidal effects. The latter method is much faster and is adequate for many realistic situations. Set MREF=1 for the simple treatment and MREF=2 for the detailed treatment. It is not advisable to use the detailed treatment for eccentric orbit cases because the required computing time will be almost prohibitively long. Cases for which the detailed treatment is especially recommended include super-synchronous rotators and overcontact binaries. However, computing time for detailed reflection scales with grid integer to the 4th power (actually with N1&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;N2&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;), so you might keep machine time within reason, even with MREF=2 in eccentric systems, by use of coarse grids.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>MREF</string>
+         <string>Use detailed reflection computation</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_94">
@@ -1791,33 +1746,17 @@
          </property>
         </item>
        </widget>
-       <widget class="QSpinBox" name="n2_spinbox">
+       <widget class="QSpinBox" name="nref_spinbox">
         <property name="geometry">
          <rect>
-          <x>500</x>
-          <y>100</y>
-          <width>61</width>
+          <x>470</x>
+          <y>225</y>
+          <width>42</width>
           <height>20</height>
          </rect>
         </property>
         <property name="minimum">
          <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>30</number>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="nref_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>210</y>
-          <width>42</width>
-          <height>20</height>
-         </rect>
         </property>
         <property name="maximum">
          <number>9</number>
@@ -1826,7 +1765,7 @@
        <widget class="QLabel" name="label_3">
         <property name="geometry">
          <rect>
-          <x>460</x>
+          <x>470</x>
           <y>150</y>
           <width>151</width>
           <height>21</height>
@@ -1854,7 +1793,7 @@
          <rect>
           <x>20</x>
           <y>100</y>
-          <width>41</width>
+          <width>51</width>
           <height>21</height>
          </rect>
         </property>
@@ -1885,8 +1824,8 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>60</y>
-          <width>41</width>
+          <y>70</y>
+          <width>51</width>
           <height>21</height>
          </rect>
         </property>
@@ -1936,7 +1875,7 @@
         <property name="geometry">
          <rect>
           <x>240</x>
-          <y>60</y>
+          <y>70</y>
           <width>41</width>
           <height>21</height>
          </rect>
@@ -1946,38 +1885,6 @@
         </property>
         <property name="text">
          <string>ALB1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_92">
-        <property name="geometry">
-         <rect>
-          <x>475</x>
-          <y>100</y>
-          <width>21</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Grid size integers (number of latitude rows per hemisphere) of star 2</string>
-        </property>
-        <property name="text">
-         <string>N2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_96">
-        <property name="geometry">
-         <rect>
-          <x>580</x>
-          <y>60</y>
-          <width>31</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Coarse grid size integers of star 1, used in certain derivatives to save computation time</string>
-        </property>
-        <property name="text">
-         <string>N1L</string>
         </property>
        </widget>
        <widget class="Line" name="line_3">
@@ -2007,6 +1914,197 @@
         </property>
         <property name="text">
          <string>GR2</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_5">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>40</y>
+          <width>91</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Atmosphere</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_110">
+        <property name="geometry">
+         <rect>
+          <x>600</x>
+          <y>100</y>
+          <width>51</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Coarse grid size integers of star 2, used in certain derivatives to save computation time</string>
+        </property>
+        <property name="statusTip">
+         <string>N2L</string>
+        </property>
+        <property name="text">
+         <string>Coarse</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_6">
+        <property name="geometry">
+         <rect>
+          <x>520</x>
+          <y>50</y>
+          <width>41</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Star 1</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_95">
+        <property name="geometry">
+         <rect>
+          <x>470</x>
+          <y>70</y>
+          <width>51</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Grid size integers (number of latitude rows per hemisphere) of star 1</string>
+        </property>
+        <property name="statusTip">
+         <string>N1</string>
+        </property>
+        <property name="text">
+         <string>Fine</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="n2_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>70</y>
+          <width>61</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>30</number>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="n1_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>520</x>
+          <y>70</y>
+          <width>61</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>30</number>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="n1l_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>520</x>
+          <y>100</y>
+          <width>61</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>15</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_111">
+        <property name="geometry">
+         <rect>
+          <x>600</x>
+          <y>70</y>
+          <width>51</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Grid size integers (number of latitude rows per hemisphere) of star 2</string>
+        </property>
+        <property name="statusTip">
+         <string>N2</string>
+        </property>
+        <property name="text">
+         <string>Fine</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_7">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>50</y>
+          <width>41</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Star 2</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_96">
+        <property name="geometry">
+         <rect>
+          <x>470</x>
+          <y>100</y>
+          <width>51</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Coarse grid size integers of star 1, used in certain derivatives to save computation time</string>
+        </property>
+        <property name="statusTip">
+         <string>N1L</string>
+        </property>
+        <property name="text">
+         <string>Coarse</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="n2l_spinbox">
+        <property name="geometry">
+         <rect>
+          <x>650</x>
+          <y>100</y>
+          <width>61</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>15</number>
         </property>
        </widget>
       </widget>
@@ -2699,7 +2797,7 @@ zero for zero output noise.</string>
        <rect>
         <x>30</x>
         <y>120</y>
-        <width>361</width>
+        <width>351</width>
         <height>20</height>
        </rect>
       </property>
@@ -2710,9 +2808,9 @@ zero for zero output noise.</string>
      <widget class="Line" name="line_19">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>385</x>
         <y>60</y>
-        <width>21</width>
+        <width>81</width>
         <height>231</height>
        </rect>
       </property>
@@ -2908,1999 +3006,233 @@ zero for zero output noise.</string>
      <attribute name="title">
       <string>DC2015</string>
      </attribute>
-     <widget class="QTabWidget" name="dctabwidget">
+     <widget class="QPushButton" name="dc_rundc_btn">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>752</width>
-        <height>308</height>
+        <x>120</x>
+        <y>200</y>
+        <width>231</width>
+        <height>61</height>
        </rect>
       </property>
-      <property name="currentIndex">
-       <number>0</number>
+      <property name="font">
+       <font>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
       </property>
-      <widget class="QWidget" name="tab_14">
-       <attribute name="title">
-        <string>Main</string>
-       </attribute>
-       <widget class="QLabel" name="label_49">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>0</y>
-          <width>711</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>DC2015 - Configure base set DC parameters and do diferential corrections on inputs</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_8">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>711</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="isym_combobox">
-        <property name="geometry">
-         <rect>
-          <x>120</x>
-          <y>100</y>
-          <width>121</width>
-          <height>30</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>Symmetrical</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Asymmetrical</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QCheckBox" name="ifoc_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>140</y>
-          <width>171</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Write extra two columns of &quot;observed&quot; and &quot;computed&quot; data in dcout file.</string>
-        </property>
-        <property name="statusTip">
-         <string>IFOC</string>
-        </property>
-        <property name="text">
-         <string>Output O - C</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="iflcin_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>220</y>
-          <width>171</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Write an input file for the LC program, from DC INPUT parameters.</string>
-        </property>
-        <property name="statusTip">
-         <string>IFLCIN</string>
-        </property>
-        <property name="text">
-         <string>Generate lcin.active</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_50">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>100</y>
-          <width>110</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Carry out solution with asymmetrical or symmetrical derivatives. Symmetrical derivatives are more reliable but take twice as long to compute</string>
-        </property>
-        <property name="statusTip">
-         <string>ISYM</string>
-        </property>
-        <property name="text">
-         <string>Derivative Type</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="dc_rundc_btn">
-        <property name="geometry">
-         <rect>
-          <x>545</x>
-          <y>90</y>
-          <width>190</width>
-          <height>50</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-          <underline>false</underline>
-          <strikeout>false</strikeout>
-          <stylestrategy>PreferDefault</stylestrategy>
-          <kerning>true</kerning>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>ArrowCursor</cursorShape>
-        </property>
-        <property name="toolTip">
-         <string>Do differential corrections on input parameters</string>
-        </property>
-        <property name="text">
-         <string>Differential Corrections</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="ifder_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>180</y>
-          <width>161</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Write matrix of parameter derivatives and residuals, or observational equations. [?]</string>
-        </property>
-        <property name="statusTip">
-         <string>IFDER</string>
-        </property>
-        <property name="whatsThis">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write control integer IFDER is set to 1 for “yes, write” or to 0 for “do not write.” It decides whether the matrix of parameter derivatives and residuals, or observational equations (both the unweighted and the weighted versions), are written. Since the observational equations for the first iteration pertain to the input parameters (and they change only a little for subsequent iterations), they are written only for the base set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Output derivatives</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_16">
-        <property name="geometry">
-         <rect>
-          <x>240</x>
-          <y>50</y>
-          <width>30</width>
-          <height>201</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-       <widget class="Line" name="line_17">
-        <property name="geometry">
-         <rect>
-          <x>520</x>
-          <y>50</y>
-          <width>31</width>
-          <height>200</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_39">
-        <property name="geometry">
-         <rect>
-          <x>270</x>
-          <y>190</y>
-          <width>51</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Designated band for interstellar extinction. Set 0 if there isn't one.</string>
-        </property>
-        <property name="statusTip">
-         <string>LINKEXT</string>
-        </property>
-        <property name="text">
-         <string>Band #</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="linkext_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>475</x>
-          <y>190</y>
-          <width>50</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="maximum">
-         <number>9</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_40">
-        <property name="geometry">
-         <rect>
-          <x>270</x>
-          <y>160</y>
-          <width>141</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Interstellar extinction in the designated band, in magnitude</string>
-        </property>
-        <property name="statusTip">
-         <string>DESEXTINC</string>
-        </property>
-        <property name="text">
-         <string>Designated Extinction</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="desextinc_ipt">
-        <property name="geometry">
-         <rect>
-          <x>424</x>
-          <y>160</y>
-          <width>101</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="maglite_combobox">
-        <property name="geometry">
-         <rect>
-          <x>120</x>
-          <y>60</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>Flux</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Magnitude</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QLabel" name="label_41">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>60</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Input unit</string>
-        </property>
-        <property name="statusTip">
-         <string>MAGLITE</string>
-        </property>
-        <property name="text">
-         <string>Input Unit</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_77">
-        <property name="geometry">
-         <rect>
-          <x>270</x>
-          <y>105</y>
-          <width>171</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>The fraction of DC’s output corrections to be applied to the input parameters to form the output parameters.</string>
-        </property>
-        <property name="statusTip">
-         <string>VLR</string>
-        </property>
-        <property name="text">
-         <string>Vector Lenght Reduction</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_78">
-        <property name="geometry">
-         <rect>
-          <x>270</x>
-          <y>65</y>
-          <width>141</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>λ to be used in the Levenberg-Marquardt method.</string>
-        </property>
-        <property name="statusTip">
-         <string>XLAMDA</string>
-        </property>
-        <property name="text">
-         <string>Marquardt multiplier</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="marqmul_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>475</x>
-          <y>62</y>
-          <width>51</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_79">
-        <property name="geometry">
-         <rect>
-          <x>410</x>
-          <y>65</y>
-          <width>61</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>1.000D −</string>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="vlr_spinbox">
-        <property name="geometry">
-         <rect>
-          <x>445</x>
-          <y>100</y>
-          <width>81</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="decimals">
-         <number>3</number>
-        </property>
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="analysistool_btn">
-        <property name="geometry">
-         <rect>
-          <x>545</x>
-          <y>160</y>
-          <width>190</width>
-          <height>50</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Analyze saved differential correction results</string>
-        </property>
-        <property name="text">
-         <string>Analysis Tool</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_15">
-       <attribute name="title">
-        <string>Base Set Parameters</string>
-       </attribute>
-       <widget class="QCheckBox" name="g1_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>G1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="l1_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>L1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="e_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>e</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2temp_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>230</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 TEMP</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="x1_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>X1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="logd_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>logD</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="t1_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>T1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="xinc3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>170</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>XINC3B</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="clearkeeps_btn">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>50</y>
-          <width>150</width>
-          <height>35</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Clear</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="pshift_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>50</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>PSHIFT</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="incl_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>INCL</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2rad_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>230</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 RAD</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="l2_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>L2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="jd0_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>JD0</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="perr3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>170</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>PERR3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="t2_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>T2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="tc3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>TC3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2long_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>230</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 LONG</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="perr0_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>PERR0</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="e3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>E3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="alb1_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>ALB1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="dperdt_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>dPERdt</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2lat_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>230</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 LAT</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="dpdt_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>dPdt</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="p0_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>50</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>P0</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="g2_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>G2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="f2_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>F2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1lat_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>200</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 LAT</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1long_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>200</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 LONG</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="pot2_chk">
-        <property name="geometry">
-         <rect>
-          <x>660</x>
-          <y>140</y>
-          <width>61</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>POT2</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="setkeepdefaults_btn">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>90</y>
-          <width>150</width>
-          <height>35</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Set Defaults</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1temp_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>200</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 TEMP</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="x2_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>X2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="a3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>A3B</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="f1_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>F1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="el3_chk">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>EL3</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="p3b_chk">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>P3B</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_37">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>0</y>
-          <width>711</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>KEEP's - Select which parameters to be adjusted for the base set. You can add subsets from Run DC menu.</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="a_chk">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>a</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1rad_chk">
-        <property name="geometry">
-         <rect>
-          <x>200</x>
-          <y>200</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 RAD</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="q_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Q</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_6">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>711</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="vgam_chk">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>80</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>VGAM</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="desextinc_chk">
-        <property name="geometry">
-         <rect>
-          <x>660</x>
-          <y>170</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>DESEXTINC</string>
-        </property>
-        <property name="text">
-         <string>DEXT</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="alb2_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>110</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>ALB2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="pot1_chk">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>140</y>
-          <width>70</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>POT1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1tstart_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>200</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 Tstart</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1tmax1_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>200</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 Tmax1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1tmax2_chk">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>200</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 Tmax2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s1tend_chk">
-        <property name="geometry">
-         <rect>
-          <x>660</x>
-          <y>200</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S1 Tend</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2tmax1_chk">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>230</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 Tmax1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2tend_chk">
-        <property name="geometry">
-         <rect>
-          <x>660</x>
-          <y>230</y>
-          <width>81</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 Tend</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2tmax2_chk">
-        <property name="geometry">
-         <rect>
-          <x>570</x>
-          <y>230</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 Tmax2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="s2tstart_chk">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>230</y>
-          <width>91</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>S2 Tstart</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_16">
-       <attribute name="title">
-        <string>Parameter DEL's</string>
-       </attribute>
-       <widget class="QLineEdit" name="del_s1tmpf_ipt">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_10">
-        <property name="geometry">
-         <rect>
-          <x>558</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Inclination</string>
-        </property>
-        <property name="text">
-         <string>i</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_g2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>98</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s2tmpf_ipt">
-        <property name="geometry">
-         <rect>
-          <x>650</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_t1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>188</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_f2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_x2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>220</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_26">
-        <property name="geometry">
-         <rect>
-          <x>558</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Angular Radius</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 RAD</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_27">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Average surface temperature in 10000K</string>
-        </property>
-        <property name="text">
-         <string>T2</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_perr0_ipt">
-        <property name="geometry">
-         <rect>
-          <x>468</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_l2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>98</x>
-          <y>220</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_alb2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>468</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.05</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_pot2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>650</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_14">
-        <property name="geometry">
-         <rect>
-          <x>468</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Longitude</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 LON</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_pshift_ipt">
-        <property name="geometry">
-         <rect>
-          <x>376</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.002</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s2agrad_ipt">
-        <property name="geometry">
-         <rect>
-          <x>558</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.0001</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_x1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>220</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_g1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_9">
-        <property name="geometry">
-         <rect>
-          <x>376</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Phase Shift</string>
-        </property>
-        <property name="text">
-         <string>PSHIFT</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_7">
-        <property name="geometry">
-         <rect>
-          <x>192</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Ratio of axial rotation rate vs. mean orbital rate</string>
-        </property>
-        <property name="text">
-         <string>F1</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s1lng_ipt">
-        <property name="geometry">
-         <rect>
-          <x>102</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="setdeldefaults_btn">
-        <property name="geometry">
-         <rect>
-          <x>559</x>
-          <y>210</y>
-          <width>165</width>
-          <height>35</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Set Defaults</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_t2_ipt">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_32">
-        <property name="geometry">
-         <rect>
-          <x>98</x>
-          <y>200</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Relative monochromatic luminosity</string>
-        </property>
-        <property name="text">
-         <string>L2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_5">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Latitude</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S1 LAT</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_17">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Semi-major axis</string>
-        </property>
-        <property name="text">
-         <string>a</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_pot1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>558</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_29">
-        <property name="geometry">
-         <rect>
-          <x>188</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Average surface temperature in 10000K</string>
-        </property>
-        <property name="text">
-         <string>T1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_13">
-        <property name="geometry">
-         <rect>
-          <x>650</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Temperature Factor</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 TF</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_23">
-        <property name="geometry">
-         <rect>
-          <x>650</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Surface potential</string>
-        </property>
-        <property name="text">
-         <string>POT2</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_i_ipt">
-        <property name="geometry">
-         <rect>
-          <x>558</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_20">
-        <property name="geometry">
-         <rect>
-          <x>468</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Bolometric Albedo</string>
-        </property>
-        <property name="text">
-         <string>ALB2</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_q_ipt">
-        <property name="geometry">
-         <rect>
-          <x>648</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.003</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s2lat_ipt">
-        <property name="geometry">
-         <rect>
-          <x>376</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_30">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>200</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Limb darkening coefficient</string>
-        </property>
-        <property name="text">
-         <string>X1</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s1agrad_ipt">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.001</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_22">
-        <property name="geometry">
-         <rect>
-          <x>648</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Mass ratio, star 2/star 1</string>
-        </property>
-        <property name="text">
-         <string>Q</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_28">
-        <property name="geometry">
-         <rect>
-          <x>98</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Gravity darkening exponent</string>
-        </property>
-        <property name="text">
-         <string>G2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_19">
-        <property name="geometry">
-         <rect>
-          <x>558</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Surface potential</string>
-        </property>
-        <property name="text">
-         <string>POT1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_16">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Ratio of axial rotation rate vs. mean orbital rate</string>
-        </property>
-        <property name="text">
-         <string>F2</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_11">
-        <property name="geometry">
-         <rect>
-          <x>102</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Longitude</string>
-        </property>
-        <property name="text">
-         <string>S1 LON</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_f1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>192</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_15">
-        <property name="geometry">
-         <rect>
-          <x>102</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Orbit eccentricity</string>
-        </property>
-        <property name="text">
-         <string>e</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_24">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>-5</y>
-          <width>521</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>DEL's - Parameter increments for approximating derivatives in finite differences. </string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_12">
-        <property name="geometry">
-         <rect>
-          <x>284</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Temperature Factor</string>
-        </property>
-        <property name="text">
-         <string>S1 TF</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s1lat_ipt">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_a_ipt">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.05</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_s2lng_ipt">
-        <property name="geometry">
-         <rect>
-          <x>468</x>
-          <y>70</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.001</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_25">
-        <property name="geometry">
-         <rect>
-          <x>468</x>
-          <y>100</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>V Gamma</string>
-        </property>
-        <property name="text">
-         <string>PERR0</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_l1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>220</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_31">
-        <property name="geometry">
-         <rect>
-          <x>282</x>
-          <y>200</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Limb darkening coefficient</string>
-        </property>
-        <property name="text">
-         <string>X2</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_7">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>20</y>
-          <width>711</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_6">
-        <property name="geometry">
-         <rect>
-          <x>192</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 1 Angular Radius</string>
-        </property>
-        <property name="text">
-         <string>S1 RAD</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_8">
-        <property name="geometry">
-         <rect>
-          <x>376</x>
-          <y>50</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Spot 2 Latitude</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>S2 LAT</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_21">
-        <property name="geometry">
-         <rect>
-          <x>376</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Bolometric Albedo</string>
-        </property>
-        <property name="text">
-         <string>ALB1</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_e_ipt">
-        <property name="geometry">
-         <rect>
-          <x>102</x>
-          <y>120</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.001</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="del_alb1_ipt">
-        <property name="geometry">
-         <rect>
-          <x>376</x>
-          <y>170</y>
-          <width>75</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>0.05</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_18">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>150</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Gravity darkening exponent</string>
-        </property>
-        <property name="text">
-         <string>G1</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_33">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>200</y>
-          <width>51</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Relative monochromatic luminosity</string>
-        </property>
-        <property name="text">
-         <string>L1</string>
-        </property>
-       </widget>
-      </widget>
+      <property name="cursor">
+       <cursorShape>ArrowCursor</cursorShape>
+      </property>
+      <property name="toolTip">
+       <string>Do differential corrections on input parameters</string>
+      </property>
+      <property name="text">
+       <string>Differential Correction</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_39">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>127</y>
+        <width>51</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Designated band for interstellar extinction. Set 0 if there isn't one.</string>
+      </property>
+      <property name="statusTip">
+       <string>LINKEXT</string>
+      </property>
+      <property name="text">
+       <string>Band #</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="maglite_combobox">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>90</y>
+        <width>121</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Flux</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Magnitude</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_40">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>87</y>
+        <width>141</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Interstellar extinction in the designated band, in magnitude</string>
+      </property>
+      <property name="statusTip">
+       <string>DESEXTINC</string>
+      </property>
+      <property name="text">
+       <string>Designated Extinction</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_49">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>711</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DC2015 - Configure DC parameters and do diferential corrections on inputs</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_50">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>130</y>
+        <width>110</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Carry out solution with asymmetrical or symmetrical derivatives. Symmetrical derivatives are more reliable but take twice as long to compute</string>
+      </property>
+      <property name="statusTip">
+       <string>ISYM</string>
+      </property>
+      <property name="text">
+       <string>Derivative Type</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="isym_combobox">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>130</y>
+        <width>121</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Symmetrical</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Asymmetrical</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_41">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>90</y>
+        <width>121</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Input unit</string>
+      </property>
+      <property name="statusTip">
+       <string>MAGLITE</string>
+      </property>
+      <property name="text">
+       <string>Input Unit</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="linkext_spinbox">
+      <property name="geometry">
+       <rect>
+        <x>525</x>
+        <y>130</y>
+        <width>50</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>9</number>
+      </property>
+     </widget>
+     <widget class="Line" name="line_8">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>711</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="desextinc_ipt">
+      <property name="geometry">
+       <rect>
+        <x>525</x>
+        <y>90</y>
+        <width>101</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="dchistory_btn">
+      <property name="geometry">
+       <rect>
+        <x>385</x>
+        <y>200</y>
+        <width>241</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>ArrowCursor</cursorShape>
+      </property>
+      <property name="toolTip">
+       <string>Do differential corrections on input parameters</string>
+      </property>
+      <property name="text">
+       <string>Solution History</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_10">
@@ -5020,9 +3352,9 @@ zero for zero output noise.</string>
       <property name="geometry">
        <rect>
         <x>530</x>
-        <y>235</y>
+        <y>210</y>
         <width>131</width>
-        <height>22</height>
+        <height>31</height>
        </rect>
       </property>
      </widget>
@@ -5030,9 +3362,9 @@ zero for zero output noise.</string>
       <property name="geometry">
        <rect>
         <x>420</x>
-        <y>235</y>
+        <y>210</y>
         <width>111</width>
-        <height>21</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="toolTip">
