@@ -6,49 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>891</width>
-    <height>591</height>
+    <width>890</width>
+    <height>680</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>890</width>
+    <height>680</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>890</width>
+    <height>680</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Run Differential Corrections</string>
   </property>
-  <widget class="QTreeWidget" name="result_treewidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>380</y>
-     <width>421</width>
-     <height>200</height>
-    </rect>
-   </property>
-   <property name="alternatingRowColors">
-    <bool>true</bool>
-   </property>
-   <property name="headerHidden">
-    <bool>false</bool>
-   </property>
-   <column>
-    <property name="text">
-     <string>Parameter</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Adjustment</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Output</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Standard Error</string>
-    </property>
-   </column>
-  </widget>
   <widget class="QPushButton" name="rundc2015_btn">
    <property name="geometry">
     <rect>
@@ -86,32 +62,6 @@
    </property>
    <property name="text">
     <string>Export Results</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>350</y>
-     <width>401</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Differential Correction Results</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>470</x>
-     <y>350</y>
-     <width>321</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Statistical Curve Information</string>
    </property>
   </widget>
   <widget class="QPushButton" name="viewlaastdcout_btn">
@@ -217,78 +167,6 @@
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-  </widget>
-  <widget class="Line" name="line_5">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>360</y>
-     <width>51</width>
-     <height>221</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-  </widget>
-  <widget class="QTreeWidget" name="curvestat_treewidget">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>380</y>
-     <width>421</width>
-     <height>200</height>
-    </rect>
-   </property>
-   <property name="indentation">
-    <number>0</number>
-   </property>
-   <property name="columnCount">
-    <number>5</number>
-   </property>
-   <attribute name="headerDefaultSectionSize">
-    <number>75</number>
-   </attribute>
-   <column>
-    <property name="text">
-     <string>Band</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string># of Obs.</string>
-    </property>
-    <property name="toolTip">
-     <string>Number of observations.</string>
-    </property>
-    <property name="statusTip">
-     <string>Number of observations.</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Std. Dev.</string>
-    </property>
-    <property name="toolTip">
-     <string>Standard deviation.</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string># of Obs. in Phs. Rng.</string>
-    </property>
-    <property name="toolTip">
-     <string>Number of observations in phase range as configured in curve properties.</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Std. Dev. in Phs. Rng.</string>
-    </property>
-    <property name="toolTip">
-     <string>Standard deviation in phase range as configured in curve properties.</string>
-    </property>
-   </column>
   </widget>
   <widget class="QTabWidget" name="tabWidget_2">
    <property name="geometry">
@@ -2013,6 +1891,141 @@
    <property name="text">
     <string>Output derivatives</string>
    </property>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>360</y>
+     <width>871</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Differential Correction Results</string>
+    </attribute>
+    <widget class="QTreeWidget" name="result_treewidget">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>5</y>
+       <width>857</width>
+       <height>271</height>
+      </rect>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="headerHidden">
+      <bool>false</bool>
+     </property>
+     <attribute name="headerDefaultSectionSize">
+      <number>160</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Parameter</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Input</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Adjustment</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Output</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Standard Error</string>
+      </property>
+     </column>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_5">
+    <attribute name="title">
+     <string>Statistical Curve Information</string>
+    </attribute>
+    <widget class="QTreeWidget" name="curvestat_treewidget">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>5</y>
+       <width>857</width>
+       <height>271</height>
+      </rect>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="indentation">
+      <number>0</number>
+     </property>
+     <property name="columnCount">
+      <number>5</number>
+     </property>
+     <attribute name="headerDefaultSectionSize">
+      <number>160</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Band</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string># of Observations</string>
+      </property>
+      <property name="toolTip">
+       <string>Number of observations.</string>
+      </property>
+      <property name="statusTip">
+       <string>Number of observations.</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Standard Deviation</string>
+      </property>
+      <property name="toolTip">
+       <string>Standard deviation.</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string># of Obs. in Phs. Rng.</string>
+      </property>
+      <property name="toolTip">
+       <string>Number of observations in phase range as configured in curve properties.</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Std. Dev. in Phs. Rng.</string>
+      </property>
+      <property name="toolTip">
+       <string>Standard deviation in phase range as configured in curve properties.</string>
+      </property>
+     </column>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <resources/>

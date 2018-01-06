@@ -1,11 +1,12 @@
-import sys
-from PyQt4 import QtGui
-from functools import partial
-from bin import classes
 import ConfigParser
-import numpy as np
-import itertools
 import StringIO
+from functools import partial
+from PyQt4 import QtGui
+from bin import classes
+
+
+__configver__ = "0.1.0"
+__dclcver__ = "2015"
 
 
 def SaveSpotConfiguration(SpotConfigureWidget):
@@ -668,12 +669,15 @@ def saveMainWindowParameters(MainWindow):
     # info
     parser.add_section("Info")
     parser.set("Info", "version", "2015")
+    parser.set("Info", "config", __configver__)
     # main tab
     parser.add_section("Main")
+    parser.set("Main", "system", str(MainWindow.systemname_ipt.text()))
     parser.set("Main", "operation mode", str(MainWindow.mode_combobox.currentIndex()))
     parser.set("Main", "jdphs", str(MainWindow.jdphs_combobox.currentIndex()))
-    parser.set("Main", "maglite", str(MainWindow.maglite_combobox.currentIndex()))
-    parser.set("Main", "isym", str(MainWindow.isym_combobox.currentIndex()))
+    parser.set("Main", "icor1", str(MainWindow.icor1_chk.isChecked()))
+    parser.set("Main", "icor2", str(MainWindow.icor2_chk.isChecked()))
+    parser.set("Main", "ifcgs", str(MainWindow.ifcgs_chk.isChecked()))
     # system tab
     parser.add_section("System")
     parser.set("System", "jd0", str(MainWindow.jd0_ipt.text()))
@@ -733,99 +737,106 @@ def saveMainWindowParameters(MainWindow):
     parser.set("Third Body", "tc3b", str(MainWindow.tc3b_ipt.text()))
     # del tab
     parser.add_section("DEL's")
-    parser.set("DEL's", "del_s1lat", str(MainWindow.del_s1lat_ipt.text()))
-    parser.set("DEL's", "del_s1lng", str(MainWindow.del_s1lng_ipt.text()))
-    parser.set("DEL's", "del_s1rad", str(MainWindow.del_s1agrad_ipt.text()))
-    parser.set("DEL's", "del_s1tmp", str(MainWindow.del_s1tmpf_ipt.text()))
-    parser.set("DEL's", "del_s2lat", str(MainWindow.del_s2lat_ipt.text()))
-    parser.set("DEL's", "del_s2lng", str(MainWindow.del_s2lng_ipt.text()))
-    parser.set("DEL's", "del_s2rad", str(MainWindow.del_s2agrad_ipt.text()))
-    parser.set("DEL's", "del_s2tmp", str(MainWindow.del_s2tmpf_ipt.text()))
-    parser.set("DEL's", "del_a", str(MainWindow.del_a_ipt.text()))
-    parser.set("DEL's", "del_e", str(MainWindow.del_e_ipt.text()))
-    parser.set("DEL's", "del_f1", str(MainWindow.del_f1_ipt.text()))
-    parser.set("DEL's", "del_f2", str(MainWindow.del_f2_ipt.text()))
-    parser.set("DEL's", "del_pshift", str(MainWindow.del_pshift_ipt.text()))
-    parser.set("DEL's", "del_perr0", str(MainWindow.del_perr0_ipt.text()))
-    parser.set("DEL's", "del_incl", str(MainWindow.del_i_ipt.text()))
-    parser.set("DEL's", "del_rm", str(MainWindow.del_q_ipt.text()))
-    parser.set("DEL's", "del_g1", str(MainWindow.del_g1_ipt.text()))
-    parser.set("DEL's", "del_g2", str(MainWindow.del_g2_ipt.text()))
-    parser.set("DEL's", "del_tavh", str(MainWindow.del_t1_ipt.text()))
-    parser.set("DEL's", "del_tavc", str(MainWindow.del_t2_ipt.text()))
-    parser.set("DEL's", "del_alb1", str(MainWindow.del_alb1_ipt.text()))
-    parser.set("DEL's", "del_alb2", str(MainWindow.del_alb2_ipt.text()))
-    parser.set("DEL's", "del_pot1", str(MainWindow.del_pot1_ipt.text()))
-    parser.set("DEL's", "del_pot2", str(MainWindow.del_pot2_ipt.text()))
-    parser.set("DEL's", "del_l1", str(MainWindow.del_l1_ipt.text()))
-    parser.set("DEL's", "del_l2", str(MainWindow.del_l2_ipt.text()))
-    parser.set("DEL's", "del_xbol1", str(MainWindow.del_x1_ipt.text()))
-    parser.set("DEL's", "del_xbol2", str(MainWindow.del_x2_ipt.text()))
+    parser.set("DEL's", "del_s1lat", str(MainWindow.DCWidget.del_s1lat_ipt.text()))
+    parser.set("DEL's", "del_s1lng", str(MainWindow.DCWidget.del_s1lng_ipt.text()))
+    parser.set("DEL's", "del_s1rad", str(MainWindow.DCWidget.del_s1agrad_ipt.text()))
+    parser.set("DEL's", "del_s1tmp", str(MainWindow.DCWidget.del_s1tmpf_ipt.text()))
+    parser.set("DEL's", "del_s2lat", str(MainWindow.DCWidget.del_s2lat_ipt.text()))
+    parser.set("DEL's", "del_s2lng", str(MainWindow.DCWidget.del_s2lng_ipt.text()))
+    parser.set("DEL's", "del_s2rad", str(MainWindow.DCWidget.del_s2agrad_ipt.text()))
+    parser.set("DEL's", "del_s2tmp", str(MainWindow.DCWidget.del_s2tmpf_ipt.text()))
+    parser.set("DEL's", "del_a", str(MainWindow.DCWidget.del_a_ipt.text()))
+    parser.set("DEL's", "del_e", str(MainWindow.DCWidget.del_e_ipt.text()))
+    parser.set("DEL's", "del_f1", str(MainWindow.DCWidget.del_f1_ipt.text()))
+    parser.set("DEL's", "del_f2", str(MainWindow.DCWidget.del_f2_ipt.text()))
+    parser.set("DEL's", "del_pshift", str(MainWindow.DCWidget.del_pshift_ipt.text()))
+    parser.set("DEL's", "del_perr0", str(MainWindow.DCWidget.del_perr0_ipt.text()))
+    parser.set("DEL's", "del_incl", str(MainWindow.DCWidget.del_i_ipt.text()))
+    parser.set("DEL's", "del_rm", str(MainWindow.DCWidget.del_q_ipt.text()))
+    parser.set("DEL's", "del_g1", str(MainWindow.DCWidget.del_g1_ipt.text()))
+    parser.set("DEL's", "del_g2", str(MainWindow.DCWidget.del_g2_ipt.text()))
+    parser.set("DEL's", "del_tavh", str(MainWindow.DCWidget.del_t1_ipt.text()))
+    parser.set("DEL's", "del_tavc", str(MainWindow.DCWidget.del_t2_ipt.text()))
+    parser.set("DEL's", "del_alb1", str(MainWindow.DCWidget.del_alb1_ipt.text()))
+    parser.set("DEL's", "del_alb2", str(MainWindow.DCWidget.del_alb2_ipt.text()))
+    parser.set("DEL's", "del_pot1", str(MainWindow.DCWidget.del_pot1_ipt.text()))
+    parser.set("DEL's", "del_pot2", str(MainWindow.DCWidget.del_pot2_ipt.text()))
+    parser.set("DEL's", "del_l1", str(MainWindow.DCWidget.del_l1_ipt.text()))
+    parser.set("DEL's", "del_l2", str(MainWindow.DCWidget.del_l2_ipt.text()))
+    parser.set("DEL's", "del_xbol1", str(MainWindow.DCWidget.del_x1_ipt.text()))
+    parser.set("DEL's", "del_xbol2", str(MainWindow.DCWidget.del_x2_ipt.text()))
     # keep tab
     parser.add_section("KEEP's")
-    parser.set("KEEP's", "jd0", str(MainWindow.jd0_chk.isChecked()))
-    parser.set("KEEP's", "p0", str(MainWindow.p0_chk.isChecked()))
-    parser.set("KEEP's", "dpdt", str(MainWindow.dpdt_chk.isChecked()))
-    parser.set("KEEP's", "perr0", str(MainWindow.perr0_chk.isChecked()))
-    parser.set("KEEP's", "dperdt", str(MainWindow.dperdt_chk.isChecked()))
-    parser.set("KEEP's", "pshift", str(MainWindow.pshift_chk.isChecked()))
-    parser.set("KEEP's", "a", str(MainWindow.a_chk.isChecked()))
-    parser.set("KEEP's", "e", str(MainWindow.e_chk.isChecked()))
-    parser.set("KEEP's", "logd", str(MainWindow.logd_chk.isChecked()))
-    parser.set("KEEP's", "vgam", str(MainWindow.vgam_chk.isChecked()))
-    parser.set("KEEP's", "incl", str(MainWindow.incl_chk.isChecked()))
-    parser.set("KEEP's", "rm", str(MainWindow.q_chk.isChecked()))
-    parser.set("KEEP's", "tavh", str(MainWindow.t1_chk.isChecked()))
-    parser.set("KEEP's", "tavc", str(MainWindow.t2_chk.isChecked()))
-    parser.set("KEEP's", "g1", str(MainWindow.g1_chk.isChecked()))
-    parser.set("KEEP's", "g2", str(MainWindow.g2_chk.isChecked()))
-    parser.set("KEEP's", "alb1", str(MainWindow.alb1_chk.isChecked()))
-    parser.set("KEEP's", "alb2", str(MainWindow.alb2_chk.isChecked()))
-    parser.set("KEEP's", "desext", str(MainWindow.desextinc_chk.isChecked()))
-    parser.set("KEEP's", "f1", str(MainWindow.f1_chk.isChecked()))
-    parser.set("KEEP's", "f2", str(MainWindow.f2_chk.isChecked()))
-    parser.set("KEEP's", "l1", str(MainWindow.l1_chk.isChecked()))
-    parser.set("KEEP's", "l2", str(MainWindow.l2_chk.isChecked()))
-    parser.set("KEEP's", "xbol1", str(MainWindow.x1_chk.isChecked()))
-    parser.set("KEEP's", "xbol2", str(MainWindow.x2_chk.isChecked()))
-    parser.set("KEEP's", "pot1", str(MainWindow.pot1_chk.isChecked()))
-    parser.set("KEEP's", "pot2", str(MainWindow.pot2_chk.isChecked()))
-    parser.set("KEEP's", "a3b", str(MainWindow.a3b_chk.isChecked()))
-    parser.set("KEEP's", "p3b", str(MainWindow.p3b_chk.isChecked()))
-    parser.set("KEEP's", "xinc3b", str(MainWindow.xinc3b_chk.isChecked()))
-    parser.set("KEEP's", "e3b", str(MainWindow.e3b_chk.isChecked()))
-    parser.set("KEEP's", "tc3b", str(MainWindow.tc3b_chk.isChecked()))
-    parser.set("KEEP's", "perr3b", str(MainWindow.perr3b_chk.isChecked()))
-    parser.set("KEEP's", "el3", str(MainWindow.el3_chk.isChecked()))
-    parser.set("KEEP's", "s1lat", str(MainWindow.s1lat_chk.isChecked()))
-    parser.set("KEEP's", "s1lng", str(MainWindow.s1long_chk.isChecked()))
-    parser.set("KEEP's", "s1rad", str(MainWindow.s1rad_chk.isChecked()))
-    parser.set("KEEP's", "s1temp", str(MainWindow.s1temp_chk.isChecked()))
-    parser.set("KEEP's", "s2lat", str(MainWindow.s2lat_chk.isChecked()))
-    parser.set("KEEP's", "s2lng", str(MainWindow.s2long_chk.isChecked()))
-    parser.set("KEEP's", "s2rad", str(MainWindow.s2rad_chk.isChecked()))
-    parser.set("KEEP's", "s2temp", str(MainWindow.s2temp_chk.isChecked()))
-    # TODO add spot keeps
-    # misc tab
-    parser.add_section("Miscellaneous")
-    parser.set("Miscellaneous", "icor1", str(MainWindow.icor1_chk.isChecked()))
-    parser.set("Miscellaneous", "icor2", str(MainWindow.icor2_chk.isChecked()))
-    parser.set("Miscellaneous", "ifoc", str(MainWindow.ifoc_chk.isChecked()))
-    parser.set("Miscellaneous", "ifcgs", str(MainWindow.ifcgs_chk.isChecked()))
-    parser.set("Miscellaneous", "ifder", str(MainWindow.ifder_chk.isChecked()))
-    parser.set("Miscellaneous", "iflcin", str(MainWindow.ifder_chk.isChecked()))
-    parser.set("Miscellaneous", "linkext", str(MainWindow.linkext_spinbox.value()))
-    parser.set("Miscellaneous", "desextinc", str(MainWindow.desextinc_ipt.text()))
+    parser.set("KEEP's", "jd0", str(MainWindow.DCWidget.jd0_chk.isChecked()))
+    parser.set("KEEP's", "p0", str(MainWindow.DCWidget.p0_chk.isChecked()))
+    parser.set("KEEP's", "dpdt", str(MainWindow.DCWidget.dpdt_chk.isChecked()))
+    parser.set("KEEP's", "perr0", str(MainWindow.DCWidget.perr0_chk.isChecked()))
+    parser.set("KEEP's", "dperdt", str(MainWindow.DCWidget.dperdt_chk.isChecked()))
+    parser.set("KEEP's", "pshift", str(MainWindow.DCWidget.pshift_chk.isChecked()))
+    parser.set("KEEP's", "a", str(MainWindow.DCWidget.a_chk.isChecked()))
+    parser.set("KEEP's", "e", str(MainWindow.DCWidget.e_chk.isChecked()))
+    parser.set("KEEP's", "logd", str(MainWindow.DCWidget.logd_chk.isChecked()))
+    parser.set("KEEP's", "vgam", str(MainWindow.DCWidget.vgam_chk.isChecked()))
+    parser.set("KEEP's", "incl", str(MainWindow.DCWidget.incl_chk.isChecked()))
+    parser.set("KEEP's", "rm", str(MainWindow.DCWidget.q_chk.isChecked()))
+    parser.set("KEEP's", "tavh", str(MainWindow.DCWidget.t1_chk.isChecked()))
+    parser.set("KEEP's", "tavc", str(MainWindow.DCWidget.t2_chk.isChecked()))
+    parser.set("KEEP's", "g1", str(MainWindow.DCWidget.g1_chk.isChecked()))
+    parser.set("KEEP's", "g2", str(MainWindow.DCWidget.g2_chk.isChecked()))
+    parser.set("KEEP's", "alb1", str(MainWindow.DCWidget.alb1_chk.isChecked()))
+    parser.set("KEEP's", "alb2", str(MainWindow.DCWidget.alb2_chk.isChecked()))
+    parser.set("KEEP's", "desext", str(MainWindow.DCWidget.desextinc_chk.isChecked()))
+    parser.set("KEEP's", "f1", str(MainWindow.DCWidget.f1_chk.isChecked()))
+    parser.set("KEEP's", "f2", str(MainWindow.DCWidget.f2_chk.isChecked()))
+    parser.set("KEEP's", "l1", str(MainWindow.DCWidget.l1_chk.isChecked()))
+    parser.set("KEEP's", "l2", str(MainWindow.DCWidget.l2_chk.isChecked()))
+    parser.set("KEEP's", "xbol1", str(MainWindow.DCWidget.x1_chk.isChecked()))
+    parser.set("KEEP's", "xbol2", str(MainWindow.DCWidget.x2_chk.isChecked()))
+    parser.set("KEEP's", "pot1", str(MainWindow.DCWidget.pot1_chk.isChecked()))
+    parser.set("KEEP's", "pot2", str(MainWindow.DCWidget.pot2_chk.isChecked()))
+    parser.set("KEEP's", "a3b", str(MainWindow.DCWidget.a3b_chk.isChecked()))
+    parser.set("KEEP's", "p3b", str(MainWindow.DCWidget.p3b_chk.isChecked()))
+    parser.set("KEEP's", "xinc3b", str(MainWindow.DCWidget.xinc3b_chk.isChecked()))
+    parser.set("KEEP's", "e3b", str(MainWindow.DCWidget.e3b_chk.isChecked()))
+    parser.set("KEEP's", "tc3b", str(MainWindow.DCWidget.tc3b_chk.isChecked()))
+    parser.set("KEEP's", "perr3b", str(MainWindow.DCWidget.perr3b_chk.isChecked()))
+    parser.set("KEEP's", "el3", str(MainWindow.DCWidget.el3_chk.isChecked()))
+    parser.set("KEEP's", "s1lat", str(MainWindow.DCWidget.s1lat_chk.isChecked()))
+    parser.set("KEEP's", "s1lng", str(MainWindow.DCWidget.s1long_chk.isChecked()))
+    parser.set("KEEP's", "s1rad", str(MainWindow.DCWidget.s1rad_chk.isChecked()))
+    parser.set("KEEP's", "s1tstart", str(MainWindow.DCWidget.s1tstart_chk.isChecked()))
+    parser.set("KEEP's", "s1max1", str(MainWindow.DCWidget.s1tmax1_chk.isChecked()))
+    parser.set("KEEP's", "s1max2", str(MainWindow.DCWidget.s1tmax2_chk.isChecked()))
+    parser.set("KEEP's", "s1tend", str(MainWindow.DCWidget.s1tend_chk.isChecked()))
+    parser.set("KEEP's", "s1temp", str(MainWindow.DCWidget.s1temp_chk.isChecked()))
+    parser.set("KEEP's", "s2lat", str(MainWindow.DCWidget.s2lat_chk.isChecked()))
+    parser.set("KEEP's", "s2lng", str(MainWindow.DCWidget.s2long_chk.isChecked()))
+    parser.set("KEEP's", "s2rad", str(MainWindow.DCWidget.s2rad_chk.isChecked()))
+    parser.set("KEEP's", "s2temp", str(MainWindow.DCWidget.s2temp_chk.isChecked()))
+    parser.set("KEEP's", "s2tstart", str(MainWindow.DCWidget.s2tstart_chk.isChecked()))
+    parser.set("KEEP's", "s2max1", str(MainWindow.DCWidget.s2tmax1_chk.isChecked()))
+    parser.set("KEEP's", "s2max2", str(MainWindow.DCWidget.s2tmax2_chk.isChecked()))
+    parser.set("KEEP's", "s2tend", str(MainWindow.DCWidget.s2tend_chk.isChecked()))
+    # dc
+    parser.add_section("DC2015")
+    parser.set("DC2015", "maglite", str(MainWindow.maglite_combobox.currentIndex()))
+    parser.set("DC2015", "isym", str(MainWindow.isym_combobox.currentIndex()))
+    parser.set("DC2015", "linkext", str(MainWindow.linkext_spinbox.value()))
+    parser.set("DC2015", "desextinc", str(MainWindow.desextinc_ipt.text()))
+    parser.set("DC2015", "ifoc", str(MainWindow.DCWidget.ifoc_chk.isChecked()))
+    parser.set("DC2015", "ifder", str(MainWindow.DCWidget.ifder_chk.isChecked()))
 
     return parser
 
 
 def loadMainWindowParameters(MainWindow, parser):
     # main tab
+    MainWindow.systemname_ipt.setText(parser.get("Main", "system"))
     MainWindow.mode_combobox.setCurrentIndex(parser.getint("Main", "operation mode"))
     MainWindow.jdphs_combobox.setCurrentIndex(parser.getint("Main", "jdphs"))
-    MainWindow.maglite_combobox.setCurrentIndex(parser.getint("Main", "maglite"))
-    MainWindow.isym_combobox.setCurrentIndex(parser.getint("Main", "isym"))
+    MainWindow.ifcgs_chk.setChecked(parser.getboolean("Main", "ifcgs"))
+    MainWindow.icor1_chk.setChecked(parser.getboolean("Main", "icor1"))
+    MainWindow.icor2_chk.setChecked(parser.getboolean("Main", "icor2"))
     # system tab
     MainWindow.jd0_ipt.setText(parser.get("System", "jd0"))
     MainWindow.p0_ipt.setText(parser.get("System", "p0"))
@@ -881,86 +892,84 @@ def loadMainWindowParameters(MainWindow, parser):
     MainWindow.perr3b_ipt.setText(parser.get("Third Body", "perr3b"))
     MainWindow.tc3b_ipt.setText(parser.get("Third Body", "tc3b"))
     # del tab
-    MainWindow.del_s1lat_ipt.setText(parser.get("DEL's", "del_s1lat"))
-    MainWindow.del_s1lng_ipt.setText(parser.get("DEL's", "del_s1lng"))
-    MainWindow.del_s1agrad_ipt.setText(parser.get("DEL's", "del_s1rad"))
-    MainWindow.del_s1tmpf_ipt.setText(parser.get("DEL's", "del_s1tmp"))
-    MainWindow.del_s2lat_ipt.setText(parser.get("DEL's", "del_s2lat"))
-    MainWindow.del_s2lng_ipt.setText(parser.get("DEL's", "del_s2lng"))
-    MainWindow.del_s2agrad_ipt.setText(parser.get("DEL's", "del_s2rad"))
-    MainWindow.del_s2tmpf_ipt.setText(parser.get("DEL's", "del_s2tmp"))
-    MainWindow.del_a_ipt.setText(parser.get("DEL's", "del_a"))
-    MainWindow.del_e_ipt.setText(parser.get("DEL's", "del_e"))
-    MainWindow.del_f1_ipt.setText(parser.get("DEL's", "del_f1"))
-    MainWindow.del_f2_ipt.setText(parser.get("DEL's", "del_f2"))
-    MainWindow.del_pshift_ipt.setText(parser.get("DEL's", "del_pshift"))
-    MainWindow.del_perr0_ipt.setText(parser.get("DEL's", "del_perr0"))
-    MainWindow.del_i_ipt.setText(parser.get("DEL's", "del_incl"))
-    MainWindow.del_q_ipt.setText(parser.get("DEL's", "del_rm"))
-    MainWindow.del_g1_ipt.setText(parser.get("DEL's", "del_g1"))
-    MainWindow.del_g2_ipt.setText(parser.get("DEL's", "del_g2"))
-    MainWindow.del_t1_ipt.setText(parser.get("DEL's", "del_tavh"))
-    MainWindow.del_t2_ipt.setText(parser.get("DEL's", "del_tavc"))
-    MainWindow.del_alb1_ipt.setText(parser.get("DEL's", "del_alb1"))
-    MainWindow.del_alb2_ipt.setText(parser.get("DEL's", "del_alb2"))
-    MainWindow.del_pot1_ipt.setText(parser.get("DEL's", "del_pot1"))
-    MainWindow.del_pot2_ipt.setText(parser.get("DEL's", "del_pot2"))
-    MainWindow.del_l1_ipt.setText(parser.get("DEL's", "del_l1"))
-    MainWindow.del_l2_ipt.setText(parser.get("DEL's", "del_l2"))
-    MainWindow.del_x1_ipt.setText(parser.get("DEL's", "del_xbol1"))
-    MainWindow.del_x2_ipt.setText(parser.get("DEL's", "del_xbol2"))
+    MainWindow.DCWidget.del_s1lat_ipt.setText(parser.get("DEL's", "del_s1lat"))
+    MainWindow.DCWidget.del_s1lng_ipt.setText(parser.get("DEL's", "del_s1lng"))
+    MainWindow.DCWidget.del_s1agrad_ipt.setText(parser.get("DEL's", "del_s1rad"))
+    MainWindow.DCWidget.del_s1tmpf_ipt.setText(parser.get("DEL's", "del_s1tmp"))
+    MainWindow.DCWidget.del_s2lat_ipt.setText(parser.get("DEL's", "del_s2lat"))
+    MainWindow.DCWidget.del_s2lng_ipt.setText(parser.get("DEL's", "del_s2lng"))
+    MainWindow.DCWidget.del_s2agrad_ipt.setText(parser.get("DEL's", "del_s2rad"))
+    MainWindow.DCWidget.del_s2tmpf_ipt.setText(parser.get("DEL's", "del_s2tmp"))
+    MainWindow.DCWidget.del_a_ipt.setText(parser.get("DEL's", "del_a"))
+    MainWindow.DCWidget.del_e_ipt.setText(parser.get("DEL's", "del_e"))
+    MainWindow.DCWidget.del_f1_ipt.setText(parser.get("DEL's", "del_f1"))
+    MainWindow.DCWidget.del_f2_ipt.setText(parser.get("DEL's", "del_f2"))
+    MainWindow.DCWidget.del_pshift_ipt.setText(parser.get("DEL's", "del_pshift"))
+    MainWindow.DCWidget.del_perr0_ipt.setText(parser.get("DEL's", "del_perr0"))
+    MainWindow.DCWidget.del_i_ipt.setText(parser.get("DEL's", "del_incl"))
+    MainWindow.DCWidget.del_q_ipt.setText(parser.get("DEL's", "del_rm"))
+    MainWindow.DCWidget.del_g1_ipt.setText(parser.get("DEL's", "del_g1"))
+    MainWindow.DCWidget.del_g2_ipt.setText(parser.get("DEL's", "del_g2"))
+    MainWindow.DCWidget.del_t1_ipt.setText(parser.get("DEL's", "del_tavh"))
+    MainWindow.DCWidget.del_t2_ipt.setText(parser.get("DEL's", "del_tavc"))
+    MainWindow.DCWidget.del_alb1_ipt.setText(parser.get("DEL's", "del_alb1"))
+    MainWindow.DCWidget.del_alb2_ipt.setText(parser.get("DEL's", "del_alb2"))
+    MainWindow.DCWidget.del_pot1_ipt.setText(parser.get("DEL's", "del_pot1"))
+    MainWindow.DCWidget.del_pot2_ipt.setText(parser.get("DEL's", "del_pot2"))
+    MainWindow.DCWidget.del_l1_ipt.setText(parser.get("DEL's", "del_l1"))
+    MainWindow.DCWidget.del_l2_ipt.setText(parser.get("DEL's", "del_l2"))
+    MainWindow.DCWidget.del_x1_ipt.setText(parser.get("DEL's", "del_xbol1"))
+    MainWindow.DCWidget.del_x2_ipt.setText(parser.get("DEL's", "del_xbol2"))
     # keep tab
-    MainWindow.jd0_chk.setChecked(parser.getboolean("KEEP's", "jd0"))
-    MainWindow.p0_chk.setChecked(parser.getboolean("KEEP's", "p0"))
-    MainWindow.dpdt_chk.setChecked(parser.getboolean("KEEP's", "dpdt"))
-    MainWindow.perr0_chk.setChecked(parser.getboolean("KEEP's", "perr0"))
-    MainWindow.dperdt_chk.setChecked(parser.getboolean("KEEP's", "dperdt"))
-    MainWindow.pshift_chk.setChecked(parser.getboolean("KEEP's", "pshift"))
-    MainWindow.a_chk.setChecked(parser.getboolean("KEEP's", "a"))
-    MainWindow.e_chk.setChecked(parser.getboolean("KEEP's", "e"))
-    MainWindow.logd_chk.setChecked(parser.getboolean("KEEP's", "logd"))
-    MainWindow.vgam_chk.setChecked(parser.getboolean("KEEP's", "vgam"))
-    MainWindow.incl_chk.setChecked(parser.getboolean("KEEP's", "incl"))
-    MainWindow.q_chk.setChecked(parser.getboolean("KEEP's", "rm"))
-    MainWindow.t1_chk.setChecked(parser.getboolean("KEEP's", "tavh"))
-    MainWindow.t2_chk.setChecked(parser.getboolean("KEEP's", "tavc"))
-    MainWindow.g1_chk.setChecked(parser.getboolean("KEEP's", "g1"))
-    MainWindow.g2_chk.setChecked(parser.getboolean("KEEP's", "g2"))
-    MainWindow.alb1_chk.setChecked(parser.getboolean("KEEP's", "alb1"))
-    MainWindow.alb2_chk.setChecked(parser.getboolean("KEEP's", "alb2"))
-    MainWindow.desextinc_chk.setChecked(parser.getboolean("KEEP's", "desext"))
-    MainWindow.f1_chk.setChecked(parser.getboolean("KEEP's", "f1"))
-    MainWindow.f2_chk.setChecked(parser.getboolean("KEEP's", "f2"))
-    MainWindow.l1_chk.setChecked(parser.getboolean("KEEP's", "l1"))
-    MainWindow.l2_chk.setChecked(parser.getboolean("KEEP's", "l2"))
-    MainWindow.x1_chk.setChecked(parser.getboolean("KEEP's", "xbol1"))
-    MainWindow.x2_chk.setChecked(parser.getboolean("KEEP's", "xbol2"))
-    MainWindow.pot1_chk.setChecked(parser.getboolean("KEEP's", "pot1"))
-    MainWindow.pot2_chk.setChecked(parser.getboolean("KEEP's", "pot2"))
-    MainWindow.a3b_chk.setChecked(parser.getboolean("KEEP's", "a3b"))
-    MainWindow.p3b_chk.setChecked(parser.getboolean("KEEP's", "p3b"))
-    MainWindow.xinc3b_chk.setChecked(parser.getboolean("KEEP's", "xinc3b"))
-    MainWindow.e3b_chk.setChecked(parser.getboolean("KEEP's", "e3b"))
-    MainWindow.tc3b_chk.setChecked(parser.getboolean("KEEP's", "tc3b"))
-    MainWindow.perr3b_chk.setChecked(parser.getboolean("KEEP's", "perr3b"))
-    MainWindow.el3_chk.setChecked(parser.getboolean("KEEP's", "el3"))
-    MainWindow.s1lat_chk.setChecked(parser.getboolean("KEEP's", "s1lat"))
-    MainWindow.s1long_chk.setChecked(parser.getboolean("KEEP's", "s1lng"))
-    MainWindow.s1rad_chk.setChecked(parser.getboolean("KEEP's", "s1rad"))
-    MainWindow.s1temp_chk.setChecked(parser.getboolean("KEEP's", "s1temp"))
-    MainWindow.s2lat_chk.setChecked(parser.getboolean("KEEP's", "s2lat"))
-    MainWindow.s2long_chk.setChecked(parser.getboolean("KEEP's", "s2lng"))
-    MainWindow.s2rad_chk.setChecked(parser.getboolean("KEEP's", "s2rad"))
-    MainWindow.s2temp_chk.setChecked(parser.getboolean("KEEP's", "s2temp"))
-    # misc tab
-    MainWindow.icor1_chk.setChecked(parser.getboolean("Miscellaneous", "icor1"))
-    MainWindow.icor2_chk.setChecked(parser.getboolean("Miscellaneous", "icor2"))
-    MainWindow.ifoc_chk.setChecked(parser.getboolean("Miscellaneous", "ifoc"))
-    MainWindow.ifcgs_chk.setChecked(parser.getboolean("Miscellaneous", "ifcgs"))
-    MainWindow.ifder_chk.setChecked(parser.getboolean("Miscellaneous", "ifder"))
-    MainWindow.iflcin_chk.setChecked(parser.getboolean("Miscellaneous", "iflcin"))
-    MainWindow.linkext_spinbox.setValue(parser.getfloat("Miscellaneous", "linkext"))
-    MainWindow.desextinc_ipt.setText(parser.get("Miscellaneous", "desextinc"))
+    MainWindow.DCWidget.jd0_chk.setChecked(parser.getboolean("KEEP's", "jd0"))
+    MainWindow.DCWidget.p0_chk.setChecked(parser.getboolean("KEEP's", "p0"))
+    MainWindow.DCWidget.dpdt_chk.setChecked(parser.getboolean("KEEP's", "dpdt"))
+    MainWindow.DCWidget.perr0_chk.setChecked(parser.getboolean("KEEP's", "perr0"))
+    MainWindow.DCWidget.dperdt_chk.setChecked(parser.getboolean("KEEP's", "dperdt"))
+    MainWindow.DCWidget.pshift_chk.setChecked(parser.getboolean("KEEP's", "pshift"))
+    MainWindow.DCWidget.a_chk.setChecked(parser.getboolean("KEEP's", "a"))
+    MainWindow.DCWidget.e_chk.setChecked(parser.getboolean("KEEP's", "e"))
+    MainWindow.DCWidget.logd_chk.setChecked(parser.getboolean("KEEP's", "logd"))
+    MainWindow.DCWidget.vgam_chk.setChecked(parser.getboolean("KEEP's", "vgam"))
+    MainWindow.DCWidget.incl_chk.setChecked(parser.getboolean("KEEP's", "incl"))
+    MainWindow.DCWidget.q_chk.setChecked(parser.getboolean("KEEP's", "rm"))
+    MainWindow.DCWidget.t1_chk.setChecked(parser.getboolean("KEEP's", "tavh"))
+    MainWindow.DCWidget.t2_chk.setChecked(parser.getboolean("KEEP's", "tavc"))
+    MainWindow.DCWidget.g1_chk.setChecked(parser.getboolean("KEEP's", "g1"))
+    MainWindow.DCWidget.g2_chk.setChecked(parser.getboolean("KEEP's", "g2"))
+    MainWindow.DCWidget.alb1_chk.setChecked(parser.getboolean("KEEP's", "alb1"))
+    MainWindow.DCWidget.alb2_chk.setChecked(parser.getboolean("KEEP's", "alb2"))
+    MainWindow.DCWidget.desextinc_chk.setChecked(parser.getboolean("KEEP's", "desext"))
+    MainWindow.DCWidget.f1_chk.setChecked(parser.getboolean("KEEP's", "f1"))
+    MainWindow.DCWidget.f2_chk.setChecked(parser.getboolean("KEEP's", "f2"))
+    MainWindow.DCWidget.l1_chk.setChecked(parser.getboolean("KEEP's", "l1"))
+    MainWindow.DCWidget.l2_chk.setChecked(parser.getboolean("KEEP's", "l2"))
+    MainWindow.DCWidget.x1_chk.setChecked(parser.getboolean("KEEP's", "xbol1"))
+    MainWindow.DCWidget.x2_chk.setChecked(parser.getboolean("KEEP's", "xbol2"))
+    MainWindow.DCWidget.pot1_chk.setChecked(parser.getboolean("KEEP's", "pot1"))
+    MainWindow.DCWidget.pot2_chk.setChecked(parser.getboolean("KEEP's", "pot2"))
+    MainWindow.DCWidget.a3b_chk.setChecked(parser.getboolean("KEEP's", "a3b"))
+    MainWindow.DCWidget.p3b_chk.setChecked(parser.getboolean("KEEP's", "p3b"))
+    MainWindow.DCWidget.xinc3b_chk.setChecked(parser.getboolean("KEEP's", "xinc3b"))
+    MainWindow.DCWidget.e3b_chk.setChecked(parser.getboolean("KEEP's", "e3b"))
+    MainWindow.DCWidget.tc3b_chk.setChecked(parser.getboolean("KEEP's", "tc3b"))
+    MainWindow.DCWidget.perr3b_chk.setChecked(parser.getboolean("KEEP's", "perr3b"))
+    MainWindow.DCWidget.el3_chk.setChecked(parser.getboolean("KEEP's", "el3"))
+    MainWindow.DCWidget.s1lat_chk.setChecked(parser.getboolean("KEEP's", "s1lat"))
+    MainWindow.DCWidget.s1long_chk.setChecked(parser.getboolean("KEEP's", "s1lng"))
+    MainWindow.DCWidget.s1rad_chk.setChecked(parser.getboolean("KEEP's", "s1rad"))
+    MainWindow.DCWidget.s1temp_chk.setChecked(parser.getboolean("KEEP's", "s1temp"))
+    MainWindow.DCWidget.s2lat_chk.setChecked(parser.getboolean("KEEP's", "s2lat"))
+    MainWindow.DCWidget.s2long_chk.setChecked(parser.getboolean("KEEP's", "s2lng"))
+    MainWindow.DCWidget.s2rad_chk.setChecked(parser.getboolean("KEEP's", "s2rad"))
+    MainWindow.DCWidget.s2temp_chk.setChecked(parser.getboolean("KEEP's", "s2temp"))
+    # dc section
+    MainWindow.maglite_combobox.setCurrentIndex(parser.getint("DC2015", "maglite"))
+    MainWindow.isym_combobox.setCurrentIndex(parser.getint("DC2015", "isym"))
+    MainWindow.linkext_spinbox.setValue(parser.getfloat("DC2015", "linkext"))
+    MainWindow.desextinc_ipt.setText(parser.get("DC2015", "desextinc"))
+    MainWindow.DCWidget.ifoc_chk.setChecked(parser.getboolean("DC2015", "ifoc"))
+    MainWindow.DCWidget.ifder_chk.setChecked(parser.getboolean("DC2015", "ifder"))
 
 
 def loadCurveParameters(MainWindow, parser):
@@ -968,6 +977,8 @@ def loadCurveParameters(MainWindow, parser):
     lcCount = parser.getint("Curve Count", "light curves")
 
     i = 0
+    removeVelocityCurve(1, MainWindow.LoadWidget)
+    removeVelocityCurve(2, MainWindow.LoadWidget)
     while i < vcCount:
         section = "Velocity Curve " + str(i + 1)
         vcprop = classes.CurveProperties("vc")
@@ -976,6 +987,8 @@ def loadCurveParameters(MainWindow, parser):
         MainWindow.LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
         loadVelocityCurve(vcNumber, MainWindow.LoadWidget)
         i = i + 1
+    while MainWindow.LoadWidget.lcCount > 0:
+        removeLightCurve(MainWindow.LoadWidget, 0)
     i = 0
     while i < lcCount:
         section = "Light Curve " + str(i + 1)
@@ -1004,37 +1017,74 @@ def loadEclipseParameters(MainWindow, parser):
 
 def loadProject(MainWindow, parser):
     # check version
-    if parser.get("Info", "version") != "2015":
+    if parser.get("Info", "version") != __dclcver__:
         raise RuntimeError("This project file is for another version of PyWD.\n" +
-                           "Current Version: 2015\n" + "Project File Version: " +
+                           "Current Version: " + __dclcver__ + "\n" + "Project File Version: " +
                            parser.get("Info", "version"))
-    else:
-        # check for filepaths before modifying ui
-        eclipsePath = parser.get("Eclipse Timing", "filepath")
-        import os
-        if os.path.isfile(eclipsePath) is not True and eclipsePath != "None":
-            raise RuntimeError("Can't read eclipse data, file does not exists: " + eclipsePath)
-        lcCount = parser.getint("Curve Count", "light curves")
-        vcCount = parser.getint("Curve Count", "velocity Curves")
-        i = 0
-        while i < vcCount:
-            section = "Velocity Curve " + str(i + 1)
-            filepath = parser.get(section, "filepath")
-            if os.path.isfile(filepath) is not True:
-                raise RuntimeError("Can't read velocity curve data, file does not exist: " + filepath)
-            i = i + 1
-        i = 0
-        while i < lcCount:
-            section = "Light Curve " + str(i + 1)
-            filepath = parser.get(section, "filepath")
-            if os.path.isfile(filepath) is not True:
-                raise RuntimeError("Can't read light curve data, file does not exist: " + filepath)
-            i = i + 1
-        # modify the ui
-        loadMainWindowParameters(MainWindow, parser)
-        LoadSpotConfiguration(MainWindow.SpotConfigureWidget, parser)
-        loadCurveParameters(MainWindow, parser)
-        loadEclipseParameters(MainWindow, parser)
+    if parser.get("Info", "config") != __configver__:
+        raise RuntimeError("This config file is incompatible with current version of PyWD.")
+    # check for filepaths before modifying ui
+    eclipsePath = parser.get("Eclipse Timing", "filepath")
+    import os
+    if os.path.isfile(eclipsePath) is not True and eclipsePath != "None":
+        raise RuntimeError("Can't read eclipse data, file does not exists: " + eclipsePath)
+    lcCount = parser.getint("Curve Count", "light curves")
+    vcCount = parser.getint("Curve Count", "velocity Curves")
+    i = 0
+    while i < vcCount:
+        section = "Velocity Curve " + str(i + 1)
+        filepath = parser.get(section, "filepath")
+        if os.path.isfile(filepath) is not True:
+            raise RuntimeError("Can't read velocity curve data, file does not exist: " + filepath)
+        i = i + 1
+    i = 0
+    while i < lcCount:
+        section = "Light Curve " + str(i + 1)
+        filepath = parser.get(section, "filepath")
+        if os.path.isfile(filepath) is not True:
+            raise RuntimeError("Can't read light curve data, file does not exist: " + filepath)
+        i = i + 1
+    # modify the ui
+    loadMainWindowParameters(MainWindow, parser)
+    LoadSpotConfiguration(MainWindow.SpotConfigureWidget, parser)
+    loadCurveParameters(MainWindow, parser)
+    loadEclipseParameters(MainWindow, parser)
+
+
+def getBaseSet(dcoutpath):
+    """
+    extract base set from dcin.active file.
+    since we are hardcoding niter to 1,
+    first occurence of target string
+    will be the result of the base set.
+    :param dcoutpath: dcout.active file path
+    :return: a list of lists containing outputs
+     [
+       [id, curveid, input, corr, output, stderr, l1/(l1+l2), se]
+       [id, curveid, input, corr, output, stderr, l1/(l1+l2), se]
+       .
+       .
+       .
+     ]
+    """
+    target = "Input-Output in F Format"
+    table = []
+    flag = False
+    offset = 3
+    start = 0
+    with open(dcoutpath, "r") as dcout:
+        for line in dcout:
+            if target in line:
+                flag = True
+            if flag is True:
+                if start < offset:
+                    start = start + 1
+                else:
+                    if line == "\n":
+                        break
+                    else:
+                        table.append(line.split())
+    return table
 
 
 if __name__ == "__main__":

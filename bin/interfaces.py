@@ -18,7 +18,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget = DCWidget()
         self.DCWidget.MainWindow = self
         self.populateStyles()  # populate theme combobox
-        self.connectSignals()  # connect events with methods
+        self.connectSignals()  # connect events with method
 
     def connectSignals(self):
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
@@ -83,7 +83,6 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
                 except:
                     msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
                     msg.exec_()
-
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
@@ -410,15 +409,75 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
         # variables
+        self.dcinpath = os.getcwd() + "/wd/dcin.active"
+        self.dcoutpath = os.getcwd() + "/wd/dcout.active"
         self.MainWindow = None
+        self.iterator = None
+        self.parameterDict = {
+            "1": "Spot 1 Latitude",
+            "2": "Spot 1 Longitude",
+            "3": "Spot 1 Ang. Rad.",
+            "4": "Spot 1 Temp. Factor",
+            "5": "Spot 2 Latitude",
+            "6": "Spot 2 Longitude",
+            "7": "Spot 2 Ang. Rad.",
+            "8": "Spot 2 Temp. Factor",
+            "9": "a",
+            "10": "e",
+            "11": "Omega",
+            "12": "F1",
+            "13": "F2",
+            "14": "Phase Shift",
+            "15": "V Gamma",
+            "16": "i",
+            "17": "g1",
+            "18": "g2",
+            "19": "T1",
+            "20": "T2",
+            "21": "Alb1",
+            "22": "Alb2",
+            "23": "Pot1",
+            "24": "Pot2",
+            "25": "Q(M2/M1)",
+            "26": "Ephemeris",
+            "27": "Period",
+            "28": "dP/dt",
+            "29": "d(Omega)/dt",
+            "30": "a (3B)",
+            "31": "Period (3B)",
+            "32": "i (3B)",
+            "33": "e (3B)",
+            "34": "Omega (3B)",
+            "35": "Ephemeris (3B)",
+            "41": "Log(d)",
+            "42": "Desig. Ext.",
+            "43": "Spot 1 Tstart",
+            "44": "Spot 1 Tmax1",
+            "45": "Spot 1 Tmax2",
+            "46": "Spot 1 Tend",
+            "47": "Spot 2 Tstart",
+            "48": "Spot 2 Tmax1",
+            "49": "Spot 2 Tmax2",
+            "50": "Spot 2 Tend",
+            "56": "L1",
+            "57": "L2",
+            "58": "X1",
+            "59": "X2",
+            "60": "L3"
+        }
         self.connectSignals()
 
     def connectSignals(self):
         self.rundc2015_btn.clicked.connect(self.runDc)
 
+    def closeEvent(self, *args, **kwargs):
+        try:
+            self.iterator.exit()
+        except:
+            pass
+
     def runDc(self):
-        dcin = classes.dcin()
-        dcin.fill(self.MainWindow)
+        dcin = classes.dcin(self.MainWindow)  # only used to check warnings/errors
         msg = QtGui.QMessageBox(self)
         if dcin.hasError:
             msg.setWindowTitle("PyWD - Fatal Error")
@@ -432,28 +491,115 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 title = "PyWD - Warning"
                 text = "Warnings are encountered while parsing inputs: \n" + dcin.warning + \
                        "\nDo you still want to run the DC Program?"
-                answer = QtGui.QMessageBox.question(self, title, text, QtGui.QMessageBox.Yes,
+                answer = QtGui.QMessageBox.question(msg, title, text, QtGui.QMessageBox.Yes,
                                                     QtGui.QMessageBox.No)
             if answer == QtGui.QMessageBox.Yes or dcin.hasWarning is False:
-                try:
-                    output_dir = os.path.join(os.getcwd(), "output")
-                    if not os.path.isdir(output_dir):
-                        os.mkdir(output_dir)
-                    filepath = os.path.join(output_dir, "dcin.active")
-                    with open(filepath, "w") as f:
-                        f.write(dcin.output)
-                    msg.setText("file written")
-                    msg.setWindowTitle("PyWD - Success")
-                    msg.exec_()
-                    # TODO continue implementing
-                except IOError as ex:
-                    msg.setWindowTitle("PyWD - IO Error")
-                    msg.setText("An IO error has been caught:\n" + ex.message)
-                    msg.exec_()
-                except:
-                    msg.setWindowTitle("PyWD - Unknown Exception")
-                    msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
-                    msg.exec_()
+                if int(self.iteration_spinbox.value()) == 1:
+                    self.singleIteration()
+                else:
+                    self.singleIteration()
+                    # self.multipleIteration()
+
+    def disableUi(self):
+        self.updateinputs_btn.setDisabled(True)
+        self.exportresults_btn.setDisabled(True)
+        self.viewlaastdcout_btn.setDisabled(True)
+        self.viewlastdcin_btn.setDisabled(True)
+        self.rundc2015_btn.setText("Abort (Iteration 1 of {0})".format(int(self.iteration_spinbox.value())))
+        self.rundc2015_btn.clicked.disconnect()
+        self.rundc2015_btn.clicked.connect(self.abort)
+        self.result_treewidget.setDisabled(True)
+        self.curvestat_treewidget.setDisabled(True)
+
+    def enableUi(self):
+        self.updateinputs_btn.setDisabled(False)
+        self.exportresults_btn.setDisabled(False)
+        self.viewlaastdcout_btn.setDisabled(False)
+        self.viewlastdcin_btn.setDisabled(False)
+        self.rundc2015_btn.setText("Run DC")
+        self.rundc2015_btn.clicked.disconnect()
+        self.rundc2015_btn.clicked.connect(self.runDc)
+        self.result_treewidget.setDisabled(False)
+        self.curvestat_treewidget.setDisabled(False)
+
+    def updateTreeWidgets(self, resultTable):
+        def _populateItem(itm, rslt):
+            itm.setText(0, self.parameterDict[rslt[0]])
+            itm.setText(1, rslt[2])
+            itm.setText(2, rslt[3])
+            itm.setText(3, rslt[4])
+            itm.setText(4, rslt[5])
+            return itm
+        self.result_treewidget.clear()
+        self.curvestat_treewidget.clear()
+        root = self.result_treewidget.invisibleRootItem()
+        for result in resultTable:
+            if result[1] != "0":
+                name = "Curve " + result[1]
+                isParent = False
+                for i in range(root.childCount()):
+                    parent = root.child(i)
+                    if parent.text(0) == name:
+                        isParent = True
+                        item = _populateItem(QtGui.QTreeWidgetItem(parent), result)
+                        parent.addChild(item)
+                        self.result_treewidget.addTopLevelItem(item)
+                if isParent is False:
+                    parent = QtGui.QTreeWidgetItem(self.result_treewidget)
+                    parent.setText(0, name)
+                    item = _populateItem(QtGui.QTreeWidgetItem(parent), result)
+                    parent.addChild(item)
+                    parent.addChild(item)
+                    self.result_treewidget.addTopLevelItem(item)
+            else:
+                item = _populateItem(QtGui.QTreeWidgetItem(self.result_treewidget), result)
+                self.result_treewidget.addTopLevelItem(item)
+
+    def abort(self):
+        self.iterator.stop()
+        self.iterator = None
+        self.enableUi()
+
+    def iteratorException(self, *args):
+        msg = QtGui.QMessageBox(self)
+        msg.setText("Iterator thread has caught an exception:\n" + args[0])
+        msg.setWindowTitle("PyWD - Thread Error")
+        msg.exec_()
+        self.enableUi()
+
+    def singleIteration(self):
+        def _afterIteration():
+            self.disconnect(self.iterator, QtCore.SIGNAL("finished()"), _afterIteration)
+            self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
+            self.iterator.deleteLater()  # dispose iterator
+            self.iterator = None
+            baseSet = methods.getBaseSet(self.dcoutpath)
+            self.updateTreeWidgets(baseSet)
+            self.enableUi()
+        dcin = classes.dcin(self.MainWindow)  # we dont care about warnings/errors if we are already here
+        try:
+            with open(self.dcinpath, "w") as f:
+                f.write(dcin.output)
+            thread = classes.IteratorThread()
+            self.iterator = thread
+            self.connect(thread, QtCore.SIGNAL("finished()"), _afterIteration)
+            self.connect(thread, thread.exception, self.iteratorException)
+            self.disableUi()
+            thread.start()
+        except IOError as ex:
+            msg = QtGui.QMessageBox(self)
+            msg.setWindowTitle("PyWD - IO Error")
+            msg.setText("An IO error has been caught:\n" + ex.message)
+            msg.exec_()
+        except:
+            msg = QtGui.QMessageBox(self)
+            msg.setWindowTitle("PyWD - Unknown Exception")
+            msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
+            msg.exec_()
+
+    def multipleIteration(self):
+        # TODO implement multiple iteration
+        pass
 
 
 if __name__ == "__main__":

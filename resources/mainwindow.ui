@@ -921,7 +921,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>First time derivative of omega</string>
+         <string/>
         </property>
         <property name="statusTip">
          <string>e</string>
@@ -2392,7 +2392,7 @@ the triple system barycenter, in the adopted time system</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>A seed number that determines individual noise excursions of output light or RV points.</string>
+       <string>A seed number that determines individual noise excursions of output light or RV points</string>
       </property>
       <property name="statusTip">
        <string>SEED</string>
@@ -2501,7 +2501,7 @@ the triple system barycenter, in the adopted time system</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Stop time of output points.</string>
+       <string>Stop time of output points</string>
       </property>
       <property name="statusTip">
        <string>HJDSP</string>
@@ -2566,12 +2566,12 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>300</x>
         <y>190</y>
-        <width>91</width>
+        <width>81</width>
         <height>21</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Phase of normalization for columns of normalized light and set magnitude.</string>
+       <string>Phase of normalization for columns of normalized light and set magnitude</string>
       </property>
       <property name="statusTip">
        <string>PHN</string>
@@ -2617,12 +2617,12 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>30</x>
         <y>190</y>
-        <width>91</width>
+        <width>81</width>
         <height>21</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Start phase of output points.</string>
+       <string>Start phase of output points</string>
       </property>
       <property name="statusTip">
        <string>PHSTRT</string>
@@ -2662,12 +2662,12 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>210</x>
         <y>190</y>
-        <width>81</width>
+        <width>71</width>
         <height>21</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Increment for phase of output points.</string>
+       <string>Increment for phase of output points</string>
       </property>
       <property name="statusTip">
        <string>PHIN</string>
@@ -2681,12 +2681,12 @@ the triple system barycenter, in the adopted time system</string>
        <rect>
         <x>120</x>
         <y>190</y>
-        <width>91</width>
+        <width>81</width>
         <height>21</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Stop phase for output points.</string>
+       <string>Stop phase for output points</string>
       </property>
       <property name="statusTip">
        <string>PHSTOP</string>
@@ -2731,7 +2731,7 @@ the triple system barycenter, in the adopted time system</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Increment for times of output points.</string>
+       <string>Increment for times of output points</string>
       </property>
       <property name="statusTip">
        <string>HJDIN</string>
@@ -2763,7 +2763,7 @@ the triple system barycenter, in the adopted time system</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Start time of output points.</string>
+       <string>Start time of output points</string>
       </property>
       <property name="statusTip">
        <string>HJDST</string>
@@ -2783,7 +2783,7 @@ the triple system barycenter, in the adopted time system</string>
       </property>
       <property name="toolTip">
        <string>Fractional standard deviation of simulated scatter in output light or RV. Enter
-zero for zero output noise.</string>
+zero for zero output noise</string>
       </property>
       <property name="statusTip">
        <string>STDEV</string>
@@ -2989,7 +2989,7 @@ zero for zero output noise.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Set how observational scatter scales with the light level. [?]</string>
+       <string>Set how observational scatter scales with the light level [?]</string>
       </property>
       <property name="statusTip">
        <string>NOISE</string>
@@ -3151,7 +3151,7 @@ zero for zero output noise.</string>
        <rect>
         <x>120</x>
         <y>90</y>
-        <width>121</width>
+        <width>111</width>
         <height>31</height>
        </rect>
       </property>
@@ -3228,7 +3228,7 @@ zero for zero output noise.</string>
        <cursorShape>ArrowCursor</cursorShape>
       </property>
       <property name="toolTip">
-       <string>Do differential corrections on input parameters</string>
+       <string>View differential correction history and plot solutions from each iteration</string>
       </property>
       <property name="text">
        <string>Solution History</string>

@@ -1,6 +1,9 @@
 import itertools
-import numpy as np
+import subprocess
+import os
 import sys
+import numpy as np
+from PyQt4 import QtCore
 
 
 class CurveProperties:
@@ -142,13 +145,14 @@ class WDInput:
 
 
 class dcin(WDInput):
-    def __init__(self):
+    def __init__(self, MainWindow):
         WDInput.__init__(self)
         self.output = ""  # ready-to-write dcin.active file
         self.warning = ""  # stored warnings
         self.error = ""  # caught error
         self.hasWarning = False
         self.hasError = False
+        self.fill(MainWindow)
 
     def addWarning(self, warning):
         self.warning = self.warning + "\n" + warning + "\n"
@@ -705,6 +709,41 @@ class Curve:
         except IOError as ex:
             self.hasError = True
             self.error = "An IO error has been caught:\n" + ex.strerror + " " + filePath
+
+
+class IteratorThread(QtCore.QThread):
+    exception = QtCore.pyqtSignal(str, name="exception")
+
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+        self.wdpath = os.getcwd() + "/wd/wd"
+        self.cwd = os.getcwd() + "/wd/"
+        self.iteration = None
+        self.connect(self, QtCore.SIGNAL("terminated()"), self.stop)
+
+    def exit(self, returnCode=0):
+        self.stop()
+        QtCore.QThread.exit(self, returnCode=returnCode)
+
+    def stop(self):
+        self.blockSignals(True)
+        try:
+            self.iteration.kill()
+        except:
+            pass
+
+    def run(self):
+        try:
+            if os.path.isfile(self.wdpath) is not True:
+                raise RuntimeError("DC2015 binary does not exist.")
+            self.iteration = subprocess.Popen(self.wdpath, cwd=self.cwd)
+            self.iteration.wait()
+        except RuntimeError as ex:
+            self.exception.emit(ex.message)
+            self.blockSignals(True)
+        except:
+            self.exception.emit(str(sys.exc_info()))
+            self.blockSignals(True)
 
 
 if __name__ == "__main__":
