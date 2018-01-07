@@ -76,10 +76,6 @@ class Ui_DCWidget(object):
         self.tab_3.setObjectName(_fromUtf8("tab_3"))
         self.tabWidget = QtGui.QTabWidget(self.tab_3)
         self.tabWidget.setGeometry(QtCore.QRect(0, 0, 841, 207))
-        self.tabWidget.setTabShape(QtGui.QTabWidget.Rounded)
-        self.tabWidget.setUsesScrollButtons(False)
-        self.tabWidget.setTabsClosable(False)
-        self.tabWidget.setMovable(True)
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
@@ -481,7 +477,6 @@ class Ui_DCWidget(object):
 
         self.retranslateUi(DCWidget)
         self.tabWidget_2.setCurrentIndex(0)
-        self.tabWidget.setCurrentIndex(0)
         self.tabWidget_3.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(DCWidget)
 
