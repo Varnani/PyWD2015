@@ -714,14 +714,14 @@ class Curve:
 class IteratorThread(QtCore.QThread):
     exception = QtCore.pyqtSignal(str, name="exception")
 
-    def __init__(self):
+    def __init__(self, binarypath):
         QtCore.QThread.__init__(self)
-        self.wdpath = os.getcwd() + "/wd/wd"
-        self.cwd = os.getcwd() + "/wd/"
+        self.binarypath = binarypath
+        self.cwd = os.path.dirname(binarypath)
         self.iteration = None
         self.connect(self, QtCore.SIGNAL("terminated()"), self.stop)
 
-    def exit(self, returnCode=0):
+    def exit(self, returnCode=0):  # should not be called manually
         self.stop()
         QtCore.QThread.exit(self, returnCode=returnCode)
 
@@ -734,9 +734,9 @@ class IteratorThread(QtCore.QThread):
 
     def run(self):
         try:
-            if os.path.isfile(self.wdpath) is not True:
-                raise RuntimeError("DC2015 binary does not exist.")
-            self.iteration = subprocess.Popen(self.wdpath, cwd=self.cwd)
+            if os.path.isfile(self.binarypath) is not True:
+                raise RuntimeError("Binary does not exists in path: " + self.binarypath)
+            self.iteration = subprocess.Popen(self.binarypath, cwd=self.cwd)
             self.iteration.wait()
         except RuntimeError as ex:
             self.exception.emit(ex.message)

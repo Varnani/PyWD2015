@@ -21,8 +21,8 @@ def run():
     app = QtGui.QApplication(sys.argv)
     gui = interfaces.MainWindow()
     gui.app = app
-    gui.show()
-    sys.exit(app.exec_())
+    if gui.begin() is 0:
+        sys.exit(app.exec_())
 
 
 if __name__ == "__main__":

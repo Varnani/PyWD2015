@@ -1,5 +1,6 @@
 from PyQt4 import QtGui, QtCore
-from gui import mainwindow, loadwidget, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, dcwidget
+from gui import mainwindow, loadwidget, spotconfigurewidget, \
+    eclipsewidget, curvepropertiesdialog, dcwidget, lcdcpickerdialog
 from functools import partial
 from bin import methods, classes
 import sys
@@ -17,6 +18,12 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.EclipseWidget = EclipseWiget()
         self.DCWidget = DCWidget()
         self.DCWidget.MainWindow = self
+        self.LCDCPickerWidget = LCDCPickerWidget()
+        self.LCDCPickerWidget.MainWindow = self
+        # variables
+        self.lcpath = None
+        self.lcinpath = None
+        self.lcoutpath = None
         self.populateStyles()  # populate theme combobox
         self.connectSignals()  # connect events with method
 
@@ -35,6 +42,38 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
         self.EclipseWidget.close()
         self.DCWidget.close()
+
+    def setPaths(self, lcpath, dcpath):
+        self.lcpath = lcpath
+        self.lcinpath = os.path.join(os.path.dirname(lcpath), "lcin.active")
+        self.lcoutpath = os.path.join(os.path.dirname(lcpath), "lcout.active")
+        self.DCWidget.dcpath = dcpath
+        self.DCWidget.dcinpath = os.path.join(os.path.dirname(dcpath), "dcin.active")
+        self.DCWidget.dcoutpath = os.path.join(os.path.dirname(dcpath), "dcout.active")
+
+    def begin(self):  # check for wd.conf
+        wdconf = "wd.conf"
+        parser = ConfigParser.SafeConfigParser()
+        if os.path.isfile(wdconf):
+            with open(wdconf, "r") as f:
+                parser.readfp(f)
+            self.setPaths(parser.get("Paths", "lc"), parser.get("Paths", "dc"))
+            self.show()
+            return 0
+        else:
+            returnCode = self.LCDCPickerWidget.exec_()
+            if returnCode == 15:
+                parser.add_section("Paths")
+                parser.set("Paths", "lc", str(self.LCDCPickerWidget.lcpath_label.text()))
+                parser.set("Paths", "dc", str(self.LCDCPickerWidget.dcpath_label.text()))
+                with open(wdconf, "w") as f:
+                    parser.write(f)
+                self.setPaths(str(self.LCDCPickerWidget.lcpath_label.text()),
+                              str(self.LCDCPickerWidget.dcpath_label.text()))
+                self.show()
+                return 0
+            else:
+                return 1
 
     def saveProjectDialog(self):
         dialog = QtGui.QFileDialog(self)
@@ -94,6 +133,37 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         styleFactory = QtGui.QStyleFactory()
         style = styleFactory.create(self.theme_combobox.currentText())
         self.app.setStyle(style)
+
+
+class LCDCPickerWidget(QtGui.QDialog, lcdcpickerdialog.Ui_LCDCPickerDialog):
+    def __init__(self):
+        super(LCDCPickerWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.MainWindow = None
+        self.connectSignals()
+        self.save_btn.setDisabled(True)
+
+    def connectSignals(self):
+        self.save_btn.clicked.connect(partial(self.done, 15))
+        self.exit_btn.clicked.connect(partial(self.done, 0))
+        self.pickdc_btn.clicked.connect(partial(self.pickFile, "dc"))
+        self.picklc_btn.clicked.connect(partial(self.pickFile, "lc"))
+
+    def pickFile(self, ftype):
+        picker = QtGui.QFileDialog(self)
+        picker.setFileMode(QtGui.QFileDialog.ExistingFile)
+        picker.exec_()
+        filepath = picker.selectedFiles()[0]
+        if os.path.isfile(filepath):
+            if ftype == "lc":
+                self.lcpath_label.setText(filepath)
+                self.lcpath_label.setToolTip(filepath)
+            if ftype == "dc":
+                self.dcpath_label.setText(filepath)
+                self.dcpath_label.setToolTip(filepath)
+        if os.path.isfile(str(self.lcpath_label.text())) and os.path.isfile(str(self.dcpath_label.text())):
+            self.save_btn.setDisabled(False)
 
 
 class EclipseWiget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
@@ -313,8 +383,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
         # variables
-        self.dcinpath = os.getcwd() + "/wd/dcin.active"
-        self.dcoutpath = os.getcwd() + "/wd/dcout.active"
+        self.dcpath = None
+        self.dcinpath = None
+        self.dcoutpath = None
         self.MainWindow = None
         self.iterator = None
         self.parameterDict = {
@@ -557,21 +628,35 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
     def singleIteration(self):
         def _afterIteration():
-            self.disconnect(self.iterator, QtCore.SIGNAL("finished()"), _afterIteration)
-            self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
-            self.iterator.deleteLater()  # dispose iterator
-            self.iterator = None
-            baseSet = methods.getBaseSet(self.dcoutpath)
-            self.updateTreeWidgets(baseSet)
-            self.enableUi()
+            try:
+                # self.disconnect(self.iterator, QtCore.SIGNAL("finished()"), _afterIteration)
+                # self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
+                # self.iterator.deleteLater()  # dispose iterator
+                self.iterator = None
+                baseSet = methods.getBaseSet(self.dcoutpath)
+                self.updateTreeWidgets(baseSet)
+                self.enableUi()
+            except IOError as ex:
+                msg = QtGui.QMessageBox(self)
+                msg.setWindowTitle("PyWD - IO Error")
+                msg.setText("An IO error has been caught:\n" + ex.message + str(sys.exc_info()))
+                msg.exec_()
+                self.enableUi()
+            except:
+                msg = QtGui.QMessageBox(self)
+                msg.setWindowTitle("PyWD - Unknown Exception")
+                msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
+                msg.exec_()
+                self.enableUi()
+
         dcin = classes.dcin(self.MainWindow)  # we dont care about warnings/errors if we are already here
         try:
             with open(self.dcinpath, "w") as f:
                 f.write(dcin.output)
-            thread = classes.IteratorThread()
+            thread = classes.IteratorThread(self.dcpath)
             self.iterator = thread
             self.connect(thread, QtCore.SIGNAL("finished()"), _afterIteration)
-            self.connect(thread, thread.exception, self.iteratorException)
+            # self.connect(thread, thread.exception, self.iteratorException)
             self.disableUi()
             thread.start()
         except IOError as ex:
