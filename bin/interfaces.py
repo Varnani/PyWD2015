@@ -15,7 +15,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
         self.LoadWidget = LoadWidget()  # get loadwidget
         self.SpotConfigureWidget = SpotConfigureWidget()  # get spotconfigurewidget
-        self.EclipseWidget = EclipseWiget()
+        self.EclipseWidget = EclipseWidget()
         self.DCWidget = DCWidget()
         self.DCWidget.MainWindow = self
         self.LCDCPickerWidget = LCDCPickerWidget()
@@ -50,6 +50,13 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.dcpath = dcpath
         self.DCWidget.dcinpath = os.path.join(os.path.dirname(dcpath), "dcin.active")
         self.DCWidget.dcoutpath = os.path.join(os.path.dirname(dcpath), "dcout.active")
+
+    def clearWidgets(self):
+        # TODO add proper cleaning here (plots, trees, widgets which depend on current project)
+        self.DCWidget.result_treewidget.clear()
+        self.DCWidget.lastBaseSet = None
+        self.DCWidget.lastSubSets = None
+        self.DCWidget.curvestat_treewidget.clear()
 
     def begin(self):  # check for wd.conf
         wdconf = "wd.conf"
@@ -103,8 +110,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         fi = QtCore.QFileInfo(filePath)
         if filePath != "" and returnCode != 0:
             title = "PyWD - Warning"
-            text = "Loading a project file will erase all unsaved changes. Do you want to load \"" + \
-                   fi.fileName() + "\" ?"
+            text = "Loading a project file will erase all unsaved changes, results and plots. " \
+                   + "Do you want to load \"" + fi.fileName() + "\" ?"
             answer = QtGui.QMessageBox.question(self, title, text, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if answer == QtGui.QMessageBox.Yes:
                 try:
@@ -112,6 +119,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
                     with open(filePath, "r") as f:
                         parser.readfp(f)
                     methods.loadProject(self, parser)
+                    self.clearWidgets()
                     msg.setText("Project file \"" + fi.fileName() + "\" loaded.")
                     msg.setWindowTitle("PyWD - Project Loaded")
                     msg.exec_()
@@ -166,9 +174,9 @@ class LCDCPickerWidget(QtGui.QDialog, lcdcpickerdialog.Ui_LCDCPickerDialog):
             self.save_btn.setDisabled(False)
 
 
-class EclipseWiget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
+class EclipseWidget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
     def __init__(self):
-        super(EclipseWiget, self).__init__()
+        super(EclipseWidget, self).__init__()
         self.setupUi(self)  # setup ui from eclipsewidget.py
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
         self.connectSignals()
@@ -189,8 +197,6 @@ class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget c
         # [[label], [filepath], [edit_button], [remove_button]]
         self.lcPropertiesList = []  # a list to hold lc property objects
         self.vcPropertiesList = [0, 0]  # a list to hold vc property objects
-        # self.EditLightCurveDialog = EditLightCurveDialog()  # get light curve edit widget
-        # self.EditVelocityCurveDialog = EditVelocityCurveDialog()  # get velocity curve edit widget
         self.connectSignals()  # connect signals
 
     def connectSignals(self):
@@ -199,6 +205,13 @@ class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget c
         self.vc2load_btn.clicked.connect(partial(self.loadCurveDialog, "vc", 2))
         self.vc1edit_btn.clicked.connect(partial(methods.editVelocityCurve, 1, self))
         self.vc2edit_btn.clicked.connect(partial(methods.editVelocityCurve, 2, self))
+
+    def getCurveProperties(self):
+        curves = []
+        for element in (self.vcPropertiesList + self.lcPropertiesList):
+            if element != 0:
+                curves.append(element)
+        return curves
 
     def loadCurveDialog(self, type, vcNumber):
         dialog = QtGui.QFileDialog(self)
@@ -386,7 +399,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.dcpath = None
         self.dcinpath = None
         self.dcoutpath = None
-        self.MainWindow = None
+        self.MainWindow = None  # mainwindow sets itself here
         self.iterator = None
         self.parameterDict = {
             "1": "Spot 1 Latitude",
@@ -440,6 +453,105 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             "59": "X2",
             "60": "L3"
         }
+        self.bandpassDict = {
+            "1": "Stromgren u",
+            "2": "Stromgren v",
+            "3": "Stromgren b",
+            "4": "Stromgren y",
+            "5": "Johnson U",
+            "6": "Johnson B",
+            "7": "Johnson V",
+            "8": "Johnson R",
+            "9": "Johnson I",
+            "10": "Johnson J",
+            "11": "Johnson K",
+            "12": "Johnson L",
+            "13": "Johnson M",
+            "14": "Johnson N",
+            "15": "Cousins Rc",
+            "16": "Cousins Ic",
+            "17": "Bessel UX",
+            "18": "Bessel BX",
+            "19": "Bessel B",
+            "20": "Bessel V",
+            "21": "Bessel R",
+            "22": "Bessel I",
+            "23": "Tycho Bt",
+            "24": "Tycho Vt",
+            "25": "Hipparchos Hp",
+            "26": "KEPLER",
+            "27": "COROT SIS",
+            "28": "COROT EXO",
+            "29": "Geneva U",
+            "30": "Geneva B",
+            "31": "Geneva B1",
+            "32": "Geneva B2",
+            "33": "Geneva V",
+            "34": "Geneva V1",
+            "35": "Geneva G",
+            "36": "Vilnius U",
+            "37": "Vilnius P",
+            "38": "Vilnius X",
+            "39": "Vilnius Y",
+            "40": "Vilnius Z",
+            "41": "Vilnius V",
+            "42": "Vilnius S",
+            "43": "Milone iz",
+            "44": "Milone iJ",
+            "45": "Milone iH",
+            "46": "Milone iK",
+            "47": "YMS94 iz",
+            "48": "YMS94 iJ",
+            "49": "YMS94 iH",
+            "50": "YMS94 iK",
+            "51": "YMS94 iL",
+            "52": "YMS94 iL'",
+            "53": "YMS94 iM",
+            "54": "YMS94 in",
+            "55": "YMS94 iN",
+            "56": "Sloan DDS u'",
+            "57": "Sloan DDS g'",
+            "58": "Sloan DDS r'",
+            "59": "Sloan DDS i'",
+            "60": "Sloan DDS z'",
+            "61": "HST STIS Ly alpha",
+            "62": "HST STIS Fclear",
+            "63": "HST STIS Fsrf2",
+            "64": "HST STIS Fqtz",
+            "65": "HST STIS C III",
+            "66": "HST STIS Mg II",
+            "67": "HST STIS Nclear",
+            "68": "HST STIS Nsrf2",
+            "69": "HST STIS Nqtz",
+            "70": "HST STIS cn182",
+            "71": "HST STIS cn270",
+            "72": "HST STIS Oclear",
+            "73": "HST STIS Oclear-lp",
+            "74": "HST STIS [O II]",
+            "75": "HST STIS [O III]",
+            "76": "2MASS J",
+            "77": "2MASS H",
+            "78": "2MASS Ks",
+            "79": "SWASP",
+            "80": "MOST",
+            "81": "Gaia G (2006)",
+            "82": "Gaia G (2010)",
+            "83": "Gaia Gbp",
+            "84": "Gaia Grp",
+            "85": "Gaia Grvs",
+            "86": "Milone 230",
+            "87": "Milone 250",
+            "88": "Milone 270",
+            "89": "Milone 290",
+            "90": "Milone 310",
+            "91": "Milone 330",
+            "92": "Ca II triplet",
+            "93": "WIRE V+R",
+            "94": "Lunar Ultraviolet Telescope",
+
+        }
+        self.lastBaseSet = None
+        self.lastSubSets = None
         self.connectSignals()
 
     def connectSignals(self):
@@ -581,20 +693,23 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.result_treewidget.setDisabled(False)
         self.curvestat_treewidget.setDisabled(False)
 
-    def updateTreeWidgets(self, resultTable):
+    def updateResultTree(self, resultTable):
         def _populateItem(itm, rslt):
+            frmt = "{:11.8f}"  # TODO add this as a user setting
             itm.setText(0, self.parameterDict[rslt[0]])
-            itm.setText(1, rslt[2])
-            itm.setText(2, rslt[3])
-            itm.setText(3, rslt[4])
-            itm.setText(4, rslt[5])
+            itm.setText(1, frmt.format(float(rslt[2])))
+            itm.setText(2, frmt.format(float(rslt[3])))
+            itm.setText(3, frmt.format(float(rslt[4])))
+            itm.setText(4, frmt.format(float(rslt[5])))
             return itm
         self.result_treewidget.clear()
-        self.curvestat_treewidget.clear()
         root = self.result_treewidget.invisibleRootItem()
+        curvelist = self.MainWindow.LoadWidget.lcPropertiesList
         for result in resultTable:
             if result[1] != "0":
-                name = "Curve " + result[1]
+                name = str(result[1]) + ": " + self.bandpassDict[curvelist[int(result[1])-1].band]
+                if curvelist[int(result[1])-1].type == "vc":
+                    name = name + " (VC #{0})".format(curvelist[int(result[1])-1].star)
                 isParent = False
                 for i in range(root.childCount()):
                     parent = root.child(i)
@@ -614,12 +729,36 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 item = _populateItem(QtGui.QTreeWidgetItem(self.result_treewidget), result)
                 self.result_treewidget.addTopLevelItem(item)
 
+    def updateCurveInfoTree(self, curveinfoTable):
+        self.curvestat_treewidget.clear()
+        frmt = "{:g}"  # TODO add this as a user setting
+        curve = 0
+        curvelist = self.MainWindow.LoadWidget.getCurveProperties()
+        for result in curveinfoTable:
+            i = 0
+            item = QtGui.QTreeWidgetItem(self.curvestat_treewidget)
+            for value in result:
+                if i is 0:
+                    label = "//"
+                    try:
+                        label = self.bandpassDict[curvelist[curve].band]
+                        if curvelist[curve].type == "vc":
+                            label = label + " (VC #{0})".format(curvelist[curve].star)
+                    except:
+                         label = "Eclipse Timings"
+                    item.setText(0, label)
+                else:
+                    item.setText(i, frmt.format(float(value.replace("D", "E"))))
+                i = i + 1
+            self.curvestat_treewidget.addTopLevelItem(item)
+            curve = curve + 1
+
     def abort(self):
         self.iterator.stop()
         self.iterator = None
         self.enableUi()
 
-    def iteratorException(self, *args):
+    def iteratorException(self, *args):  # unused
         msg = QtGui.QMessageBox(self)
         msg.setText("Iterator thread has caught an exception:\n" + args[0])
         msg.setWindowTitle("PyWD - Thread Error")
@@ -633,8 +772,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 # self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
                 # self.iterator.deleteLater()  # dispose iterator
                 self.iterator = None
-                baseSet = methods.getBaseSet(self.dcoutpath)
-                self.updateTreeWidgets(baseSet)
+                self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")
+                self.updateResultTree(self.lastBaseSet)
+                self.updateCurveInfoTree(methods.getTableFromOutput(self.dcoutpath,
+                    "Standard Deviations for Computation of Curve-dependent Weights")
+                )
                 self.enableUi()
             except IOError as ex:
                 msg = QtGui.QMessageBox(self)

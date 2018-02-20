@@ -1051,28 +1051,27 @@ def loadProject(MainWindow, parser):
     loadEclipseParameters(MainWindow, parser)
 
 
-def getBaseSet(dcoutpath):
+def getTableFromOutput(path, target, offset=3):
     """
-    extract base set from dcin.active file.
-    since we are hardcoding niter to 1,
-    first occurence of target string
-    will be the result of the base set.
-    :param dcoutpath: dcout.active file path
+    extract a table from a dc/lc output file.
+    :param path: output file path
+    :param target: target string to find
+    :param offset: offset of data from target
     :return: a list of lists containing outputs
+    for results:
      [
        [id, curveid, input, corr, output, stderr, l1/(l1+l2), se]
-       [id, curveid, input, corr, output, stderr, l1/(l1+l2), se]
-       .
-       .
-       .
+     ]
+     for curvestat:
+     [
+       [curveid, n.obs, std.dev, n.obs in pgs rng, std.dev in phs rng, ref.flux, ref.mag]
      ]
     """
-    target = "Input-Output in F Format"
+
     table = []
     flag = False
-    offset = 3
     start = 0
-    with open(dcoutpath, "r") as dcout:
+    with open(path, "r") as dcout:
         for line in dcout:
             if target in line:
                 flag = True

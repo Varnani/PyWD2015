@@ -385,7 +385,7 @@ class dcin(WDInput):
             }
             nlc = ((2 - len(str(MainWindow.LoadWidget.lcCount))) * "0") + str(MainWindow.LoadWidget.lcCount)
             line6 = ifvc1 + " " + ifvc2 + " " + nlc \
-                    + " 0" + " 2" + " 0" + " " + \
+                    + " " + self.evalCheckBox(MainWindow.EclipseWidget.iftime_chk) + " 2" + " 0" + " " + \
                     isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " " + \
                     self.evalCheckBox(MainWindow.DCWidget.ifder_chk) + " " + "1" \
                     + " " + self.evalCheckBox(MainWindow.DCWidget.ifoc_chk) + "\n"
@@ -744,6 +744,21 @@ class IteratorThread(QtCore.QThread):
         except:
             self.exception.emit(str(sys.exc_info()))
             self.blockSignals(True)
+
+
+# class bidict(dict):
+# this could be useful in the future
+#     def __init__(self):
+#         dict.__init__(self)
+#         self.reverse = dict()
+#
+#     def __setitem__(self, key, value):
+#         self.reverse[value] = key
+#         dict.__setitem__(self, key, value)
+#
+#     def __delitem__(self, key):
+#         self.reverse.__delitem__(key)
+#         dict.__delitem__(self, key)
 
 
 if __name__ == "__main__":
