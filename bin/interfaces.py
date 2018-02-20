@@ -3,6 +3,7 @@ from gui import mainwindow, loadwidget, spotconfigurewidget, \
     eclipsewidget, curvepropertiesdialog, dcwidget, lcdcpickerdialog
 from functools import partial
 from bin import methods, classes
+import numpy as np
 import sys
 import ConfigParser
 import os
@@ -558,6 +559,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.rundc2015_btn.clicked.connect(self.runDc)
         self.setdeldefaults_btn.clicked.connect(self.setDelDefaults)
         self.clearbaseset_btn.clicked.connect(self.clearKeeps)
+        self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -692,6 +694,74 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.rundc2015_btn.clicked.connect(self.runDc)
         self.result_treewidget.setDisabled(False)
         self.curvestat_treewidget.setDisabled(False)
+
+    def updateInputFromOutput(self):
+        # TODO finish implementing and confirm these
+        paramdict = {
+            9: self.MainWindow.a_ipt,
+            10: self.MainWindow.e_ipt,
+            11: self.MainWindow.perr0_ipt,
+            12: self.MainWindow.f1_ipt,
+            13: self.MainWindow.f2_ipt,
+            14: self.MainWindow.pshift_ipt,
+            15: self.MainWindow.vgam_ipt,
+            16: self.MainWindow.xincl_ipt,
+            17: self.MainWindow.gr1_spinbox,
+            18: self.MainWindow.gr2_spinbox,
+            19: self.MainWindow.tavh_ipt,
+            20: self.MainWindow.tavc_ipt,
+            21: self.MainWindow.alb1_spinbox,
+            22: self.MainWindow.alb2_spinbox,
+            23: self.MainWindow.phsv_ipt,
+            24: self.MainWindow.pcsv_ipt,
+            25: self.MainWindow.rm_ipt,
+            26: self.MainWindow.jd0_ipt,
+            27: self.MainWindow.p0_ipt,
+            28: self.MainWindow.dpdt_ipt,
+            29: self.MainWindow.dperdt_ipt,
+            30: self.MainWindow.a3b_ipt,
+            31: self.MainWindow.p3b_ipt,
+            32: self.MainWindow.xinc3b_ipt,
+            33: self.MainWindow.e3b_ipt,
+            34: self.MainWindow.perr3b_ipt,
+            35: self.MainWindow.tc3b_ipt,
+            41: self.MainWindow.dpclog_ipt,
+            42: self.MainWindow.desextinc_ipt
+        }
+        # add conditions here
+        spotparams = (1, 2, 3, 4, 5, 6, 7, 8, 43, 44, 45, 46, 47, 48, 49, 50)
+        degreeparams = (11, 34)
+        valueparams = (17, 18, 21, 22)
+
+        def _updateCurve(parameter):
+            pass
+
+        def _updateSpot(parameter):
+            pass
+
+        for result in self.lastBaseSet:
+            done = False
+            index = int(result[0])
+            if result[1] != "0":
+                _updateCurve(int(result[0]))
+            else:
+                if index in spotparams:
+                    _updateSpot(result[4])
+                else:  # add rules here
+                    if index in degreeparams:  # output is in radians
+                        paramdict[index].setText(str(float(result[4]) * 180 / np.pi))
+                        done = True
+                    if index in valueparams:  # input is spinbox
+                        paramdict[index].setValue(float(result[4]))
+                        done = True
+                    if index in (19, 20):  # output temp is in k/10000 format
+                        paramdict[index].setText(str(float(result[4]) * 10000))
+                        done = True
+                    if index is 15:  # output is in v/vgam format
+                        paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vgam_ipt)))
+                        done = True
+                    if done is False:  # just slap output into input
+                        paramdict[index].setText(result[4])
 
     def updateResultTree(self, resultTable):
         def _populateItem(itm, rslt):
