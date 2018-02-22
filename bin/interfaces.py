@@ -401,7 +401,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.dcinpath = None
         self.dcoutpath = None
         self.MainWindow = None  # mainwindow sets itself here
-        self.OutputView = OutputView()
+        self.DcinView = OutputView()
+        self.DcoutView = OutputView()
         self.iterator = None
         self.parameterDict = {
             "1": "Spot 1 Latitude",
@@ -562,6 +563,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.clearbaseset_btn.clicked.connect(self.clearKeeps)
         self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
         self.viewlastdcin_btn.clicked.connect(self.showDcin)
+        self.viewlaastdcout_btn.clicked.connect(self.showDcout)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -569,9 +571,18 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         except:
             pass
 
+        self.DcinView.close()
+        self.DcoutView.close()
+
     def showDcin(self):
-        self.OutputView.fill(self.dcinpath)
-        self.OutputView.show()
+        self.DcinView.setWindowTitle(self.dcinpath)
+        self.DcinView.fill(self.dcinpath)
+        self.DcinView.show()
+
+    def showDcout(self):
+        self.DcoutView.setWindowTitle(self.dcoutpath)
+        self.DcoutView.fill(self.dcoutpath)
+        self.DcoutView.show()
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
@@ -683,23 +694,26 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.updateinputs_btn.setDisabled(True)
         self.exportresults_btn.setDisabled(True)
         self.viewlaastdcout_btn.setDisabled(True)
-        self.viewlastdcin_btn.setDisabled(True)
+        # self.viewlastdcin_btn.setDisabled(True)
         self.rundc2015_btn.setText("Abort (Iteration 1 of {0})".format(int(self.iteration_spinbox.value())))
         self.rundc2015_btn.clicked.disconnect()
         self.rundc2015_btn.clicked.connect(self.abort)
         self.result_treewidget.setDisabled(True)
         self.curvestat_treewidget.setDisabled(True)
+        self.DcinView.fill(self.dcinpath)
+        self.DcoutView.hide()
 
     def enableUi(self):
         self.updateinputs_btn.setDisabled(False)
         self.exportresults_btn.setDisabled(False)
         self.viewlaastdcout_btn.setDisabled(False)
-        self.viewlastdcin_btn.setDisabled(False)
+        # self.viewlastdcin_btn.setDisabled(False)
         self.rundc2015_btn.setText("Run DC")
         self.rundc2015_btn.clicked.disconnect()
         self.rundc2015_btn.clicked.connect(self.runDc)
         self.result_treewidget.setDisabled(False)
         self.curvestat_treewidget.setDisabled(False)
+
 
     def updateInputFromOutput(self):
         # TODO finish implementing and confirm these
@@ -907,10 +921,10 @@ class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
     def __init__(self):  # constructor
         super(OutputView, self).__init__()
         self.setupUi(self)
-        # db = QtGui.QFontDatabase()
-        # fontid = db.addApplicationFont(os.path.join(os.getcwd(), "resources", "Inconsolata-Regular.ttf"))
-        # inconsolata = QtGui.QFont(QtCore.QString("Inconsolata"), pointSize=12)
-        # self.output_textedit.setFont(inconsolata)
+        db = QtGui.QFontDatabase()
+        db.addApplicationFont(os.path.join(os.getcwd(), "resources", "PTM55FT.ttf"))
+        inconsolata = QtGui.QFont(QtCore.QString("PT Mono"), pointSize=11)
+        self.output_textedit.setFont(inconsolata)
 
     def fill(self, filepath):
         text = ""
