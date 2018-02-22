@@ -219,6 +219,7 @@ class Ui_CurvePropertiesDialog(object):
         self.repick_btn.setObjectName(_fromUtf8("repick_btn"))
         self.bandpasscontextlist_btn = QtGui.QPushButton(CurvePropertiesDialog)
         self.bandpasscontextlist_btn.setGeometry(QtCore.QRect(100, 60, 50, 20))
+        self.bandpasscontextlist_btn.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.bandpasscontextlist_btn.setObjectName(_fromUtf8("bandpasscontextlist_btn"))
 
         self.retranslateUi(CurvePropertiesDialog)

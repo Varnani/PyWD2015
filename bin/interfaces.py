@@ -272,6 +272,103 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
         self.type = ""
         self.hasError = False
+        self.bandpassdict = {
+            "Stromgren u": "1",
+            "Stromgren v": "2",
+            "Stromgren b": "3",
+            "Stromgren y": "4",
+            "Johnson U": "5",
+            "Johnson B": "6",
+            "Johnson V": "7",
+            "Johnson R": "8",
+            "Johnson I": "9",
+            "Johnson J": "10",
+            "Johnson K": "11",
+            "Johnson L": "12",
+            "Johnson M": "13",
+            "Johnson N": "14",
+            "Cousins Rc": "15",
+            "Cousins Ic": "16",
+            "Bessel UX": "17",
+            "Bessel BX": "18",
+            "Bessel B": "19",
+            "Bessel V": "20",
+            "Bessel R": "21",
+            "Bessel I": "22",
+            "Tycho Bt": "23",
+            "Tycho Vt": "24",
+            "Hipparchos Hp": "25",
+            "KEPLER": "26",
+            "COROT SIS": "27",
+            "COROT EXO": "28",
+            "Geneva U": "29",
+            "Geneva B": "30",
+            "Geneva B1": "31",
+            "Geneva B2": "32",
+            "Geneva V": "33",
+            "Geneva V1": "34",
+            "Geneva G": "35",
+            "Vilnius U": "36",
+            "Vilnius P": "37",
+            "Vilnius X": "38",
+            "Vilnius Y": "39",
+            "Vilnius Z": "40",
+            "Vilnius V": "41",
+            "Vilnius S": "42",
+            "Milone iz": "43",
+            "Milone iJ": "44",
+            "Milone iH": "45",
+            "Milone iK": "46",
+            "YMS94 iz": "47",
+            "YMS94 iJ": "48",
+            "YMS94 iH": "49",
+            "YMS94 iK": "50",
+            "YMS94 iL": "51",
+            "YMS94 iL'": "52",
+            "YMS94 iM": "53",
+            "YMS94 in": "54",
+            "YMS94 iN": "55",
+            "Sloan DDS u'": "56",
+            "Sloan DDS g'": "57",
+            "Sloan DDS r'": "58",
+            "Sloan DDS i'": "59",
+            "Sloan DDS z'": "60",
+            "HST STIS Ly alpha": "61",
+            "HST STIS Fclear": "62",
+            "HST STIS Fsrf2": "63",
+            "HST STIS Fqtz": "64",
+            "HST STIS C III": "65",
+            "HST STIS Mg II": "66",
+            "HST STIS Nclear": "67",
+            "HST STIS Nsrf2": "68",
+            "HST STIS Nqtz": "69",
+            "HST STIS cn182": "70",
+            "HST STIS cn270": "71",
+            "HST STIS Oclear": "72",
+            "HST STIS Oclear-lp": "73",
+            "HST STIS [O II]": "74",
+            "HST STIS [O III]": "75",
+            "2MASS J": "76",
+            "2MASS H": "77",
+            "2MASS Ks": "78",
+            "SWASP": "79",
+            "MOST": "80",
+            "Gaia G (2006)": "81",
+            "Gaia G (2010)": "82",
+            "Gaia Gbp": "83",
+            "Gaia Grp": "84",
+            "Gaia Grvs": "85",
+            "Milone 230": "86",
+            "Milone 250": "87",
+            "Milone 270": "88",
+            "Milone 290": "89",
+            "Milone 310": "90",
+            "Milone 330": "91",
+            "Ca II triplet": "92",
+            "WIRE V+R": "93",
+            "Lunar Ultraviolet Telescope": "94"
+        }
+        self.bandpassContextMenu = self.createBandpassContextMenu()
         self.connectSignals()
 
     def connectSignals(self):
@@ -279,6 +376,241 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         self.discard_btn.clicked.connect(partial(self.done, 2))
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
         self.repick_btn.clicked.connect(self.repick)
+        # this gets fired when we right click
+        self.bandpasscontextlist_btn.customContextMenuRequested.connect(self.openBandpassContextMenu)
+        self.bandpasscontextlist_btn.clicked.connect(self.openBandpassContextMenu)
+
+    def openBandpassContextMenu(self):
+        band = self.bandpassContextMenu.exec_(QtGui.QCursor.pos())
+        if band is not None:
+            self.band_box.setValue(int(self.bandpassdict[str(band.objectName())]))
+
+    def createBandpassContextMenu(self):
+        rootmenu = QtGui.QMenu(self)
+        # johnson
+        johnson = rootmenu.addMenu("Johnson")
+        ju = johnson.addAction("U")
+        ju.setObjectName("Johnson U")
+        jb = johnson.addAction("B")
+        jb.setObjectName("Johnson B")
+        jv = johnson.addAction("V")
+        jv.setObjectName("Johnson V")
+        jr = johnson.addAction("R")
+        jr.setObjectName("Johnson R")
+        ji = johnson.addAction("I")
+        ji.setObjectName("Johnson I")
+
+        # stromgren
+        stromgren = rootmenu.addMenu("Stromgren")
+        su = stromgren.addAction("u")
+        su.setObjectName("Stromgren u")
+        sv = stromgren.addAction("v")
+        sv.setObjectName("Stromgren v")
+        sb = stromgren.addAction("b")
+        sb.setObjectName("Stromgren b")
+        sy = stromgren.addAction("y")
+        sy.setObjectName("Stromgren y")
+
+        # cousins
+        cousins = rootmenu.addMenu("Cousins")
+        crc = cousins.addAction("Rc")
+        crc.setObjectName("Cousins Rc")
+        cic = cousins.addAction("Ic")
+        cic.setObjectName("Cousins Ic")
+
+        # bessel
+        bessel = rootmenu.addMenu("Bessel")
+        bux = bessel.addAction("UX")
+        bux.setObjectName("Bessel UX")
+        bbx = bessel.addAction("BX")
+        bbx.setObjectName("Bessel BX")
+        bb = bessel.addAction("B")
+        bb.setObjectName("Bessel B")
+        bv = bessel.addAction("B")
+        bv.setObjectName("Bessel V")
+        br = bessel.addAction("V")
+        br.setObjectName("Bessel R")
+        bi = bessel.addAction("I")
+        bi.setObjectName("Bessel I")
+
+        # tycho
+        tycho = rootmenu.addMenu("Tycho")
+        tbt = tycho.addAction("Bt")
+        tbt.setObjectName("Tycho Bt")
+        tvt = tycho.addAction("Vt")
+        tvt.setObjectName("Tycho Vt")
+
+        # corot
+        corot = rootmenu.addMenu("Corot")
+        csis = corot.addAction("SIS")
+        csis.setObjectName("COROT SIS")
+        cexo = corot.addAction("EXO")
+        cexo.setObjectName("COROT EXO")
+
+        # geneva
+        geneva = rootmenu.addMenu("Geneva")
+        gu = geneva.addAction("U")
+        gu.setObjectName("Geneva U")
+        gb = geneva.addAction("B")
+        gb.setObjectName("Geneva B")
+        gb1 = geneva.addAction("B1")
+        gb1.setObjectName("Geneva B1")
+        gb2 = geneva.addAction("B2")
+        gb2.setObjectName("Geneva B2")
+        gv = geneva.addAction("V")
+        gv.setObjectName("Geneva V")
+        gv1 = geneva.addAction("V1")
+        gv1.setObjectName("Geneva V1")
+        gg = geneva.addAction("G")
+        gg.setObjectName("Geneva G")
+
+        # vilnius
+        vilnius = rootmenu.addMenu("Vilnius")
+        vu = vilnius.addAction("U")
+        vu.setObjectName("Vilnius U")
+        vp = vilnius.addAction("P")
+        vp.setObjectName("Vilnius P")
+        vx = vilnius.addAction("X")
+        vx.setObjectName("Vilnius X")
+        vy = vilnius.addAction("Y")
+        vy.setObjectName("Vilnius Y")
+        vz = vilnius.addAction("Z")
+        vz.setObjectName("Vilnius Z")
+        vv = vilnius.addAction("V")
+        vv.setObjectName("Vilnius V")
+        vs = vilnius.addAction("S")
+        vs.setObjectName("Vilnius S")
+
+        # milone
+        milone = rootmenu.addMenu("Milone")
+        miz = milone.addAction("iz")
+        miz.setObjectName("Milone iz")
+        mij = milone.addAction("iJ")
+        mij.setObjectName("Milone iJ")
+        mih = milone.addAction("iH")
+        mih.setObjectName("Milone iH")
+        mik = milone.addAction("iK")
+        mik.setObjectName("Milone iK")
+        m230 = milone.addAction("230")
+        m230.setObjectName("Milone 230")
+        m250 = milone.addAction("250")
+        m250.setObjectName("Milone 250")
+        m270 = milone.addAction("270")
+        m270.setObjectName("Milone 270")
+        m290 = milone.addAction("290")
+        m290.setObjectName("Milone 290")
+        m310 = milone.addAction("310")
+        m310.setObjectName("Milone 310")
+        m330 = milone.addAction("330")
+        m330.setObjectName("Milone 330")
+
+        # yms94
+        yms94 = rootmenu.addMenu("YMS94")
+        yiz = yms94.addAction("iz")
+        yiz.setObjectName("YMS94 iz")
+        yij = yms94.addAction("iJ")
+        yij.setObjectName("YMS94 iJ")
+        yih = yms94.addAction("iH")
+        yih.setObjectName("YMS94 iH")
+        yik = yms94.addAction("iK")
+        yik.setObjectName("YMS94 iK")
+        yil = yms94.addAction("iL")
+        yil.setObjectName("YMS94 iL")
+        yill = yms94.addAction("iL'")
+        yill.setObjectName("YMS94 iL'")
+        yim = yms94.addAction("iM")
+        yim.setObjectName("YMS94 iM")
+        yin = yms94.addAction("in")
+        yin.setObjectName("YMS94 in")
+        yinn = yms94.addAction("iN")
+        yinn.setObjectName("YMS94 iN")
+
+        # sloandds
+        sloandds = rootmenu.addMenu("Sloan DDS")
+        sdu = sloandds.addAction("u'")
+        sdu.setObjectName("Sloan DDS u'")
+        sdg = sloandds.addAction("g'")
+        sdg.setObjectName("Sloan DDS g'")
+        sdr = sloandds.addAction("r'")
+        sdr.setObjectName("Sloan DDS r'")
+        sdi = sloandds.addAction("i'")
+        sdi.setObjectName("Sloan DDS i'")
+        sdz = sloandds.addAction("z'")
+        sdz.setObjectName("Sloan DDS z'")
+
+        # hststis
+        hststis = rootmenu.addMenu("HST STIS")
+        hly = hststis.addAction("Ly alpha")
+        hly.setObjectName("HST STIS Ly alpha")
+        hlf = hststis.addAction("Fclear")
+        hlf.setObjectName("HST STIS Fclear")
+        hlfc = hststis.addAction("Fsrf2")
+        hlfc.setObjectName("HST STIS Fsrf2")
+        hlfq = hststis.addAction("Fqtz")
+        hlfq.setObjectName("HST STIS Fqtz")
+        hlc3 = hststis.addAction("C III")
+        hlc3.setObjectName("HST STIS C III")
+        hlm2 = hststis.addAction("Mg II")
+        hlm2.setObjectName("HST STIS Mg II")
+        hlnc = hststis.addAction("Nclear")
+        hlnc.setObjectName("HST STIS Nclear")
+        hlns = hststis.addAction("Nsfr2")
+        hlns.setObjectName("HST STIS Nsrf2")
+        hlnq = hststis.addAction("Nqtz")
+        hlnq.setObjectName("HST STIS Nqtz")
+        hlcn = hststis.addAction("cn182")
+        hlcn.setObjectName("HST STIS cn182")
+        hlcn2 = hststis.addAction("cn270")
+        hlcn2.setObjectName("HST STIS cn270")
+        hlo = hststis.addAction("Oclear")
+        hlo.setObjectName("HST STIS Oclear")
+        hloc = hststis.addAction("Oclear-lp")
+        hloc.setObjectName("HST STIS Oclear-lp")
+        hlo2 = hststis.addAction("[O II]")
+        hlo2.setObjectName("HST STIS [O II]")
+        hlo3 = hststis.addAction("[O III]")
+        hlo3.setObjectName("HST STIS [O III]")
+
+        # 2mass
+        twomass = rootmenu.addMenu("2MASS")
+        tmj = twomass.addAction("J")
+        tmj.setObjectName("2MASS J")
+        tmh = twomass.addAction("H")
+        tmh.setObjectName("2MASS H")
+        tmjks = twomass.addAction("Ks")
+        tmjks.setObjectName("2MASS Ks")
+
+        # gaia
+        gaia = rootmenu.addMenu("Gaia")
+        gg2006 = gaia.addAction("G (2006)")
+        gg2006.setObjectName("Gaia G (2006)")
+        gg2010 = gaia.addAction("G (2010)")
+        gg2010.setObjectName("Gaia G (2010)")
+        ggbp = gaia.addAction("Gbp")
+        ggbp.setObjectName("Gaia Gbp")
+        ggrp = gaia.addAction("Grp")
+        ggrp.setObjectName("Gaia Grp")
+        ggrvs = gaia.addAction("Grvs")
+        ggrvs.setObjectName("Gaia Grvs")
+
+        seperator = rootmenu.addSeparator()
+        # single menu bands
+        hipparchos = rootmenu.addAction("Hipparchos Hp")
+        hipparchos.setObjectName("Hipparchos Hp")
+        kepler = rootmenu.addAction("KEPLER")
+        kepler.setObjectName("KEPLER")
+        swasp = rootmenu.addAction("SWASP")
+        swasp.setObjectName("SWASP")
+        most = rootmenu.addAction("MOST")
+        most.setObjectName("MOST")
+        triplet = rootmenu.addAction("Ca II triplet")
+        triplet.setObjectName("Ca II triplet")
+        wire = rootmenu.addAction("WIRE V+R")
+        wire.setObjectName("WIRE V+R")
+        lut = rootmenu.addAction("Lunar Ultraviolet Telescope")
+        lut.setObjectName("Lunar Ultraviolet Telescope")
+
+        return rootmenu
 
     def repick(self):
         dialog = QtGui.QFileDialog(self)
@@ -971,3 +1303,4 @@ class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
 
 if __name__ == "__main__":
     pass
+
