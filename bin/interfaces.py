@@ -1164,6 +1164,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             itm.setText(2, frmt.format(float(rslt[3])))
             itm.setText(3, frmt.format(float(rslt[4])))
             itm.setText(4, frmt.format(float(rslt[5])))
+            if float(rslt[5]) > float(rslt[3]):
+                #itm.setBackground(0, QtGui.QBrush(QtGui.QColor("green")))
+                #itm.setBackground(1, QtGui.QBrush(QtGui.QColor("green")))
+                #itm.setBackground(2, QtGui.QBrush(QtGui.QColor("green")))
+                itm.setBackground(3, QtGui.QBrush(QtGui.QColor("green")))
+                #itm.setBackground(4, QtGui.QBrush(QtGui.QColor("green")))
             return itm
         self.result_treewidget.clear()
         root = self.result_treewidget.invisibleRootItem()
@@ -1191,6 +1197,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             else:
                 item = _populateItem(QtGui.QTreeWidgetItem(self.result_treewidget), result)
                 self.result_treewidget.addTopLevelItem(item)
+        self.result_treewidget.expandAll()
 
     def updateCurveInfoTree(self, curveinfoTable):
         self.curvestat_treewidget.clear()
