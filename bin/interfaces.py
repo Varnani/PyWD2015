@@ -899,6 +899,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         }
         self.lastBaseSet = None
         self.lastSubSets = None
+        self.lastiteration = 0
         self.connectSignals()
 
     def connectSignals(self):
@@ -1028,18 +1029,13 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 answer = QtGui.QMessageBox.question(msg, title, text, QtGui.QMessageBox.Yes,
                                                     QtGui.QMessageBox.No)
             if answer == QtGui.QMessageBox.Yes or dcin.hasWarning is False:
-                if int(self.iteration_spinbox.value()) == 1:
-                    self.singleIteration()
-                else:
-                    self.singleIteration()
-                    # self.multipleIteration()
+                self.runIteration()
 
     def disableUi(self):
         self.updateinputs_btn.setDisabled(True)
         self.exportresults_btn.setDisabled(True)
         self.viewlaastdcout_btn.setDisabled(True)
         # self.viewlastdcin_btn.setDisabled(True)
-        self.rundc2015_btn.setText("Abort (Iteration 1 of {0})".format(int(self.iteration_spinbox.value())))
         self.rundc2015_btn.clicked.disconnect()
         self.rundc2015_btn.clicked.connect(self.abort)
         self.result_treewidget.setDisabled(True)
@@ -1224,6 +1220,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.iterator.stop()
         self.iterator = None
         self.enableUi()
+        self.lastiteration = 0
 
     def iteratorException(self, *args):  # unused
         msg = QtGui.QMessageBox(self)
@@ -1232,39 +1229,16 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         msg.exec_()
         self.enableUi()
 
-    def singleIteration(self):
-        def _afterIteration():
-            try:
-                # self.disconnect(self.iterator, QtCore.SIGNAL("finished()"), _afterIteration)
-                # self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
-                # self.iterator.deleteLater()  # dispose iterator
-                self.iterator = None
-                self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")
-                self.updateResultTree(self.lastBaseSet)
-                self.updateCurveInfoTree(methods.getTableFromOutput(self.dcoutpath,
-                    "Standard Deviations for Computation of Curve-dependent Weights")
-                )
-                self.enableUi()
-            except IOError as ex:
-                msg = QtGui.QMessageBox(self)
-                msg.setWindowTitle("PyWD - IO Error")
-                msg.setText("An IO error has been caught:\n" + ex.message + str(sys.exc_info()))
-                msg.exec_()
-                self.enableUi()
-            except:
-                msg = QtGui.QMessageBox(self)
-                msg.setWindowTitle("PyWD - Unknown Exception")
-                msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
-                msg.exec_()
-                self.enableUi()
-
+    def runIteration(self):
         dcin = classes.dcin(self.MainWindow)  # we dont care about warnings/errors if we are already here
+        self.rundc2015_btn.setText("Abort (Iteration {0} of {1})".format(self.lastiteration + 1,
+                                                                         int(self.iteration_spinbox.value())))
         try:
             with open(self.dcinpath, "w") as f:
                 f.write(dcin.output)
             thread = classes.IteratorThread(self.dcpath)
             self.iterator = thread
-            self.connect(thread, QtCore.SIGNAL("finished()"), _afterIteration)
+            self.connect(thread, QtCore.SIGNAL("finished()"), self.afterIteration)
             # self.connect(thread, thread.exception, self.iteratorException)
             self.disableUi()
             thread.start()
@@ -1279,9 +1253,48 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
             msg.exec_()
 
+    def afterIteration(self):
+        try:
+            # self.disconnect(self.iterator, QtCore.SIGNAL("finished()"), _afterIteration)
+            # self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
+            # self.iterator.deleteLater()  # dispose iterator
+            self.iterator = None
+            self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")
+            self.updateResultTree(self.lastBaseSet)
+            self.updateCurveInfoTree(methods.getTableFromOutput(self.dcoutpath,
+                "Standard Deviations for Computation of Curve-dependent Weights")
+            )
+            self.enableUi()
+            self.continueIterating()
+        except IOError as ex:
+            msg = QtGui.QMessageBox(self)
+            msg.setWindowTitle("PyWD - IO Error")
+            msg.setText("An IO error has been caught:\n" + ex.message + str(sys.exc_info()))
+            msg.exec_()
+            self.enableUi()
+        except:
+            msg = QtGui.QMessageBox(self)
+            msg.setWindowTitle("PyWD - Unknown Exception")
+            msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
+            msg.exec_()
+            self.enableUi()
+
+    def continueIterating(self):
+        self.lastiteration = self.lastiteration + 1
+        if self.lastiteration < int(self.iteration_spinbox.value()):
+            self.updateinputs_btn.click()
+            self.runIteration()
+        else:
+            self.lastiteration = 0
+
     def multipleIteration(self):
-        # TODO implement multiple iteration
-        pass
+        iteration = 0
+        target = int(self.iteration_spinbox.value())
+        while iteration < target:
+            self.rundc2015_btn.setText("Abort (Iteration {0} of {1})".format(iteration + 1, target))
+            self.singleIteration()
+            self.updateinputs_btn.click()
+            iteration = iteration + 1
 
 
 class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
