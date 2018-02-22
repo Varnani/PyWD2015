@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
 from gui import mainwindow, loadwidget, spotconfigurewidget, \
-    eclipsewidget, curvepropertiesdialog, dcwidget, lcdcpickerdialog
+    eclipsewidget, curvepropertiesdialog, dcwidget, lcdcpickerdialog, outputview
 from functools import partial
 from bin import methods, classes
 import numpy as np
@@ -401,6 +401,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.dcinpath = None
         self.dcoutpath = None
         self.MainWindow = None  # mainwindow sets itself here
+        self.OutputView = OutputView()
         self.iterator = None
         self.parameterDict = {
             "1": "Spot 1 Latitude",
@@ -560,12 +561,17 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.setdeldefaults_btn.clicked.connect(self.setDelDefaults)
         self.clearbaseset_btn.clicked.connect(self.clearKeeps)
         self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
+        self.viewlastdcin_btn.clicked.connect(self.showDcin)
 
     def closeEvent(self, *args, **kwargs):
         try:
             self.iterator.exit()
         except:
             pass
+
+    def showDcin(self):
+        self.OutputView.fill(self.dcinpath)
+        self.OutputView.show()
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
@@ -733,20 +739,30 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         degreeparams = (11, 34)
         valueparams = (17, 18, 21, 22)
 
-        def _updateCurve(parameter):
-            pass
+        def _updateCurve(rslt):
+            curveindex = int(rslt[1]) - 1
+            if rslt[0] == "56":
+                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l1 = rslt[4]
+            if rslt[0] == "57":
+                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l2 = rslt[4]
+            if rslt[0] == "58":
+                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x1 = rslt[4]
+            if rslt[0] == "59":
+                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x2 = rslt[4]
+            if rslt[0] == "60":
+                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].el3a = rslt[4]
 
-        def _updateSpot(parameter):
+        def _updateSpot(rslt):
             pass
 
         for result in self.lastBaseSet:
             done = False
             index = int(result[0])
             if result[1] != "0":
-                _updateCurve(int(result[0]))
+                _updateCurve(result)
             else:
                 if index in spotparams:
-                    _updateSpot(result[4])
+                    _updateSpot(result)
                 else:  # add rules here
                     if index in degreeparams:  # output is in radians
                         paramdict[index].setText(str(float(result[4]) * 180 / np.pi))
@@ -758,7 +774,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                         paramdict[index].setText(str(float(result[4]) * 10000))
                         done = True
                     if index is 15:  # output is in v/vgam format
-                        paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vgam_ipt)))
+                        paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vunit_ipt.text())))
                         done = True
                     if done is False:  # just slap output into input
                         paramdict[index].setText(result[4])
@@ -885,6 +901,23 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
     def multipleIteration(self):
         # TODO implement multiple iteration
         pass
+
+
+class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
+    def __init__(self):  # constructor
+        super(OutputView, self).__init__()
+        self.setupUi(self)
+        # db = QtGui.QFontDatabase()
+        # fontid = db.addApplicationFont(os.path.join(os.getcwd(), "resources", "Inconsolata-Regular.ttf"))
+        # inconsolata = QtGui.QFont(QtCore.QString("Inconsolata"), pointSize=12)
+        # self.output_textedit.setFont(inconsolata)
+
+    def fill(self, filepath):
+        text = ""
+        with open(filepath, "r") as f:
+            for line in f:
+                text = text + line
+        self.output_textedit.setPlainText(text)
 
 
 if __name__ == "__main__":
