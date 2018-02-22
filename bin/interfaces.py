@@ -340,9 +340,11 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
         self.star1RowCount = 0
         self.star2RowCount = 0
         self.star1ElementList = []
-        # [[label], [radioA], [radioB], [lat_input], [lon_input], [radsp_input], [temsp_input], [remove_button]]
+        # [[label], [radioA], [radioB], [lat_input], [lon_input], [radsp_input], [temsp_input],
+        # [tstart], [tmax1], [tmax2], [tend], [remove_button]]
         self.star2ElementList = []
-        # [[label], [radioA], [radioB], [lat_input], [lon_input], [radsp_input], [temsp_input], [remove_button]]
+        # [[label], [radioA], [radioB], [lat_input], [lon_input], [radsp_input], [temsp_input],
+        # [tstart], [tmax1], [tmax2], [tend], [remove_button]]]
         self.radioButtonGroupA = QtGui.QButtonGroup()
         self.radioButtonGroupB = QtGui.QButtonGroup()
         self.connectSignals()  # connect signals
@@ -575,12 +577,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.DcoutView.close()
 
     def showDcin(self):
-        self.DcinView.setWindowTitle(self.dcinpath)
+        self.DcinView.setWindowTitle("PyWD - " + self.dcinpath)
         self.DcinView.fill(self.dcinpath)
         self.DcinView.show()
 
     def showDcout(self):
-        self.DcoutView.setWindowTitle(self.dcoutpath)
+        self.DcoutView.setWindowTitle("PyWD - " + self.dcoutpath)
         self.DcoutView.fill(self.dcoutpath)
         self.DcoutView.show()
 
@@ -714,9 +716,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.result_treewidget.setDisabled(False)
         self.curvestat_treewidget.setDisabled(False)
 
-
     def updateInputFromOutput(self):
-        # TODO finish implementing and confirm these
         paramdict = {
             9: self.MainWindow.a_ipt,
             10: self.MainWindow.e_ipt,
@@ -748,36 +748,62 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             41: self.MainWindow.dpclog_ipt,
             42: self.MainWindow.desextinc_ipt
         }
+        spotparamdict = {
+            1: 3,
+            2: 4,
+            3: 5,
+            4: 6,
+            5: 3,
+            6: 4,
+            7: 5,
+            8: 6,
+            43: 7,
+            44: 8,
+            45: 9,
+            46: 10,
+            47: 7,
+            48: 8,
+            49: 9,
+            50: 10,
+        }
         # add conditions here
-        spotparams = (1, 2, 3, 4, 5, 6, 7, 8, 43, 44, 45, 46, 47, 48, 49, 50)
+        spota = (1, 2, 3, 4, 43, 44, 45, 46)
+        spotb = (5, 6, 7, 8, 47, 48, 49, 50)
         degreeparams = (11, 34)
         valueparams = (17, 18, 21, 22)
-
-        def _updateCurve(rslt):
-            curveindex = int(rslt[1]) - 1
-            if rslt[0] == "56":
-                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l1 = rslt[4]
-            if rslt[0] == "57":
-                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l2 = rslt[4]
-            if rslt[0] == "58":
-                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x1 = rslt[4]
-            if rslt[0] == "59":
-                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x2 = rslt[4]
-            if rslt[0] == "60":
-                self.MainWindow.LoadWidget.lcPropertiesList[curveindex].el3a = rslt[4]
-
-        def _updateSpot(rslt):
-            pass
 
         for result in self.lastBaseSet:
             done = False
             index = int(result[0])
+            print index
             if result[1] != "0":
-                _updateCurve(result)
+                curveindex = int(result[1]) - 1
+                if result[0] == "56":
+                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l1 = result[4]
+                if result[0] == "57":
+                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l2 = result[4]
+                if result[0] == "58":
+                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x1 = result[4]
+                if result[0] == "59":
+                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x2 = result[4]
+                if result[0] == "60":
+                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].el3a = result[4]
             else:
-                if index in spotparams:
-                    _updateSpot(result)
-                else:  # add rules here
+                if index in (spota + spotb):
+                    star1spots = self.MainWindow.SpotConfigureWidget.star1ElementList
+                    star2spots = self.MainWindow.SpotConfigureWidget.star2ElementList
+                    radioindex = ""
+                    if index in spota:
+                        radioindex = 1
+                    if index in spotb:
+                        radioindex = 2
+                    for spot in star1spots:
+                        if spot[radioindex].isChecked():
+                            spot[spotparamdict[index]].setText(result[4])
+                    for spot in star2spots:
+                        if spot[radioindex].isChecked():
+                            spot[spotparamdict[index]].setText(result[4])
+                else:  # add rules here TODO move this to output formatting in result tree widget
                     if index in degreeparams:  # output is in radians
                         paramdict[index].setText(str(float(result[4]) * 180 / np.pi))
                         done = True
