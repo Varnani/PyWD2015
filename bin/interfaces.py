@@ -278,6 +278,16 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         self.accept_btn.clicked.connect(partial(self.done, 1))
         self.discard_btn.clicked.connect(partial(self.done, 2))
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
+        self.repick_btn.clicked.connect(self.repick)
+
+    def repick(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setAcceptMode(0)
+        returnCode = dialog.exec_()
+        filePath = (dialog.selectedFiles())[0]
+        if filePath != "" and returnCode != 0:
+            self.datawidget.clear()
+            self.populateFromFile(filePath)
 
     def populateFromFile(self, filePath):
         curve = classes.Curve(filePath)
@@ -775,7 +785,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         for result in self.lastBaseSet:
             done = False
             index = int(result[0])
-            print index
             if result[1] != "0":
                 curveindex = int(result[1]) - 1
                 if result[0] == "56":

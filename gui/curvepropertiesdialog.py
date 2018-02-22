@@ -214,6 +214,12 @@ class Ui_CurvePropertiesDialog(object):
         self.line_3.setFrameShape(QtGui.QFrame.VLine)
         self.line_3.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_3.setObjectName(_fromUtf8("line_3"))
+        self.repick_btn = QtGui.QPushButton(CurvePropertiesDialog)
+        self.repick_btn.setGeometry(QtCore.QRect(580, 50, 50, 20))
+        self.repick_btn.setObjectName(_fromUtf8("repick_btn"))
+        self.bandpasscontextlist_btn = QtGui.QPushButton(CurvePropertiesDialog)
+        self.bandpasscontextlist_btn.setGeometry(QtCore.QRect(100, 60, 50, 20))
+        self.bandpasscontextlist_btn.setObjectName(_fromUtf8("bandpasscontextlist_btn"))
 
         self.retranslateUi(CurvePropertiesDialog)
         self.noise_combobox.setCurrentIndex(1)
@@ -294,4 +300,6 @@ class Ui_CurvePropertiesDialog(object):
         self.label_21.setToolTip(_translate("CurvePropertiesDialog", "The multiplier that restores the flux numbers to directly inverted magnitudes. [?]", None))
         self.label_21.setWhatsThis(_translate("CurvePropertiesDialog", "<html><head/><body><p>This quantity is intended only for flux (as opposed to magnitude) input, and allows rescaling of observed fluxes so that the input flux numbers can be in a convenient range. If input fluxes are simply inverted magnitudes (e.g. 10<span style=\" vertical-align:super;\">−0.4V</span> for V magnitudes), then XUNIT should be unity. However, it may be convenient to enter rescaled (i.e. wrongly scaled) fluxes in cases where they would otherwise be of order, say, 10<span style=\" vertical-align:super;\">−10</span> or 10<span style=\" vertical-align:super;\">3</span> . Then XUNIT can be the multiplier that restores the flux numbers to directly inverted magnitudes. If working in (presumably standard) magnitudes with control integer MAGLITE=1, of course, then don’t worry about XUNIT—just set it to 1.0000.</p></body></html>", None))
         self.label_21.setText(_translate("CurvePropertiesDialog", "XUNIT", None))
+        self.repick_btn.setText(_translate("CurvePropertiesDialog", "Pick", None))
+        self.bandpasscontextlist_btn.setText(_translate("CurvePropertiesDialog", "List", None))
 

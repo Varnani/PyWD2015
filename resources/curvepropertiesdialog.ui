@@ -827,6 +827,32 @@
     <enum>Qt::Vertical</enum>
    </property>
   </widget>
+  <widget class="QPushButton" name="repick_btn">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>50</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pick</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="bandpasscontextlist_btn">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>60</y>
+     <width>50</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>List</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
