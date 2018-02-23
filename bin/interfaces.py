@@ -1164,7 +1164,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             itm.setText(2, frmt.format(float(rslt[3])))
             itm.setText(3, frmt.format(float(rslt[4])))
             itm.setText(4, frmt.format(float(rslt[5])))
-            if float(rslt[5]) > float(rslt[3]):
+            if np.absolute(float(rslt[5])) > np.absolute(float(rslt[3])):
                 #itm.setBackground(0, QtGui.QBrush(QtGui.QColor("green")))
                 #itm.setBackground(1, QtGui.QBrush(QtGui.QColor("green")))
                 #itm.setBackground(2, QtGui.QBrush(QtGui.QColor("green")))

@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Fri Feb 23 17:13:12 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -371,7 +372,7 @@ class Ui_MainWindow(object):
         self.label.setObjectName(_fromUtf8("label"))
         self.ipb_chk = QtGui.QCheckBox(self.tab_3)
         self.ipb_chk.setGeometry(QtCore.QRect(470, 175, 261, 21))
-        self.ipb_chk.setChecked(True)
+        self.ipb_chk.setChecked(False)
         self.ipb_chk.setTristate(False)
         self.ipb_chk.setObjectName(_fromUtf8("ipb_chk"))
         self.label_97 = QtGui.QLabel(self.tab_3)
@@ -494,7 +495,7 @@ class Ui_MainWindow(object):
         self.n1l_spinbox.setGeometry(QtCore.QRect(520, 100, 61, 20))
         self.n1l_spinbox.setMinimum(1)
         self.n1l_spinbox.setMaximum(100)
-        self.n1l_spinbox.setProperty("value", 15)
+        self.n1l_spinbox.setProperty("value", 30)
         self.n1l_spinbox.setObjectName(_fromUtf8("n1l_spinbox"))
         self.label_111 = QtGui.QLabel(self.tab_3)
         self.label_111.setGeometry(QtCore.QRect(600, 70, 51, 21))
@@ -509,7 +510,7 @@ class Ui_MainWindow(object):
         self.n2l_spinbox.setGeometry(QtCore.QRect(650, 100, 61, 20))
         self.n2l_spinbox.setMinimum(1)
         self.n2l_spinbox.setMaximum(100)
-        self.n2l_spinbox.setProperty("value", 15)
+        self.n2l_spinbox.setProperty("value", 30)
         self.n2l_spinbox.setObjectName(_fromUtf8("n2l_spinbox"))
         self.inputtabwidget.addTab(self.tab_3, _fromUtf8(""))
         self.tab_4 = QtGui.QWidget()
@@ -967,9 +968,9 @@ class Ui_MainWindow(object):
         self.label_101.setToolTip(_translate("MainWindow", "Used if LD1 is set to Logarithmic, this is the coefficient of cos γ ln(cos γ) term in the bolometric logarithmic limb darkening law, for star 1", None))
         self.label_101.setText(_translate("MainWindow", "YBOL1", None))
         self.label.setText(_translate("MainWindow", "Limb Darkening", None))
-        self.ipb_chk.setToolTip(_translate("MainWindow", "<html><head/><body><p>If unchecked, input L2 values will be used instead of calculating from radiation laws.</p></body></html>", None))
+        self.ipb_chk.setToolTip(_translate("MainWindow", "<html><head/><body><p>If checked, input L2 values will be used instead of calculating from radiation laws.</p></body></html>", None))
         self.ipb_chk.setStatusTip(_translate("MainWindow", "IPB", None))
-        self.ipb_chk.setText(_translate("MainWindow", "Calculate L2 from T1 and T2", None))
+        self.ipb_chk.setText(_translate("MainWindow", "Decouple L2 from T1 and T2", None))
         self.label_97.setToolTip(_translate("MainWindow", "The coefficient of cos γ in the bolometric limb darkening law, for star 2. Only used with detailed reflection (MREF = 1).", None))
         self.label_97.setText(_translate("MainWindow", "XBOL2", None))
         self.label_90.setToolTip(_translate("MainWindow", "The bolometric albedo for reflection heating and re-radiation on star 2", None))

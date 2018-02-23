@@ -569,9 +569,9 @@ class dcin(WDInput):
                 star1spotparams = MainWindow.SpotConfigureWidget.star1ElementList
                 for spot in star1spotparams:
                     star1spotline = star1spotline + \
-                                    self.formatInput(spot[3].text(), 9, 5, "F", isDeg=True) + \
-                                    self.formatInput(spot[4].text(), 9, 5, "F", isDeg=True) + \
-                                    self.formatInput(spot[5].text(), 9, 5, "F", isDeg=True) + \
+                                    self.formatInput(spot[3].text(), 9, 5, "F") + \
+                                    self.formatInput(spot[4].text(), 9, 5, "F") + \
+                                    self.formatInput(spot[5].text(), 9, 5, "F") + \
                                     self.formatInput(spot[6].text(), 9, 5, "F") + \
                                     self.formatInput(spot[7].text(), 14, 5, "F") + \
                                     self.formatInput(spot[8].text(), 14, 5, "F") + \
@@ -582,9 +582,9 @@ class dcin(WDInput):
                 star2spotparams = MainWindow.SpotConfigureWidget.star2ElementList
                 for spot in star2spotparams:
                     star2spotline = star2spotline + \
-                                    self.formatInput(spot[3].text(), 9, 5, "F", isDeg=True) + \
-                                    self.formatInput(spot[4].text(), 9, 5, "F", isDeg=True) + \
-                                    self.formatInput(spot[5].text(), 9, 5, "F", isDeg=True) + \
+                                    self.formatInput(spot[3].text(), 9, 5, "F") + \
+                                    self.formatInput(spot[4].text(), 9, 5, "F") + \
+                                    self.formatInput(spot[5].text(), 9, 5, "F") + \
                                     self.formatInput(spot[6].text(), 9, 5, "F") + \
                                     self.formatInput(spot[7].text(), 14, 5, "F") + \
                                     self.formatInput(spot[8].text(), 14, 5, "F") + \
