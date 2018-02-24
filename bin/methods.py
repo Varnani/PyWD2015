@@ -405,167 +405,6 @@ def radioButtonSameSpotCheck(radioButton, SpotConfigureWidget, starNumber):
             SpotConfigureWidget.radioButtonGroupB.setExclusive(True)
 
 
-def addLightCurve(LoadWidget):
-    # start adding row
-    LoadWidget.lcElementList.append([])  # get a new row
-    LoadWidget.lcCount += 1  # increment lc count since we are adding a row
-    shiftAmount = (LoadWidget.lcCount * 40)  # shifting this number of pixels downwards
-    resizeLoadWidget(LoadWidget)
-
-    # add new elements
-    # label
-    label = QtGui.QLabel(LoadWidget)  # load element
-    label.setGeometry(40, 140 + shiftAmount, 90, 21)  # set geometry
-    label.setText("Light Curve " + str(LoadWidget.lcCount))  # set text
-    label.setObjectName("lclabel" + str(LoadWidget.lcCount))  # set object name
-    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(label)  # store element in the element list
-    label.show()  # show the element
-
-    # file path
-    path = QtGui.QLineEdit(LoadWidget)  # load element
-    path.setGeometry(130, 140 + shiftAmount, 381, 20)  # set geometry
-    path.setText(LoadWidget.lcPropertiesList[-1].FilePath)  # set text
-    path.setObjectName("lcpath" + str(LoadWidget.lcCount))  # set object name
-    path.setReadOnly(True)  # set read only
-    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(path)  # store element in the element list
-    path.show()  # show the element
-
-    # edit button
-    row = LoadWidget.lcCount - 1  # current row index
-    edit = QtGui.QPushButton(LoadWidget)
-    edit.setGeometry(520, 140 + shiftAmount, 51, 21)
-    edit.setText("Edit")
-    edit.setObjectName("lcedit" + str(LoadWidget.lcCount))
-    edit.clicked.connect(partial(editLightCurve, LoadWidget, row))
-    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(edit)
-    edit.show()
-
-    # remove button
-    remove = QtGui.QPushButton(LoadWidget)
-    remove.setGeometry(580, 140 + shiftAmount, 61, 21)
-    remove.setText("Remove")
-    remove.setObjectName("lcload" + str(LoadWidget.lcCount))
-    remove.clicked.connect(partial(removeLightCurve, LoadWidget, row))
-    LoadWidget.lcElementList[LoadWidget.lcCount - 1].append(remove)
-    remove.show()
-
-
-def editLightCurve(LoadWidget, buttonRow):
-    curvedialog = LoadWidget.createCurveDialog("lc")
-    curvedialog.populateFromObject(LoadWidget.lcPropertiesList[buttonRow])
-    if curvedialog.hasError:
-        pass
-    else:
-        exitcode = curvedialog.exec_()
-        if exitcode == 1:  # if changes are accepted;
-            lcprop = classes.CurveProperties("lc")  # create object
-            lcprop.populateFromInterface(curvedialog)
-            LoadWidget.lcPropertiesList[buttonRow] = lcprop  # assign it to the list
-
-
-def removeLightCurve(LoadWidget, buttonRow):
-    LoadWidget.lcCount -= 1  # decrement lcCount since we are removing a row
-
-    # hide elements
-    LoadWidget.lcElementList[buttonRow][0].hide()
-    LoadWidget.lcElementList[buttonRow][1].hide()
-    LoadWidget.lcElementList[buttonRow][2].hide()
-    LoadWidget.lcElementList[buttonRow][3].hide()
-
-    # remove elements
-    LoadWidget.lcElementList[buttonRow][0].deleteLater()
-    LoadWidget.lcElementList[buttonRow][1].deleteLater()
-    LoadWidget.lcElementList[buttonRow][2].deleteLater()
-    LoadWidget.lcElementList[buttonRow][3].deleteLater()
-    LoadWidget.lcElementList.pop(buttonRow)
-
-    # discard lc properties
-    LoadWidget.lcPropertiesList.pop(buttonRow)
-
-    # move elements
-    row = 0
-    for elementList in LoadWidget.lcElementList:
-        for element in elementList:
-            element.move(element.x(), 180 + (40 * row))
-        row += 1
-
-    # rename labels
-    nlc = 1
-    for elementList in LoadWidget.lcElementList:
-        elementList[0].setText("Light Curve " + str(nlc))
-        nlc += 1
-
-    # reassing button.clicked and edit.clicked events with some black magic
-    i = 0
-    for elementList in LoadWidget.lcElementList:
-        elementList[3].clicked.disconnect()
-        elementList[2].clicked.disconnect()
-        elementList[3].clicked.connect(partial(removeLightCurve, LoadWidget, i))
-        elementList[2].clicked.connect(partial(editLightCurve, LoadWidget, i))
-        i += 1
-
-    # resize window
-    resizeLoadWidget(LoadWidget)
-
-
-def resizeLoadWidget(LoadWidget):
-    shiftAmount = LoadWidget.lcCount * 40
-    LoadWidget.nlc_label.setText("Light curve count: " + str(LoadWidget.lcCount))  # update nlc label
-
-    # resize the widget
-    LoadWidget.setMaximumHeight(shiftAmount + 215)
-    LoadWidget.setMinimumHeight(shiftAmount + 215)
-    LoadWidget.resize(650, shiftAmount + 215)
-
-    # move existing elements
-    LoadWidget.lcadd_btn.setGeometry(20, shiftAmount + 180, 115, 25)  # move 'add light curve' button
-    LoadWidget.nlc_label.setGeometry(500, shiftAmount + 180, 141, 21)  # move 'light curve number' label
-
-
-def editVelocityCurve(vcNumber, LoadWidget):
-    if LoadWidget.vcPropertiesList[vcNumber - 1] is not 0:
-        curvedialog = LoadWidget.createCurveDialog("vc")
-        curvedialog.populateFromObject(LoadWidget.vcPropertiesList[vcNumber - 1])
-        if curvedialog.hasError:
-            pass
-        else:
-            returncode = curvedialog.exec_()
-            if returncode == 1:
-                vcprop = classes.CurveProperties("vc")
-                vcprop.populateFromInterface(curvedialog)
-                vcprop.star = vcNumber
-                LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
-
-
-def removeVelocityCurve(vcNumber, LoadWidget):
-    LoadWidget.vcPropertiesList[vcNumber - 1] = 0
-    if vcNumber == 1:
-        LoadWidget.vc1load_btn.setText("Load")
-        LoadWidget.vc1load_btn.clicked.disconnect()
-        LoadWidget.vc1load_btn.clicked.connect(partial(LoadWidget.loadCurveDialog, "vc", vcNumber))
-        LoadWidget.vc1_fileline.setText("Load a file...")
-    if vcNumber == 2:
-        LoadWidget.vc2load_btn.setText("Load")
-        LoadWidget.vc2load_btn.clicked.disconnect()
-        LoadWidget.vc2load_btn.clicked.connect(partial(LoadWidget.loadCurveDialog, "vc", vcNumber))
-        LoadWidget.vc2_fileline.setText("Load a file...")
-
-
-def loadVelocityCurve(vcNumber, LoadWidget):
-    if vcNumber == 1:
-        LoadWidget.vcPropertiesList[vcNumber - 1].star = vcNumber
-        LoadWidget.vc1_fileline.setText(LoadWidget.vcPropertiesList[vcNumber - 1].FilePath)
-        LoadWidget.vc1load_btn.clicked.disconnect()
-        LoadWidget.vc1load_btn.clicked.connect(partial(removeVelocityCurve, 1, LoadWidget))
-        LoadWidget.vc1load_btn.setText("Remove")
-    if vcNumber == 2:
-        LoadWidget.vcPropertiesList[vcNumber - 1].star = vcNumber
-        LoadWidget.vc2_fileline.setText(LoadWidget.vcPropertiesList[vcNumber - 1].FilePath)
-        LoadWidget.vc2load_btn.clicked.disconnect()
-        LoadWidget.vc2load_btn.clicked.connect(partial(removeVelocityCurve, 2, LoadWidget))
-        LoadWidget.vc2load_btn.setText("Remove")
-
-
 def loadEclipseTimings(EclipseWidget):
     dialog = QtGui.QFileDialog(EclipseWidget)
     dialog.setAcceptMode(0)
@@ -610,8 +449,8 @@ def saveProject(MainWindow):
 
 
 def saveCurveParameters(MainWindow):
-    vcpropList = MainWindow.LoadWidget.vcPropertiesList
-    lcpropList = MainWindow.LoadWidget.lcPropertiesList
+    vcpropList = MainWindow.LoadObservationWidget.vcPropertiesList
+    lcpropList = MainWindow.LoadObservationWidget.lcPropertiesList
     propList = vcpropList + lcpropList
     parser = ConfigParser.SafeConfigParser()
     vcCount = 0
@@ -989,25 +828,19 @@ def loadCurveParameters(MainWindow, parser):
     lcCount = parser.getint("Curve Count", "light curves")
 
     i = 0
-    removeVelocityCurve(1, MainWindow.LoadWidget)
-    removeVelocityCurve(2, MainWindow.LoadWidget)
     while i < vcCount:
         section = "Velocity Curve " + str(i + 1)
         vcprop = classes.CurveProperties("vc")
         vcprop.populateFromParserSection(parser, section)
         vcNumber = vcprop.star
-        MainWindow.LoadWidget.vcPropertiesList[vcNumber - 1] = vcprop
-        loadVelocityCurve(vcNumber, MainWindow.LoadWidget)
+        MainWindow.LoadObservationWidget.vcPropertiesList[vcNumber - 1] = vcprop
         i = i + 1
-    while MainWindow.LoadWidget.lcCount > 0:
-        removeLightCurve(MainWindow.LoadWidget, 0)
     i = 0
     while i < lcCount:
         section = "Light Curve " + str(i + 1)
         lcprop = classes.CurveProperties("lc")
         lcprop.populateFromParserSection(parser, section)
-        MainWindow.LoadWidget.lcPropertiesList.append(lcprop)
-        addLightCurve(MainWindow.LoadWidget)
+        MainWindow.LoadObservationWidget.lcPropertiesList.append(lcprop)
         i = i + 1
 
 

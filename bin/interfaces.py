@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
-from gui import mainwindow, loadwidget, spotconfigurewidget, \
-    eclipsewidget, curvepropertiesdialog, dcwidget, lcdcpickerdialog, outputview
+from gui import mainwindow, spotconfigurewidget, \
+    eclipsewidget, curvepropertiesdialog, dcwidget, lcdcpickerdialog, outputview, loadobservationwidget
 from functools import partial
 from bin import methods, classes
 import numpy as np
@@ -14,7 +14,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         super(MainWindow, self).__init__()
         self.setupUi(self)  # setup ui from mainwindow.py
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
-        self.LoadWidget = LoadWidget()  # get loadwidget
+        self.LoadObservationWidget = LoadObservationWidget()  # get loadwidget
+        self.LoadObservationWidget.MainWindow = self
         self.SpotConfigureWidget = SpotConfigureWidget()  # get spotconfigurewidget
         self.EclipseWidget = EclipseWidget()
         self.DCWidget = DCWidget()
@@ -25,21 +26,23 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.lcpath = None
         self.lcinpath = None
         self.lcoutpath = None
+        self.lastProjectPath = None
         self.populateStyles()  # populate theme combobox
         self.connectSignals()  # connect events with method
 
     def connectSignals(self):
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
-        self.loadwidget_btn.clicked.connect(self.LoadWidget.show)  # opens loadwidget
+        self.loadwidget_btn.clicked.connect(self.LoadObservationWidget.show)  # opens loadwidget
         self.spotconfigure_btn.clicked.connect(self.SpotConfigureWidget.show)  # opens spotconfigurewidget
         self.dc_rundc_btn.clicked.connect(partial(self.DCWidget.show))
         self.theme_combobox.currentIndexChanged.connect(self.changeStyle)
         self.eclipsewidget_btn.clicked.connect(self.EclipseWidget.show)
-        self.saveproject_btn.clicked.connect(self.saveProjectDialog)
+        self.saveproject_btn.clicked.connect(self.overwriteProject)
         self.loadproject_btn.clicked.connect(self.loadProjectDialog)
+        self.saveas_btn.clicked.connect(self.saveProjectDialog)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
-        self.LoadWidget.close()  # close loadwidget if we exit
+        self.LoadObservationWidget.close()  # close loadwidget if we exit
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
         self.EclipseWidget.close()
         self.DCWidget.close()
@@ -83,6 +86,23 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
             else:
                 return 1
 
+    def overwriteProject(self):
+        if self.lastProjectPath is None:
+            self.saveas_btn.click()
+        else:
+            msg = QtGui.QMessageBox()
+            try:
+                project = methods.saveProject(self)
+                with open(self.lastProjectPath, "w") as f:
+                    f.write(project)
+                    fi = QtCore.QFileInfo(self.lastProjectPath)
+                    msg.setText("Project file \"" + fi.fileName() + "\" saved.")
+                    msg.setWindowTitle("PyWD - Project Saved")
+                    msg.exec_()
+            except:
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+
     def saveProjectDialog(self):
         dialog = QtGui.QFileDialog(self)
         dialog.setDefaultSuffix("pywdproject")
@@ -91,12 +111,17 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         returnCode = dialog.exec_()
         filePath = str((dialog.selectedFiles())[0])
         if filePath != "" and returnCode != 0:
+            msg = QtGui.QMessageBox()
+            fi = QtCore.QFileInfo(filePath)
             try:
                 project = methods.saveProject(self)
                 with open(filePath, "w") as f:
                     f.write(project)
+                self.lastProjectPath = filePath
+                msg.setText("Project file \"" + fi.fileName() + "\" saved.")
+                msg.setWindowTitle("PyWD - Project Saved")
+                msg.exec_()
             except:
-                msg = QtGui.QMessageBox()
                 msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
                 msg.exec_()
 
@@ -121,6 +146,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
                         parser.readfp(f)
                     methods.loadProject(self, parser)
                     self.clearWidgets()
+                    self.LoadObservationWidget.updateCurveWidget()
+                    self.lastProjectPath = filePath
                     msg.setText("Project file \"" + fi.fileName() + "\" loaded.")
                     msg.setWindowTitle("PyWD - Project Loaded")
                     msg.exec_()
@@ -187,59 +214,28 @@ class EclipseWidget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
         self.clear_btn.clicked.connect(partial(methods.removeEclipseTimings, self))
 
 
-class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget class
-    def __init__(self):  # constructor
-        super(LoadWidget, self).__init__()
-        self.setupUi(self)  # setup ui from loadwidget.py
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
-        # setup variables
-        self.lcCount = 0  # lc input count for widget restructure
-        self.lcElementList = []  # a list of lists to store dynamically created elements
-        # [[label], [filepath], [edit_button], [remove_button]]
-        self.lcPropertiesList = []  # a list to hold lc property objects
-        self.vcPropertiesList = [0, 0]  # a list to hold vc property objects
-        self.connectSignals()  # connect signals
+class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationWidget):
+    def __init__(self):
+        super(LoadObservationWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        # variables
+        self.vcPropertiesList = [0, 0]
+        self.lcPropertiesList = []
+        self.MainWindow = None
+        self.connectSignals()
 
     def connectSignals(self):
-        self.lcadd_btn.clicked.connect(partial(self.loadCurveDialog, "lc", -1))
-        self.vc1load_btn.clicked.connect(partial(self.loadCurveDialog, "vc", 1))
-        self.vc2load_btn.clicked.connect(partial(self.loadCurveDialog, "vc", 2))
-        self.vc1edit_btn.clicked.connect(partial(methods.editVelocityCurve, 1, self))
-        self.vc2edit_btn.clicked.connect(partial(methods.editVelocityCurve, 2, self))
+        self.add_btn.clicked.connect(self.openAddMenu)
+        self.edit_btn.clicked.connect(self.editCurve)
+        self.remove_btn.clicked.connect(self.removeCurve)
 
-    def getCurveProperties(self):
+    def Curves(self):
         curves = []
-        for element in (self.vcPropertiesList + self.lcPropertiesList):
-            if element != 0:
-                curves.append(element)
+        for curve in (self.vcPropertiesList + self.lcPropertiesList):
+            if curve is not 0:
+                curves.append(curve)
         return curves
-
-    def loadCurveDialog(self, type, vcNumber):
-        dialog = QtGui.QFileDialog(self)
-        dialog.setAcceptMode(0)
-        returnCode = dialog.exec_()
-        filePath = (dialog.selectedFiles())[0]
-        if filePath != "" and returnCode != 0:
-            try:
-                curvedialog = self.createCurveDialog(type)
-                curvedialog.populateFromFile(filePath)
-                if curvedialog.hasError:
-                    pass
-                else:
-                    result = curvedialog.exec_()
-                    if result == 1:
-                        curveprop = classes.CurveProperties(type)
-                        curveprop.populateFromInterface(curvedialog)
-                        if type == "lc":
-                            self.lcPropertiesList.append(curveprop)
-                            methods.addLightCurve(self)  # actually just adds a row to the ui
-                        if type == "vc":
-                            self.vcPropertiesList[vcNumber-1] = curveprop
-                            methods.loadVelocityCurve(vcNumber, self)
-            except:
-                msg = QtGui.QMessageBox()
-                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
-                msg.exec_()
 
     def createCurveDialog(self, type):
         curvedialog = CurvePropertiesDialog()
@@ -263,6 +259,121 @@ class LoadWidget(QtGui.QWidget, loadwidget.Ui_LoadWidget):  # file load widget c
             curvedialog.xunit_ipt.setDisabled(True)
             curvedialog.xunit_ipt.setText("N/A")
             return curvedialog
+
+    def loadCurveDialog(self, type, vcNumber):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setAcceptMode(0)
+        returnCode = dialog.exec_()
+        filePath = (dialog.selectedFiles())[0]
+        if filePath != "" and returnCode != 0:
+            try:
+                curvedialog = self.createCurveDialog(type)
+                curvedialog.populateFromFile(filePath)
+                if curvedialog.hasError:
+                    pass
+                else:
+                    result = curvedialog.exec_()
+                    if result == 1:
+                        curveprop = classes.CurveProperties(type)
+                        curveprop.populateFromInterface(curvedialog)
+                        if type == "lc":
+                            self.lcPropertiesList.append(curveprop)
+                        if type == "vc":
+                            curveprop.star = vcNumber
+                            self.vcPropertiesList[vcNumber-1] = curveprop
+                        self.updateCurveWidget()
+            except:
+                msg = QtGui.QMessageBox()
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+
+    def openAddMenu(self):
+        menu = QtGui.QMenu(self)
+        addvc = QtGui.QMenu("Velocity Curve")
+        menu.addMenu(addvc)
+        pri = addvc.addAction("Primary")
+        pri.setObjectName("primary")
+        sec = addvc.addAction("Secondary")
+        sec.setObjectName("secondary")
+        if self.vcPropertiesList[0] is not 0:
+            pri.setDisabled(True)
+        if self.vcPropertiesList[1] is not 0:
+            sec.setDisabled(True)
+        addlc = menu.addAction("Light Curve")
+        addlc.setObjectName("lightcurve")
+        selection = menu.exec_(QtGui.QCursor.pos())
+        if selection is not None:
+            if selection.objectName() == "primary":
+                self.loadCurveDialog("vc", 1)
+            if selection.objectName() == "secondary":
+                self.loadCurveDialog("vc", 2)
+            if selection.objectName() == "lightcurve":
+                self.loadCurveDialog("lc", -1)
+
+    def getSelectedLightCurveIndex(self, item):
+        invindex = self.curve_treewidget.invisibleRootItem().indexOfChild(item)
+        return invindex - (len(self.Curves()) - len(self.lcPropertiesList))
+
+    def editCurve(self):
+        selecteditem = self.curve_treewidget.selectedItems()
+        item = None
+        if len(selecteditem) > 0:
+            item = selecteditem[0]
+            curvedialog = CurvePropertiesDialog()
+            if item.text(1) == "Velocity Curve (#1)":
+                curvedialog.populateFromObject(self.vcPropertiesList[0])
+            if item.text(1) == "Velocity Curve (#2)":
+                curvedialog.populateFromObject(self.vcPropertiesList[1])
+            if item.text(1) == "Light Curve":
+                curvedialog.populateFromObject(self.lcPropertiesList[self.getSelectedLightCurveIndex(item)])
+            returnCode = curvedialog.exec_()
+            if returnCode == 1:
+                if item.text(1) == "Velocity Curve (#1)":
+                    curveprop = classes.CurveProperties("vc")
+                    curveprop.star = 1
+                    curveprop.populateFromInterface(curvedialog)
+                    self.vcPropertiesList[0] = curveprop
+                if item.text(1) == "Velocity Curve (#2)":
+                    curveprop = classes.CurveProperties("vc")
+                    curveprop.star = 2
+                    curveprop.populateFromInterface(curvedialog)
+                    self.vcPropertiesList[1] = curveprop
+                if item.text(1) == "Light Curve":
+                    curveprop = classes.CurveProperties("lc")
+                    curveprop.populateFromInterface(curvedialog)
+                    self.lcPropertiesList[self.getSelectedLightCurveIndex(item)] = curveprop
+                self.updateCurveWidget()
+
+    def removeCurve(self):
+        selecteditem = self.curve_treewidget.selectedItems()
+        item = None
+        if len(selecteditem) > 0:
+            item = selecteditem[0]
+            if item.text(1) == "Velocity Curve (#1)":
+                self.vcPropertiesList[0] = 0
+            if item.text(1) == "Velocity Curve (#2)":
+                self.vcPropertiesList[1] = 0
+            if item.text(1) == "Light Curve":
+                self.lcPropertiesList.pop(self.getSelectedLightCurveIndex(item))
+            self.updateCurveWidget()
+
+    def updateCurveWidget(self):
+        self.curve_treewidget.clear()
+        for curve in self.Curves():
+            item = QtGui.QTreeWidgetItem(self.curve_treewidget)
+            item.setText(0, os.path.basename(curve.FilePath))
+            item.setToolTip(0, curve.FilePath)
+            curvetype = ""
+            if curve.type == "lc":
+                curvetype = "Light Curve"
+            else:
+                if curve.type == "vc":
+                    if curve.star == 1:
+                        curvetype = "Velocity Curve (#1)"
+                    if curve.star == 2:
+                        curvetype = "Velocity Curve (#2)"
+            item.setText(1, curvetype)
+            item.setText(2, self.MainWindow.DCWidget.bandpassDict[curve.band])
 
 
 class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropertiesDialog):
@@ -1042,6 +1153,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.curvestat_treewidget.setDisabled(True)
         self.DcinView.fill(self.dcinpath)
         self.DcoutView.hide()
+        self.MainWindow.LoadObservationWidget.hide()
+        self.MainWindow.SpotConfigureWidget.hide()
+        self.MainWindow.EclipseWidget.hide()
+        self.MainWindow.setDisabled(True)
+        self.tabWidget_2.setDisabled(True)
 
     def enableUi(self):
         self.updateinputs_btn.setDisabled(False)
@@ -1053,6 +1169,10 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.rundc2015_btn.clicked.connect(self.runDc)
         self.result_treewidget.setDisabled(False)
         self.curvestat_treewidget.setDisabled(False)
+        self.MainWindow.setDisabled(False)
+        self.tabWidget_2.setDisabled(False)
+
+
 
     def updateInputFromOutput(self):
         paramdict = {
@@ -1116,15 +1236,15 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             if result[1] != "0":
                 curveindex = int(result[1]) - 1
                 if result[0] == "56":
-                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l1 = result[4]
+                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l1 = result[4]
                 if result[0] == "57":
-                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].l2 = result[4]
+                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l2 = result[4]
                 if result[0] == "58":
-                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x1 = result[4]
+                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x1 = result[4]
                 if result[0] == "59":
-                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].x2 = result[4]
+                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x2 = result[4]
                 if result[0] == "60":
-                    self.MainWindow.LoadWidget.lcPropertiesList[curveindex].el3a = result[4]
+                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].el3a = result[4]
             else:
                 if index in (spota + spotb):
                     star1spots = self.MainWindow.SpotConfigureWidget.star1ElementList
@@ -1173,7 +1293,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             return itm
         self.result_treewidget.clear()
         root = self.result_treewidget.invisibleRootItem()
-        curvelist = self.MainWindow.LoadWidget.lcPropertiesList
+        curvelist = self.MainWindow.LoadObservationWidget.lcPropertiesList
         for result in resultTable:
             if result[1] != "0":
                 name = str(result[1]) + ": " + self.bandpassDict[curvelist[int(result[1])-1].band]
@@ -1203,7 +1323,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.curvestat_treewidget.clear()
         frmt = "{:g}"  # TODO add this as a user setting
         curve = 0
-        curvelist = self.MainWindow.LoadWidget.getCurveProperties()
+        curvelist = self.MainWindow.LoadObservationWidget.Curves()
         for result in curveinfoTable:
             i = 0
             item = QtGui.QTreeWidgetItem(self.curvestat_treewidget)

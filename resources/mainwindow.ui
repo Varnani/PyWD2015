@@ -87,7 +87,7 @@
         <property name="geometry">
          <rect>
           <x>520</x>
-          <y>200</y>
+          <y>190</y>
           <width>210</width>
           <height>50</height>
          </rect>
@@ -108,7 +108,7 @@
         <property name="geometry">
          <rect>
           <x>520</x>
-          <y>50</y>
+          <y>60</y>
           <width>210</width>
           <height>50</height>
          </rect>
@@ -316,7 +316,7 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>125</y>
+          <y>190</y>
           <width>210</width>
           <height>50</height>
          </rect>
@@ -329,8 +329,8 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>200</y>
-          <width>210</width>
+          <y>130</y>
+          <width>101</width>
           <height>50</height>
          </rect>
         </property>
@@ -422,6 +422,19 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="saveas_btn">
+        <property name="geometry">
+         <rect>
+          <x>115</x>
+          <y>130</y>
+          <width>101</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save as...</string>
         </property>
        </widget>
       </widget>
@@ -1248,7 +1261,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Surface Parameters - Parameters that control atmosphere, darkening, grid sizes and reflection.</string>
+         <string>Surface Parameters - Parameters that control atmosphere, darkening, grid sizes and reflection</string>
         </property>
        </widget>
        <widget class="Line" name="line_9">
@@ -2332,7 +2345,7 @@
          <string>IF3B</string>
         </property>
         <property name="text">
-         <string>Enable third body parameters.</string>
+         <string>Enable third body parameters</string>
         </property>
        </widget>
        <widget class="Line" name="line_10">
@@ -2474,7 +2487,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>LC2015 - Configure standard LC program parameters and compute synthetic data points</string>
+       <string>LC2015 - Configure LC parameters and compute synthetic data points</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="tobs_ipt">

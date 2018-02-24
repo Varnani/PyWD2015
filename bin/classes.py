@@ -2,7 +2,6 @@ import itertools
 import subprocess
 import os
 import sys
-import numpy as np
 from PyQt4 import QtCore
 
 
@@ -372,15 +371,16 @@ class dcin(WDInput):
             line5 = spot1 + spot2 + "\n"
             ifvc1 = "0"
             ifvc2 = "0"
-            if MainWindow.LoadWidget.vcPropertiesList[0] != 0:
+            if MainWindow.LoadObservationWidget.vcPropertiesList[0] != 0:
                 ifvc1 = "1"
-            if MainWindow.LoadWidget.vcPropertiesList[1] != 0:
+            if MainWindow.LoadObservationWidget.vcPropertiesList[1] != 0:
                 ifvc2 = "1"
             isymDict = {
                 "Symmetrical": "1",
                 "Asymmetrical": "0"
             }
-            nlc = ((2 - len(str(MainWindow.LoadWidget.lcCount))) * "0") + str(MainWindow.LoadWidget.lcCount)
+            lcCount = len(MainWindow.LoadObservationWidget.lcPropertiesList)
+            nlc = ((2 - len(str(lcCount))) * "0") + str(lcCount)
             line6 = ifvc1 + " " + ifvc2 + " " + nlc \
                     + " " + self.evalCheckBox(MainWindow.EclipseWidget.iftime_chk) + " 2" + " 0" + " " + \
                     isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " " + \
@@ -504,9 +504,9 @@ class dcin(WDInput):
             vclines = ""
             vcList = []
             if ifvc1 == "1":
-                vcList.append(MainWindow.LoadWidget.vcPropertiesList[0])
+                vcList.append(MainWindow.LoadObservationWidget.vcPropertiesList[0])
             if ifvc2 == "1":
-                vcList.append(MainWindow.LoadWidget.vcPropertiesList[1])
+                vcList.append(MainWindow.LoadObservationWidget.vcPropertiesList[1])
             if len(vcList) != 0:
                 for vcprop in vcList:
                     iband = (" " * (3 - len(vcprop.band))) + vcprop.band
@@ -526,10 +526,10 @@ class dcin(WDInput):
 
             lclines = ""
             lcextralines = ""
-            if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
+            if len(MainWindow.LoadObservationWidget.lcPropertiesList) != 0:
                 lcparamsList = []
                 lcextraparamsList = []
-                for lcprop in MainWindow.LoadWidget.lcPropertiesList:
+                for lcprop in MainWindow.LoadObservationWidget.lcPropertiesList:
                     iband = (" " * (3 - len(lcprop.band))) + lcprop.band
                     lcparams = iband + self.formatInput(lcprop.l1, 13, 6, "F") + \
                                self.formatInput(lcprop.l2, 13, 6, "F") + \
@@ -589,7 +589,7 @@ class dcin(WDInput):
                                     self.formatInput(spot[10].text(), 14, 5, "F") + "\n"
             vc1dataline = ""
             if ifvc1 == "1":
-                vc1prop = Curve(MainWindow.LoadWidget.vcPropertiesList[0].FilePath)
+                vc1prop = Curve(MainWindow.LoadObservationWidget.vcPropertiesList[0].FilePath)
                 if vc1prop.hasError:
                     self.addError(vc1prop.error)
                 else:
@@ -603,7 +603,7 @@ class dcin(WDInput):
                 vc1dataline = vc1dataline + "  -10001.00000\n"
             vc2dataline = ""
             if ifvc2 == "1":
-                vc2prop = Curve(MainWindow.LoadWidget.vcPropertiesList[1].FilePath)
+                vc2prop = Curve(MainWindow.LoadObservationWidget.vcPropertiesList[1].FilePath)
                 if vc2prop.hasError:
                     self.addError(vc2prop.error)
                 else:
@@ -617,8 +617,8 @@ class dcin(WDInput):
                 vc2dataline = vc2dataline + "  -10001.00000\n"
 
             lcdataline = ""
-            if len(MainWindow.LoadWidget.lcPropertiesList) != 0:
-                for lcprop in MainWindow.LoadWidget.lcPropertiesList:
+            if len(MainWindow.LoadObservationWidget.lcPropertiesList) != 0:
+                for lcprop in MainWindow.LoadObservationWidget.lcPropertiesList:
                     curve = Curve(lcprop.FilePath)
                     if curve.hasError:
                         self.addError(curve.error)
