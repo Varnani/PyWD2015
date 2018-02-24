@@ -412,7 +412,8 @@ class dcin(WDInput):
             }
             ld1 = ld1_sign + ldDict[str(MainWindow.ld1_combobox.currentText())]
             ld2 = ld2_sign + ldDict[str(MainWindow.ld2_combobox.currentText())]
-            line7 = str(MainWindow.nref_spinbox.value()) + " " + self.evalCheckBox(MainWindow.mref_chk) + " " \
+            line7 = str(MainWindow.nref_spinbox.value()) + " " \
+                    + str(int(self.evalCheckBox(MainWindow.mref_chk)) + 1) + " " \
                     + self.evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv1_chk) + " " \
                     + self.evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv2_chk) + " " \
                     + self.evalCheckBox(MainWindow.icor1_chk) + " " + self.evalCheckBox(MainWindow.icor2_chk) + " " \
