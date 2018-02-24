@@ -419,7 +419,7 @@ class dcin(WDInput):
                     + self.evalCheckBox(MainWindow.if3b_chk) \
                     + " " + ld1 + " " + ld2 + " " \
                     + self.evalCheckBox(MainWindow.SpotConfigureWidget.kspev_chk) + " " \
-                    + self.evalCheckBox(MainWindow.SpotConfigureWidget.kspot_chk) + " " \
+                    + str(int(self.evalCheckBox(MainWindow.SpotConfigureWidget.kspot_chk)) + 1) + " " \
                     + nomaxDict[str(MainWindow.SpotConfigureWidget.nomax_combobox.currentText())] + " " \
                     + self.evalCheckBox(MainWindow.ifcgs_chk) + " " \
                     + magliteDict[str(MainWindow.maglite_combobox.currentText())] + " " \

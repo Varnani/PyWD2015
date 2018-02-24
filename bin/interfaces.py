@@ -1173,9 +1173,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.curvestat_treewidget.setDisabled(True)
         self.DcinView.fill(self.dcinpath)
         self.DcoutView.hide()
-        self.MainWindow.LoadObservationWidget.hide()
-        self.MainWindow.SpotConfigureWidget.hide()
-        self.MainWindow.EclipseWidget.hide()
+        self.MainWindow.LoadObservationWidget.setDisabled(True)
+        self.MainWindow.SpotConfigureWidget.setDisabled(True)
+        self.MainWindow.EclipseWidget.setDisabled(True)
         self.MainWindow.setDisabled(True)
         self.tabWidget_2.setDisabled(True)
 
@@ -1189,10 +1189,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.rundc2015_btn.clicked.connect(self.runDc)
         self.result_treewidget.setDisabled(False)
         self.curvestat_treewidget.setDisabled(False)
+        self.MainWindow.LoadObservationWidget.setDisabled(False)
+        self.MainWindow.SpotConfigureWidget.setDisabled(False)
+        self.MainWindow.EclipseWidget.setDisabled(False)
         self.MainWindow.setDisabled(False)
         self.tabWidget_2.setDisabled(False)
-
-
 
     def updateInputFromOutput(self):
         paramdict = {
@@ -1412,11 +1413,24 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 "Standard Deviations for Computation of Curve-dependent Weights")
             )
             self.enableUi()
-            self.continueIterating()
+            sanity = self.checkSanity()
+            if sanity is True:
+                self.continueIterating()
+            else:
+                niter = int(self.lastiteration)
+                self.lastiteration = 0
+                raise ValueError("Iteration #{0} resulted in NaN for one "
+                                 "or multiple solutions.".format(niter + 1))
         except IOError as ex:
             msg = QtGui.QMessageBox(self)
             msg.setWindowTitle("PyWD - IO Error")
             msg.setText("An IO error has been caught:\n" + ex.message + str(sys.exc_info()))
+            msg.exec_()
+            self.enableUi()
+        except ValueError as ex:
+            msg = QtGui.QMessageBox(self)
+            msg.setWindowTitle("PyWD - Value Error")
+            msg.setText("A value error has been caught:\n" + ex.message)
             msg.exec_()
             self.enableUi()
         except:
@@ -1426,6 +1440,15 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             msg.exec_()
             self.enableUi()
 
+    def checkSanity(self):
+        sanity = True
+        for result in self.lastBaseSet:
+            for cell in result:
+                if cell == "NaN" or cell == "nan":
+                    sanity = False
+                    break
+        return sanity
+
     def continueIterating(self):
         self.lastiteration = self.lastiteration + 1
         if self.lastiteration < int(self.iteration_spinbox.value()):
@@ -1433,15 +1456,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.runIteration()
         else:
             self.lastiteration = 0
-
-    def multipleIteration(self):
-        iteration = 0
-        target = int(self.iteration_spinbox.value())
-        while iteration < target:
-            self.rundc2015_btn.setText("Abort (Iteration {0} of {1})".format(iteration + 1, target))
-            self.singleIteration()
-            self.updateinputs_btn.click()
-            iteration = iteration + 1
 
 
 class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
