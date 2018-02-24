@@ -4,6 +4,7 @@ from gui import mainwindow, spotconfigurewidget, \
 from functools import partial
 from bin import methods, classes
 import numpy as np
+from matplotlib import pyplot
 import sys
 import ConfigParser
 import os
@@ -229,6 +230,7 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
         self.add_btn.clicked.connect(self.openAddMenu)
         self.edit_btn.clicked.connect(self.editCurve)
         self.remove_btn.clicked.connect(self.removeCurve)
+        self.plot_btn.clicked.connect(self.plotCurve)
 
     def Curves(self):
         curves = []
@@ -314,17 +316,25 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
         invindex = self.curve_treewidget.invisibleRootItem().indexOfChild(item)
         return invindex - (len(self.Curves()) - len(self.lcPropertiesList))
 
-    def editCurve(self):
+    def selectedItem(self):
         selecteditem = self.curve_treewidget.selectedItems()
-        item = None
         if len(selecteditem) > 0:
-            item = selecteditem[0]
-            curvedialog = CurvePropertiesDialog()
+            return selecteditem[0]
+        else:
+            return None
+
+    def editCurve(self):
+        item = self.selectedItem()
+        if item is not None:
+            curvedialog = None
             if item.text(1) == "Velocity Curve (#1)":
+                curvedialog = self.createCurveDialog("vc")
                 curvedialog.populateFromObject(self.vcPropertiesList[0])
             if item.text(1) == "Velocity Curve (#2)":
+                curvedialog = self.createCurveDialog("vc")
                 curvedialog.populateFromObject(self.vcPropertiesList[1])
             if item.text(1) == "Light Curve":
+                curvedialog = self.createCurveDialog("lc")
                 curvedialog.populateFromObject(self.lcPropertiesList[self.getSelectedLightCurveIndex(item)])
             returnCode = curvedialog.exec_()
             if returnCode == 1:
@@ -345,10 +355,8 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
                 self.updateCurveWidget()
 
     def removeCurve(self):
-        selecteditem = self.curve_treewidget.selectedItems()
-        item = None
-        if len(selecteditem) > 0:
-            item = selecteditem[0]
+        item = self.selectedItem()
+        if item is not None:
             if item.text(1) == "Velocity Curve (#1)":
                 self.vcPropertiesList[0] = 0
             if item.text(1) == "Velocity Curve (#2)":
@@ -356,6 +364,18 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
             if item.text(1) == "Light Curve":
                 self.lcPropertiesList.pop(self.getSelectedLightCurveIndex(item))
             self.updateCurveWidget()
+
+    def plotCurve(self):
+        item = self.selectedItem()
+        pyplot.cla()
+        if item is not None:
+            curve = classes.Curve(item.toolTip(0))
+            x = [float(x) for x in curve.timeList]
+            y = [float(y) for y in curve.observationList]
+            pyplot.scatter(x, y)
+            pyplot.title(item.text(0))
+            pyplot.get_current_fig_manager().set_window_title("Matplotlib - " + item.text(0))
+            pyplot.show()
 
     def updateCurveWidget(self):
         self.curve_treewidget.clear()

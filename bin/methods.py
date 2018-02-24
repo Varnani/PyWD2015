@@ -827,6 +827,9 @@ def loadCurveParameters(MainWindow, parser):
     vcCount = parser.getint("Curve Count", "velocity curves")
     lcCount = parser.getint("Curve Count", "light curves")
 
+    MainWindow.LoadObservationWidget.vcPropertiesList = [0, 0]
+    MainWindow.LoadObservationWidget.lcPropertiesList = []
+
     i = 0
     while i < vcCount:
         section = "Velocity Curve " + str(i + 1)
