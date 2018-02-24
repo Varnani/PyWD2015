@@ -105,14 +105,11 @@ class WDInput:
             output = "{:6.5f}".format(f_ipt)
             return output[1:]
 
-    def formatInput(self, ipt, width, precision, exponent, isDeg=False):
+    def formatInput(self, ipt, width, precision, exponent):
         ipt = str(ipt)
         if ipt == "":
             raise IndexError("Inputs can't be blank.")
         f_ipt = float(ipt)
-        if isDeg:
-            f_ipt = f_ipt * np.pi / 180.0  # convert to radians
-            ipt = str(f_ipt)
         output = ""
         if float(1) > f_ipt > float(-1):
             if f_ipt == float(0):
@@ -468,7 +465,7 @@ class dcin(WDInput):
                     self.evalCheckBox(MainWindow.ipb_chk) + \
                     ifatDict[str(MainWindow.ifat1_combobox.currentText())] + \
                     ifatDict[str(MainWindow.ifat2_combobox.currentText())] + n1 + n2 + n1l + n2l + \
-                    self.formatInput(MainWindow.perr0_ipt.text(), 13, 6, "F", isDeg=True) + \
+                    self.formatInput(MainWindow.perr0_ipt.text(), 13, 6, "F") + \
                     self.formatInput(MainWindow.dperdt_ipt.text(), 13, 5, "D") + \
                     self.formatInput(MainWindow.the_ipt.text(), 8, 5, "F") + \
                     self.formatInput(MainWindow.vunit_ipt.text(), 9, 3, "F") + "\n"
@@ -501,7 +498,7 @@ class dcin(WDInput):
                      self.formatInput(MainWindow.p3b_ipt.text(), 14, 7, "D") + \
                      self.formatInput(MainWindow.xinc3b_ipt.text(), 11, 5, "F") + \
                      self.formatInput(MainWindow.e3b_ipt.text(), 9, 6, "F") + \
-                     self.formatInput(MainWindow.perr3b_ipt.text(), 10, 7, "F", isDeg=True) + \
+                     self.formatInput(MainWindow.perr3b_ipt.text(), 10, 7, "F") + \
                      self.formatInput(MainWindow.tc3b_ipt.text(), 17, 8, "F") + "\n"
 
             vclines = ""

@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Fri Feb 23 17:13:12 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -530,7 +529,7 @@ class Ui_MainWindow(object):
         self.perr3b_ipt.setGeometry(QtCore.QRect(150, 110, 115, 25))
         self.perr3b_ipt.setObjectName(_fromUtf8("perr3b_ipt"))
         self.label_106 = QtGui.QLabel(self.tab_4)
-        self.label_106.setGeometry(QtCore.QRect(280, 90, 71, 21))
+        self.label_106.setGeometry(QtCore.QRect(280, 90, 111, 21))
         self.label_106.setStatusTip(_fromUtf8(""))
         self.label_106.setObjectName(_fromUtf8("label_106"))
         self.e3b_ipt = QtGui.QLineEdit(self.tab_4)
@@ -546,7 +545,7 @@ class Ui_MainWindow(object):
         self.p3b_ipt.setGeometry(QtCore.QRect(150, 60, 115, 25))
         self.p3b_ipt.setObjectName(_fromUtf8("p3b_ipt"))
         self.label_108 = QtGui.QLabel(self.tab_4)
-        self.label_108.setGeometry(QtCore.QRect(150, 90, 71, 21))
+        self.label_108.setGeometry(QtCore.QRect(150, 90, 111, 21))
         self.label_108.setStatusTip(_fromUtf8(""))
         self.label_108.setObjectName(_fromUtf8("label_108"))
         self.label_109 = QtGui.QLabel(self.tab_4)
@@ -865,7 +864,7 @@ class Ui_MainWindow(object):
         self.label_61.setText(_translate("MainWindow", "F2", None))
         self.pshift_ipt.setText(_translate("MainWindow", "0", None))
         self.vunit_ipt.setText(_translate("MainWindow", "100", None))
-        self.label_55.setToolTip(_translate("MainWindow", "Initial argument of periastron for star 1 in degrees, the argument of periastron for star 2 differs by 180 degrees", None))
+        self.label_55.setToolTip(_translate("MainWindow", "<html><head/><body><p>Initial argument of periastron for star 1 in radians, the argument of periastron for star 2 differs by pi radians</p></body></html>", None))
         self.label_55.setStatusTip(_translate("MainWindow", "PERR0", None))
         self.label_55.setText(_translate("MainWindow", "Omega (ω)", None))
         self.label_60.setToolTip(_translate("MainWindow", "Ratio of axial rotation rate vs. mean orbital rate for star 1", None))
@@ -1019,28 +1018,27 @@ class Ui_MainWindow(object):
         self.label_96.setText(_translate("MainWindow", "Coarse", None))
         self.inputtabwidget.setTabText(self.inputtabwidget.indexOf(self.tab_3), _translate("MainWindow", "Surface", None))
         self.label_104.setToolTip(_translate("MainWindow", "Period of the 3rd body orbit in mean solar days", None))
-        self.label_104.setText(_translate("MainWindow", "P3B", None))
+        self.label_104.setText(_translate("MainWindow", "Period (3B)", None))
         self.a3b_ipt.setToolTip(_translate("MainWindow", "Binary system inclination", None))
         self.a3b_ipt.setText(_translate("MainWindow", "0", None))
         self.label_105.setToolTip(_translate("MainWindow", "Inclination of the 3rd body orbit to the plane of the sky, in degrees", None))
-        self.label_105.setText(_translate("MainWindow", "XINC3B", None))
+        self.label_105.setText(_translate("MainWindow", "i (3B)", None))
         self.perr3b_ipt.setToolTip(_translate("MainWindow", "Binary system inclination", None))
         self.perr3b_ipt.setText(_translate("MainWindow", "0", None))
-        self.label_106.setToolTip(_translate("MainWindow", "Time of superior conjunction of the EB center of mass in its reflex motion about\n"
-"the triple system barycenter, in the adopted time system", None))
-        self.label_106.setText(_translate("MainWindow", "TC3B", None))
+        self.label_106.setToolTip(_translate("MainWindow", "Time of superior conjunction of the EB center of mass in its reflex motion about the triple system barycenter, in the adopted time system", None))
+        self.label_106.setText(_translate("MainWindow", "Conj. Time (3B)", None))
         self.e3b_ipt.setToolTip(_translate("MainWindow", "Binary system inclination", None))
         self.e3b_ipt.setText(_translate("MainWindow", "0", None))
         self.tc3b_ipt.setToolTip(_translate("MainWindow", "Binary system inclination", None))
         self.tc3b_ipt.setText(_translate("MainWindow", "0", None))
         self.label_107.setToolTip(_translate("MainWindow", "Semi-major axis of the relative 3rd body orbit in solar radii", None))
-        self.label_107.setText(_translate("MainWindow", "A3B", None))
+        self.label_107.setText(_translate("MainWindow", "a (3B)", None))
         self.p3b_ipt.setToolTip(_translate("MainWindow", "Binary system inclination", None))
         self.p3b_ipt.setText(_translate("MainWindow", "0", None))
         self.label_108.setToolTip(_translate("MainWindow", "Argument of periastron of the 3rd body orbit in radians", None))
-        self.label_108.setText(_translate("MainWindow", "PERR3B", None))
+        self.label_108.setText(_translate("MainWindow", "Omega (ω, 3B)", None))
         self.label_109.setToolTip(_translate("MainWindow", "Eccentricity of the 3rd body orbit", None))
-        self.label_109.setText(_translate("MainWindow", "E3B", None))
+        self.label_109.setText(_translate("MainWindow", "e (3B)", None))
         self.xinc3b_ipt.setToolTip(_translate("MainWindow", "Binary system inclination", None))
         self.xinc3b_ipt.setText(_translate("MainWindow", "0", None))
         self.if3b_chk.setToolTip(_translate("MainWindow", "Include light time effect from a 3rd body", None))

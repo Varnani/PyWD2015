@@ -69,7 +69,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>Spot latitude</string>
+    <string>Spot latitude in radians</string>
    </property>
    <property name="text">
     <string>LAT</string>
@@ -101,7 +101,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>Spot longitude</string>
+    <string>Spot longitude in radians</string>
    </property>
    <property name="text">
     <string>LON</string>
@@ -117,7 +117,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The angular radius of a star spot, in &lt;span style=&quot; font-weight:600;&quot;&gt;degrees&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>The angular radius of a star spot, in radians</string>
    </property>
    <property name="text">
     <string>RADSP</string>
@@ -272,7 +272,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>Spot longitude</string>
+    <string>Spot longitude radians</string>
    </property>
    <property name="text">
     <string>LON</string>
@@ -317,7 +317,8 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The angular radius of a star spot, in &lt;span style=&quot; font-weight:600;&quot;&gt;degrees&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>The angular radius of a star spot, in radians
+</string>
    </property>
    <property name="text">
     <string>RADSP</string>
@@ -349,7 +350,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>Spot latitude</string>
+    <string>Spot latitude in radians</string>
    </property>
    <property name="text">
     <string>LAT</string>

@@ -199,14 +199,16 @@ def addSpotRow(SpotConfigureWidget, starNumber):
     tmax1_input = QtGui.QLineEdit(SpotConfigureWidget)
     tmax2_input = QtGui.QLineEdit(SpotConfigureWidget)
     tend_input = QtGui.QLineEdit(SpotConfigureWidget)
-    lat_input.setGeometry(120 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-    lon_input.setGeometry(190 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-    radsp_input.setGeometry(260 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-    temsp_input.setGeometry(330 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-    tstart_input.setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-    tmax1_input.setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-    tmax2_input.setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-    tend_input.setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+    width = 60
+    height = 20
+    lat_input.setGeometry(120 + xshiftAmount, 100 + yshiftAmount, width, height)
+    lon_input.setGeometry(190 + xshiftAmount, 100 + yshiftAmount, width, height)
+    radsp_input.setGeometry(260 + xshiftAmount, 100 + yshiftAmount, width, height)
+    temsp_input.setGeometry(330 + xshiftAmount, 100 + yshiftAmount, width, height)
+    tstart_input.setGeometry(120 + xshiftAmount, 130 + yshiftAmount, width, height)
+    tmax1_input.setGeometry(190 + xshiftAmount, 130 + yshiftAmount, width, height)
+    tmax2_input.setGeometry(260 + xshiftAmount, 130 + yshiftAmount, width, height)
+    tend_input.setGeometry(330 + xshiftAmount, 130 + yshiftAmount, width, height)
     lat_input.setText("0")
     lon_input.setText("0")
     radsp_input.setText("0")
@@ -279,6 +281,8 @@ def removeSpotRow(SpotConfigureWidget, removeButton, starNumber):
     row = int(removeButton.row)
     xshiftAmount = 0
     yshiftAmount = 0
+    width = 60
+    height = 20
     if starNumber == 1:
         SpotConfigureWidget.star1RowCount -= 1
         for element in SpotConfigureWidget.star1ElementList[row]:
@@ -300,14 +304,14 @@ def removeSpotRow(SpotConfigureWidget, removeButton, starNumber):
             elementList[2].toggled.disconnect()
             elementList[2].toggled.connect(partial(
                 radioButtonSameSpotCheck, elementList[2], SpotConfigureWidget, starNumber))
-            elementList[3].setGeometry(120 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[4].setGeometry(190 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[5].setGeometry(260 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[6].setGeometry(330 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[7].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-            elementList[8].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-            elementList[9].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-            elementList[10].setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[3].setGeometry(120 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[4].setGeometry(190 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[5].setGeometry(260 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[6].setGeometry(330 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[7].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, width, height)
+            elementList[8].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, width, height)
+            elementList[9].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, width, height)
+            elementList[10].setGeometry(330 + xshiftAmount, 130 + yshiftAmount, width, height)
             elementList[11].setGeometry(390 + xshiftAmount, 100 + yshiftAmount, 60, 50)
             elementList[11].row = int(i)
             elementList[11].clicked.disconnect()
@@ -334,13 +338,13 @@ def removeSpotRow(SpotConfigureWidget, removeButton, starNumber):
             elementList[2].toggled.disconnect()
             elementList[2].toggled.connect(partial(
                 radioButtonSameSpotCheck, elementList[2], SpotConfigureWidget, starNumber))
-            elementList[3].setGeometry(120 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[4].setGeometry(190 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[5].setGeometry(260 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[6].setGeometry(330 + xshiftAmount, 100 + yshiftAmount, 50, 20)
-            elementList[7].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-            elementList[8].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, 50, 20)
-            elementList[9].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, 50, 20)
+            elementList[3].setGeometry(120 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[4].setGeometry(190 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[5].setGeometry(260 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[6].setGeometry(330 + xshiftAmount, 100 + yshiftAmount, width, height)
+            elementList[7].setGeometry(120 + xshiftAmount, 130 + yshiftAmount, width, height)
+            elementList[8].setGeometry(190 + xshiftAmount, 130 + yshiftAmount, width, height)
+            elementList[9].setGeometry(260 + xshiftAmount, 130 + yshiftAmount, width, height)
             elementList[10].setGeometry(330 + xshiftAmount, 130 + yshiftAmount, 50, 20)
             elementList[11].setGeometry(390 + xshiftAmount, 100 + yshiftAmount, 60, 50)
             elementList[11].row = i

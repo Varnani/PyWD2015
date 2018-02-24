@@ -545,7 +545,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Initial argument of periastron for star 1 in degrees, the argument of periastron for star 2 differs by 180 degrees</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Initial argument of periastron for star 1 in radians, the argument of periastron for star 2 differs by pi radians&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="statusTip">
          <string>PERR0</string>
@@ -2128,7 +2128,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>P3B</string>
+         <string>Period (3B)</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="a3b_ipt">
@@ -2163,7 +2163,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>XINC3B</string>
+         <string>i (3B)</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="perr3b_ipt">
@@ -2187,19 +2187,18 @@
          <rect>
           <x>280</x>
           <y>90</y>
-          <width>71</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Time of superior conjunction of the EB center of mass in its reflex motion about
-the triple system barycenter, in the adopted time system</string>
+         <string>Time of superior conjunction of the EB center of mass in its reflex motion about the triple system barycenter, in the adopted time system</string>
         </property>
         <property name="statusTip">
          <string/>
         </property>
         <property name="text">
-         <string>TC3B</string>
+         <string>Conj. Time (3B)</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="e3b_ipt">
@@ -2247,7 +2246,7 @@ the triple system barycenter, in the adopted time system</string>
          <string>Semi-major axis of the relative 3rd body orbit in solar radii</string>
         </property>
         <property name="text">
-         <string>A3B</string>
+         <string>a (3B)</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="p3b_ipt">
@@ -2271,7 +2270,7 @@ the triple system barycenter, in the adopted time system</string>
          <rect>
           <x>150</x>
           <y>90</y>
-          <width>71</width>
+          <width>111</width>
           <height>21</height>
          </rect>
         </property>
@@ -2282,7 +2281,7 @@ the triple system barycenter, in the adopted time system</string>
          <string/>
         </property>
         <property name="text">
-         <string>PERR3B</string>
+         <string>Omega (ω, 3B)</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_109">
@@ -2298,7 +2297,7 @@ the triple system barycenter, in the adopted time system</string>
          <string>Eccentricity of the 3rd body orbit</string>
         </property>
         <property name="text">
-         <string>E3B</string>
+         <string>e (3B)</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="xinc3b_ipt">
