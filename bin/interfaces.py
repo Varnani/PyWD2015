@@ -1248,11 +1248,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         # add conditions here
         spota = (1, 2, 3, 4, 43, 44, 45, 46)
         spotb = (5, 6, 7, 8, 47, 48, 49, 50)
-        degreeparams = (11, 34)
         valueparams = (17, 18, 21, 22)
 
         for result in self.lastBaseSet:
-            done = False
             index = int(result[0])
             if result[1] != "0":
                 curveindex = int(result[1]) - 1
@@ -1281,31 +1279,42 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     for spot in star2spots:
                         if spot[radioindex].isChecked():
                             spot[spotparamdict[index]].setText(result[4])
-                else:  # add rules here TODO move this to output formatting in result tree widget
-                    if index in degreeparams:  # output is in radians
-                        paramdict[index].setText(str(float(result[4]) * 180 / np.pi))
-                        done = True
-                    if index in valueparams:  # input is spinbox
-                        paramdict[index].setValue(float(result[4]))
-                        done = True
-                    if index in (19, 20):  # output temp is in k/10000 format
-                        paramdict[index].setText(str(float(result[4]) * 10000))
-                        done = True
-                    if index is 15:  # output is in v/vgam format
-                        paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vunit_ipt.text())))
-                        done = True
-                    if done is False:  # just slap output into input
-                        paramdict[index].setText(result[4])
+                else:
+                    if index in (19, 20):
+                        paramdict[index].setText(str(float(result[4]) * 10000.0))
+                    else:
+                        if index is 15:
+                            paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vunit_ipt.text())))
+                        else:
+                            if index in valueparams:  # input is spinbox
+                                paramdict[index].setValue(float(result[4]))
+                            else:  # just slap output into input
+                                paramdict[index].setText(result[4])
 
     def updateResultTree(self, resultTable):
         def _populateItem(itm, rslt):
             frmt = "{:11.8f}"  # TODO add this as a user setting
+            id = int(rslt[0])
+            input = rslt[2]
+            corr = rslt[3]
+            output = rslt[4]
+            stderr = rslt[5]
+            if id in (19, 20):  # T's are in K/10000 format
+                input = str(float(input) * 10000.0)
+                corr = str(float(corr) * 10000.0)
+                output = str(float(output) * 10000.0)
+                stderr = str(float(stderr) * 10000.0)
+            if id == 15:  # vgamma is in V/Vunit format
+                input = str(float(input) * float(self.MainWindow.vunit_ipt.text()))
+                corr = str(float(corr) * float(self.MainWindow.vunit_ipt.text()))
+                output = str(float(output) * float(self.MainWindow.vunit_ipt.text()))
+                stderr = str(float(stderr) * float(self.MainWindow.vunit_ipt.text()))
             itm.setText(0, self.parameterDict[rslt[0]])
-            itm.setText(1, frmt.format(float(rslt[2])))
-            itm.setText(2, frmt.format(float(rslt[3])))
-            itm.setText(3, frmt.format(float(rslt[4])))
-            itm.setText(4, frmt.format(float(rslt[5])))
-            if np.absolute(float(rslt[5])) > np.absolute(float(rslt[3])):
+            itm.setText(1, frmt.format(float(input)))
+            itm.setText(2, frmt.format(float(corr)))
+            itm.setText(3, frmt.format(float(output)))
+            itm.setText(4, frmt.format(float(stderr)))
+            if np.absolute(float(stderr)) > np.absolute(float(corr)):
                 #itm.setBackground(0, QtGui.QBrush(QtGui.QColor("green")))
                 #itm.setBackground(1, QtGui.QBrush(QtGui.QColor("green")))
                 #itm.setBackground(2, QtGui.QBrush(QtGui.QColor("green")))
