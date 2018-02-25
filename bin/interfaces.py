@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
-from gui import mainwindow, spotconfigurewidget, \
-    eclipsewidget, curvepropertiesdialog, dcwidget, lcdcpickerdialog, outputview, loadobservationwidget
+from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
+    dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget
 from functools import partial
 from bin import methods, classes
 import numpy as np
@@ -876,6 +876,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.dcinpath = None
         self.dcoutpath = None
         self.MainWindow = None  # mainwindow sets itself here
+        self.PlotResultsWidget = PlotResultsWidget()
         self.DcinView = OutputView()
         self.DcoutView = OutputView()
         self.iterator = None
@@ -1040,6 +1041,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
         self.viewlastdcin_btn.clicked.connect(self.showDcin)
         self.viewlaastdcout_btn.clicked.connect(self.showDcout)
+        self.plotdcresults_btn.clicked.connect(self.PlotResultsWidget.show)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -1049,6 +1051,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
         self.DcinView.close()
         self.DcoutView.close()
+        self.PlotResultsWidget.close()
 
     def showDcin(self):
         self.DcinView.setWindowTitle("PyWD - " + self.dcinpath)
@@ -1473,8 +1476,8 @@ class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
         self.setupUi(self)
         db = QtGui.QFontDatabase()
         db.addApplicationFont(os.path.join(os.getcwd(), "resources", "PTM55FT.ttf"))
-        inconsolata = QtGui.QFont(QtCore.QString("PT Mono"), pointSize=11)
-        self.output_textedit.setFont(inconsolata)
+        ptmono = QtGui.QFont(QtCore.QString("PT Mono"), pointSize=11)
+        self.output_textedit.setFont(ptmono)
 
     def fill(self, filepath):
         text = ""
@@ -1482,6 +1485,19 @@ class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
             for line in f:
                 text = text + line
         self.output_textedit.setPlainText(text)
+
+
+class PlotResultsWidget(QtGui.QWidget, plotresultswidget.Ui_PlotResultsWidget):
+    def __init__(self):
+        super(PlotResultsWidget, self).__init__()
+        self.setupUi(self)
+        self.connectSignals()
+
+    def connectSignals(self):
+        pass
+
+    def updateCurveComboBox(self):
+        pass
 
 
 if __name__ == "__main__":
