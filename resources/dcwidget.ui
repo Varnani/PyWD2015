@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>890</width>
-    <height>680</height>
+    <width>1675</width>
+    <height>691</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>890</width>
-    <height>680</height>
+    <width>1675</width>
+    <height>691</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>890</width>
-    <height>680</height>
+    <width>1675</width>
+    <height>691</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -28,11 +28,18 @@
   <widget class="QPushButton" name="rundc2015_btn">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>245</x>
      <y>20</y>
      <width>191</width>
-     <height>41</height>
+     <height>91</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
    </property>
    <property name="text">
     <string>Run DC</string>
@@ -41,7 +48,7 @@
   <widget class="QPushButton" name="updateinputs_btn">
    <property name="geometry">
     <rect>
-     <x>470</x>
+     <x>465</x>
      <y>20</y>
      <width>191</width>
      <height>41</height>
@@ -54,7 +61,7 @@
   <widget class="QPushButton" name="exportresults_btn">
    <property name="geometry">
     <rect>
-     <x>470</x>
+     <x>465</x>
      <y>70</y>
      <width>191</width>
      <height>41</height>
@@ -67,7 +74,7 @@
   <widget class="QPushButton" name="viewlaastdcout_btn">
    <property name="geometry">
     <rect>
-     <x>690</x>
+     <x>685</x>
      <y>70</y>
      <width>191</width>
      <height>41</height>
@@ -80,7 +87,7 @@
   <widget class="QPushButton" name="viewlastdcin_btn">
    <property name="geometry">
     <rect>
-     <x>690</x>
+     <x>685</x>
      <y>20</y>
      <width>191</width>
      <height>41</height>
@@ -93,9 +100,9 @@
   <widget class="Line" name="line_2">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>430</x>
      <y>20</y>
-     <width>51</width>
+     <width>41</width>
      <height>91</height>
     </rect>
    </property>
@@ -109,7 +116,7 @@
      <x>20</x>
      <y>20</y>
      <width>141</width>
-     <height>20</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -122,7 +129,7 @@
      <x>170</x>
      <y>20</y>
      <width>51</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="minimum">
@@ -140,19 +147,6 @@
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="plotdcresults_btn">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>70</y>
-     <width>191</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Plot DC Results</string>
    </property>
   </widget>
   <widget class="Line" name="line_4">
@@ -741,7 +735,7 @@
         <rect>
          <x>670</x>
          <y>100</y>
-         <width>70</width>
+         <width>81</width>
          <height>17</height>
         </rect>
        </property>
@@ -770,7 +764,7 @@
         <rect>
          <x>670</x>
          <y>80</y>
-         <width>61</width>
+         <width>71</width>
          <height>17</height>
         </rect>
        </property>
@@ -1837,6 +1831,9 @@
    </widget>
   </widget>
   <widget class="QCheckBox" name="ifoc_chk">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -1854,12 +1851,18 @@
    <property name="text">
     <string>Output O - C</string>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QCheckBox" name="ifder_chk">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>90</y>
+     <y>80</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -1876,6 +1879,12 @@
    <property name="text">
     <string>Output derivatives</string>
    </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QTabWidget" name="tabWidget_3">
    <property name="geometry">
@@ -1883,7 +1892,7 @@
      <x>10</x>
      <y>360</y>
      <width>871</width>
-     <height>311</height>
+     <height>321</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -1899,7 +1908,7 @@
        <x>5</x>
        <y>5</y>
        <width>857</width>
-       <height>271</height>
+       <height>281</height>
       </rect>
      </property>
      <property name="alternatingRowColors">
@@ -1954,7 +1963,7 @@
        <x>5</x>
        <y>5</y>
        <width>857</width>
-       <height>271</height>
+       <height>281</height>
       </rect>
      </property>
      <property name="selectionMode">
@@ -2011,6 +2020,166 @@
      </column>
     </widget>
    </widget>
+  </widget>
+  <widget class="QWidget" name="residualwidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>440</y>
+     <width>761</width>
+     <height>241</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="mainwidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>80</y>
+     <width>761</width>
+     <height>331</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="autoupdate_chk">
+   <property name="geometry">
+    <rect>
+     <x>1280</x>
+     <y>30</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Auto update</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>60</y>
+     <width>761</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="popmain_btn">
+   <property name="geometry">
+    <rect>
+     <x>1430</x>
+     <y>20</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pop Main</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line_5">
+   <property name="geometry">
+    <rect>
+     <x>970</x>
+     <y>410</y>
+     <width>691</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="Line" name="line_6">
+   <property name="geometry">
+    <rect>
+     <x>1390</x>
+     <y>20</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="plot_btn">
+   <property name="geometry">
+    <rect>
+     <x>1165</x>
+     <y>20</y>
+     <width>100</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Plot</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="data_combobox">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>25</y>
+     <width>251</width>
+     <height>30</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="popresiduals_btn">
+   <property name="geometry">
+    <rect>
+     <x>1550</x>
+     <y>20</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pop Residuals</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>410</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Residuals</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line_8">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>20</y>
+     <width>21</width>
+     <height>661</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+  </widget>
+  <widget class="Line" name="line_9">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>20</y>
+     <width>41</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
   </widget>
  </widget>
  <resources/>

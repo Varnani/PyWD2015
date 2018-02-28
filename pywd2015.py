@@ -6,7 +6,6 @@ from bin import interfaces
 
 # TODO add red emphasis on selected keeps and dels
 # TODO add tooltips, statustips and whatsthis on every parameter
-# TODO add file picker for missing files in loadProject()
 # TODO add program input control (mode, ifcgs, maglite/xcalib etc.)
 # TODO add dc subset support
 # TODO finish implementing saveProject()/loadProject()

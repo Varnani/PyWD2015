@@ -6,7 +6,7 @@ from PyQt4 import QtCore
 
 
 class CurveProperties:
-    def __init__(self, type):
+    def __init__(self, type, synthetic=False):
         self.type = type
         self.FilePath = ""
         self.band = ""
@@ -37,6 +37,54 @@ class CurveProperties:
             self.calib = ""
         if type == "vc":
             self.star = 0
+        if synthetic is True:
+            self.synthetic = True
+            self.zero = ""
+            self.factor = ""
+        else:
+            self.synthetic = False
+
+    def getSynthetic(self):
+        curve = CurveProperties(self.type)
+        curve.type = self.type
+        curve.FilePath = self.FilePath
+        curve.band = self.band
+        curve.ksd = self.ksd
+        curve.l1 = self.l1
+        curve.l2 = self.l2
+        curve.x1 = self.x1
+        curve.x2 = self.x2
+        curve.y1 = self.y1
+        curve.y2 = self.y2
+        curve.e1 = self.e1
+        curve.e2 = self.e2
+        curve.e3 = self.e3
+        curve.e4 = self.e4
+        curve.wla = self.wla
+        curve.opsf = self.opsf
+        curve.sigma = self.sigma
+        if curve.type == "lc":
+            curve.noiseDict = {
+                "None": "0",
+                "Square Root": "1",
+                "Linear": "2"
+            }
+            curve.noise = self.noise
+            curve.el3a = self.el3a
+            curve.aextinc = self.aextinc
+            curve.xunit = self.xunit
+            curve.calib = self.calib
+        if curve.type == "vc":
+            curve.star = self.star
+            curve.noise = "0"
+            curve.el3a = "0"
+            curve.aextinc = "0"
+            curve.xunit = "0"
+            curve.calib = "0"
+        curve.synthetic = True
+        curve.zero = "0"
+        curve.factor = "0"
+        return curve
 
     def populateFromInterface(self, CurvePropertiesDialog):
         self.FilePath = str(CurvePropertiesDialog.filepath_label.text())
@@ -94,7 +142,11 @@ class CurveProperties:
 
 class WDInput:
     def __init__(self):
-        pass
+        self.output = ""  # ready-to-write [lc/dc]in.active file
+        self.warning = ""  # stored warnings
+        self.error = ""  # caught error
+        self.hasWarning = False
+        self.hasError = False
 
     def formatEcc(self, ipt):
         f_ipt = float(ipt)
@@ -139,17 +191,6 @@ class WDInput:
         else:
             return "0"
 
-
-class dcin(WDInput):
-    def __init__(self, MainWindow):
-        WDInput.__init__(self)
-        self.output = ""  # ready-to-write dcin.active file
-        self.warning = ""  # stored warnings
-        self.error = ""  # caught error
-        self.hasWarning = False
-        self.hasError = False
-        self.fill(MainWindow)
-
     def addWarning(self, warning):
         self.warning = self.warning + "\n" + warning + "\n"
         self.hasWarning = True
@@ -158,7 +199,13 @@ class dcin(WDInput):
         self.error = self.error + "\n" + error + "\n"
         self.hasError = True
         self.output = ""
-    
+
+
+class dcin(WDInput):
+    def __init__(self, MainWindow):
+        WDInput.__init__(self)
+        self.fill(MainWindow)
+
     def formatDel(self, ipt):  # only used in dcin.active
         error = "This del can't be formatted into 7 character limitation of dcin.active file: " + ipt
         ipt = str(ipt)  # convert to string from QString
@@ -438,7 +485,7 @@ class dcin(WDInput):
                     self.formatInput(MainWindow.jd0_ipt.text(), 15, 6, "F") + \
                     self.formatInput(MainWindow.p0_ipt.text(), 17, 10, "D") + \
                     self.formatInput(MainWindow.dpdt_ipt.text(), 14, 6, "D") + \
-                    self.formatInput(MainWindow.pshift_ipt.text(), 10, 5, "F") + \
+                    self.formatInput(MainWindow.pshift_ipt.text(), 10, 4, "F") + \
                     self.formatInput(MainWindow.delph_ipt.text(), 8, 5, "F") + nga + "\n"
 
             modeDict = {
@@ -658,6 +705,203 @@ class dcin(WDInput):
                 self.addWarning("There aren't any light curves loaded.")
             if MainWindow.EclipseWidget.iftime_chk.isChecked() and ecdataline == "":
                 self.addWarning("IFTIME is checked, but eclipse timings are not provided.")
+
+        except ValueError as ex:
+            self.addError("Value Error - Can't cast input into a numeric value: \n" + ex.message)
+        except IndexError as ex:
+            self.addError("Wrong Input: \n" + ex.message)
+        except:
+            self.addError("Unknown exception has been caught. This is most likely a programming error: \n" +
+                          str(sys.exc_info()))
+
+
+class lcin(WDInput):
+    def __init__(self, MainWindow):
+        WDInput.__init__(self)
+        self.MainWindow = MainWindow
+
+    def syntheticLightCurve(self, curve, line3=None):
+        """
+        MPAGE = 1
+        running self.output with LC will result in a synthetic light curve
+        :param curve: a SyntheticCurveProperties object
+        :param line3: an optinal list with start and end points of data
+        it should be in this format:
+        [jdstart, jdstop, jdincrement, phasestart, phasestop, phaseincrement, phasenorm, phobs, lsp, tobs]
+        :return: this fills self.output with ready-to-write data.
+        """
+        self.initialFill(self.MainWindow, 1)
+        if line3 is not None:
+            limits = self.formatInput(line3[0], 14, 6, "F") + \
+                    self.formatInput(line3[1], 15, 6, "F") + \
+                    self.formatInput(line3[2], 13, 6, "F") + \
+                    self.formatInput(line3[3], 12, 6, "F") + \
+                    self.formatInput(line3[4], 12, 6, "F") + \
+                    self.formatInput(line3[5], 12, 6, "F") + \
+                    self.formatInput(line3[6], 12, 6, "F") + \
+                    self.formatInput(line3[7], 10, 4, "F") + \
+                    " " + str(line3[8]) + \
+                    self.formatInput(line3[9], 8, 4, "F")
+
+            output = self.output.splitlines()
+            output[2] = limits
+            self.output = ""
+            for line in output:
+                self.output = self.output + line + "\n"
+        iband = (" " * (3 - len(curve.band))) + curve.band
+        lcparams = iband + \
+                   self.formatInput(curve.l1, 13, 7, "D") + \
+                   self.formatInput(curve.l2, 13, 7, "D") + \
+                   self.formatInput(curve.x1, 7, 3, "F") + \
+                   self.formatInput(curve.x2, 7, 3, "F") + \
+                   self.formatInput(curve.y1, 7, 3, "F") + \
+                   self.formatInput(curve.y2, 7, 3, "F") + \
+                   self.formatInput(curve.el3a, 12, 4, "D") + \
+                   self.formatInput(curve.opsf, 11, 4, "D") + \
+                   self.formatInput(curve.zero, 8, 3, "F") + \
+                   self.formatInput(curve.factor, 8, 4, "F") + \
+                   self.formatInput(curve.wla, 10, 6, "F") + \
+                   self.formatInput(curve.aextinc, 8, 4, "F") + \
+                   self.formatInput(curve.calib, 12, 5, "D") + "\n"
+        self.output = self.output + lcparams + \
+            "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
+            "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
+            "150.\n"
+
+    def initialFill(self, MainWindow, mpage):
+        try:
+            ldDict = {
+                "Linear Cosine": "1",
+                "Logarithmic": "2",
+                "Square Root": "3"
+            }
+            ld1_sign = ""
+            ld2_sign = ""
+            if MainWindow.ld1_chk.isChecked():
+                ld1_sign = "+"
+            else:
+                ld1_sign = "-"
+
+            if MainWindow.ld2_chk.isChecked():
+                ld2_sign = "+"
+            else:
+                ld2_sign = "-"
+            nomaxDict = {
+                "Trapezoidal": "0",
+                "Triangular": "1"
+            }
+            ld1 = ld1_sign + ldDict[str(MainWindow.ld1_combobox.currentText())]
+            ld2 = ld2_sign + ldDict[str(MainWindow.ld2_combobox.currentText())]
+            # TODO add KTSTEP
+            ktstep = ""
+            if mpage == 6:
+                ktstep = "     0"
+            line1 = str(mpage) + " " + str(MainWindow.nref_spinbox.value()) + " " \
+                    + str(int(self.evalCheckBox(MainWindow.mref_chk)) + 1) + " " \
+                    + self.evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv1_chk) + " " \
+                    + self.evalCheckBox(MainWindow.SpotConfigureWidget.ifsmv2_chk) + " " \
+                    + self.evalCheckBox(MainWindow.icor1_chk) + " " + self.evalCheckBox(MainWindow.icor2_chk) + " " \
+                    + self.evalCheckBox(MainWindow.if3b_chk) \
+                    + " " + ld1 + " " + ld2 + " " \
+                    + self.evalCheckBox(MainWindow.SpotConfigureWidget.kspev_chk) + " " \
+                    + str(int(self.evalCheckBox(MainWindow.SpotConfigureWidget.kspot_chk)) + 1) + " " \
+                    + nomaxDict[str(MainWindow.SpotConfigureWidget.nomax_combobox.currentText())] + " " \
+                    + self.evalCheckBox(MainWindow.ifcgs_chk) + ktstep + "\n"
+
+            jdDict = {
+                "Time": "1",
+                "Phase": "2"
+            }
+            nga = " " * (3 - len(str(MainWindow.nga_spinbox.value()))) + str(MainWindow.nga_spinbox.value())
+            noiseDict = {
+                "None": "0",
+                "Square Root": "1",
+                "Linear": "2"
+            }
+            line2 = jdDict[str(MainWindow.jdphs_combobox.currentText())] + \
+                    self.formatInput(MainWindow.jd0_ipt.text(), 15, 6, "F") + \
+                    self.formatInput(MainWindow.p0_ipt.text(), 17, 10, "D") + \
+                    self.formatInput(MainWindow.dpdt_ipt.text(), 14, 6, "D") + \
+                    self.formatInput(MainWindow.pshift_ipt.text(), 10, 4, "F") + \
+                    self.formatInput(MainWindow.delph_ipt.text(), 8, 5, "F") + nga + \
+                    self.formatInput(MainWindow.stdev_ipt.text(), 11, 4, "D") + \
+                    " " + noiseDict[str(MainWindow.lcnoise_combobox.currentText())] + \
+                    self.formatInput(MainWindow.seed_spinbox.value(), 11, 0, "F") + "\n"
+
+            line3 = self.formatInput(MainWindow.jdstart_ipt.text(), 14, 6, "F") + \
+                    self.formatInput(MainWindow.jdstop_ipt.text(), 15, 6, "F") + \
+                    self.formatInput(MainWindow.jdincrement_ipt.text(), 13, 6, "F") + \
+                    self.formatInput(MainWindow.phasestart_ipt.text(), 12, 6, "F") + \
+                    self.formatInput(MainWindow.phasestop_ipt.text(), 12, 6, "F") + \
+                    self.formatInput(MainWindow.phaseincrement_ipt.text(), 12, 6, "F") + \
+                    self.formatInput(MainWindow.phasenorm_ipt.text(), 12, 6, "F") + \
+                    self.formatInput(MainWindow.phobs_ipt.text(), 10, 4, "F") + \
+                    " " + str(MainWindow.lsp_spinbox.value()) + \
+                    self.formatInput(MainWindow.tobs_ipt.text(), 8, 4, "F") + "\n"
+
+            modeDict = {
+                "Mode -1": "-1",
+                "Mode 0": " 0",
+                "Mode 1": " 1",
+                "Mode 2": " 2",
+                "Mode 3": " 3",
+                "Mode 4": " 4",
+                "Mode 5": " 5",
+                "Mode 6": " 6"
+            }
+
+            ifatDict = {
+                "Stellar Atmosphere": " 1",
+                "Blackbody": " 0"
+            }
+
+            n1 = " " * (4 - len(str(MainWindow.n1_spinbox.value()))) + str(MainWindow.n1_spinbox.value())
+            n2 = " " * (4 - len(str(MainWindow.n2_spinbox.value()))) + str(MainWindow.n2_spinbox.value())
+
+            line4 = modeDict[str(MainWindow.mode_combobox.currentText())] + " " + \
+                    self.evalCheckBox(MainWindow.ipb_chk) + \
+                    ifatDict[str(MainWindow.ifat1_combobox.currentText())] + \
+                    ifatDict[str(MainWindow.ifat2_combobox.currentText())] + n1 + n2 + \
+                    self.formatInput(MainWindow.perr0_ipt.text(), 13, 6, "F") + \
+                    self.formatInput(MainWindow.dperdt_ipt.text(), 14, 6, "D") + \
+                    self.formatInput(MainWindow.the_ipt.text(), 8, 5, "F") + \
+                    self.formatInput(MainWindow.vunit_ipt.text(), 8, 2, "F") + "\n"
+
+            vgam = float(MainWindow.vgam_ipt.text())
+            vunit = float(MainWindow.vunit_ipt.text())
+            line5 = self.formatEcc(MainWindow.e_ipt.text()) + \
+                    self.formatInput(MainWindow.a_ipt.text(), 13, 6, "D") + \
+                    self.formatInput(MainWindow.f1_ipt.text(), 10, 4, "F") + \
+                    self.formatInput(MainWindow.f2_ipt.text(), 10, 4, "F") + \
+                    self.formatInput((vgam / vunit), 10, 4, "F") + \
+                    self.formatInput(MainWindow.xincl_ipt.text(), 9, 3, "F") + \
+                    self.formatInput(MainWindow.gr1_spinbox.value(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.gr2_spinbox.value(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.abunin_ipt.text(), 7, 2, "F") + \
+                    self.formatInput(MainWindow.SpotConfigureWidget.fspot1_ipt.text(), 10, 4, "F") + \
+                    self.formatInput(MainWindow.SpotConfigureWidget.fspot2_ipt.text(), 10, 4, "F") + "\n"
+
+            line6 = self.formatInput(float(MainWindow.tavh_ipt.text()) / 10000.0, 7, 4, "F") + " " +\
+                    self.formatInput(float(MainWindow.tavc_ipt.text()) / 10000.0, 7, 4, "F") + \
+                    self.formatInput(MainWindow.alb1_spinbox.value(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.alb2_spinbox.value(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.phsv_ipt.text(), 13, 6, "D") + \
+                    self.formatInput(MainWindow.pcsv_ipt.text(), 13, 6, "D") + \
+                    self.formatInput(MainWindow.rm_ipt.text(), 13, 6, "D") + \
+                    self.formatInput(MainWindow.xbol1_ipt.text(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.xbol2_ipt.text(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.ybol1_ipt.text(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.ybol2_ipt.text(), 7, 3, "F") + \
+                    self.formatInput(MainWindow.dpclog_ipt.text(), 8, 5, "F") + "\n"
+
+            line7 = self.formatInput(MainWindow.a3b_ipt.text(), 12, 6, "D") + \
+                     self.formatInput(MainWindow.p3b_ipt.text(), 14, 7, "D") + \
+                     self.formatInput(MainWindow.xinc3b_ipt.text(), 11, 5, "F") + \
+                     self.formatInput(MainWindow.e3b_ipt.text(), 9, 6, "F") + \
+                     self.formatInput(MainWindow.perr3b_ipt.text(), 10, 7, "F") + \
+                     self.formatInput(MainWindow.tc3b_ipt.text(), 17, 8, "F") + "\n"
+
+            self.output = line1 + line2 + line3 + line4 + line5 + line6 + line7
 
         except ValueError as ex:
             self.addError("Value Error - Can't cast input into a numeric value: \n" + ex.message)

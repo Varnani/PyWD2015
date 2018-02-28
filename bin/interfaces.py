@@ -1,10 +1,13 @@
 from PyQt4 import QtGui, QtCore
+import numpy as np
+from matplotlib import pyplot
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget
 from functools import partial
 from bin import methods, classes
-import numpy as np
-from matplotlib import pyplot
 import sys
 import ConfigParser
 import os
@@ -41,12 +44,29 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.saveproject_btn.clicked.connect(self.overwriteProject)
         self.loadproject_btn.clicked.connect(self.loadProjectDialog)
         self.saveas_btn.clicked.connect(self.saveProjectDialog)
+        self.lc_lightcurve_btn.clicked.connect(self.testLcin)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()  # close loadwidget if we exit
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
         self.EclipseWidget.close()
         self.DCWidget.close()
+
+    def testLcin(self):
+        lcin = classes.lcin(self)
+        curveprop = self.LoadObservationWidget.lcPropertiesList[0].getSynthetic()
+        curve = classes.Curve(curveprop.FilePath)
+        lcin.syntheticLightCurve(curveprop,
+                                 line3=[50000, 51000, 0.01,
+                                        curve.timeList[0], curve.timeList[-1], 0.0001,
+                                        0.25, 0.25, 1, 0.5940])
+        if lcin.hasError:
+            msg = QtGui.QMessageBox()
+            msg.setText(lcin.error)
+            msg.exec_()
+        else:
+            with open("lcin.active", "w") as f:
+                f.write(lcin.output)
 
     def setPaths(self, lcpath, dcpath):
         self.lcpath = lcpath
@@ -58,6 +78,11 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
 
     def clearWidgets(self):
         # TODO add proper cleaning here (plots, trees, widgets which depend on current project)
+        self.DCWidget.data_combobox.clear()
+        self.DCWidget.main_axis.clear()
+        self.DCWidget.residual_axis.clear()
+        self.DCWidget.main_canvas.draw()
+        self.DCWidget.residual_canvas.draw()
         self.DCWidget.result_treewidget.clear()
         self.DCWidget.lastBaseSet = None
         self.DCWidget.lastSubSets = None
@@ -379,6 +404,7 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
 
     def updateCurveWidget(self):
         self.curve_treewidget.clear()
+        self.MainWindow.clearWidgets()
         for curve in self.Curves():
             item = QtGui.QTreeWidgetItem(self.curve_treewidget)
             item.setText(0, os.path.basename(curve.FilePath))
@@ -1032,6 +1058,24 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.lastBaseSet = None
         self.lastSubSets = None
         self.lastiteration = 0
+        # canvas for main
+        self.main_figure = Figure()
+        self.main_canvas = FigureCanvas(self.main_figure)
+        self.main_toolbar = NavigationToolbar(self.main_canvas, self.mainwidget)
+        main_layout = QtGui.QVBoxLayout()
+        main_layout.addWidget(self.main_toolbar)
+        main_layout.addWidget(self.main_canvas)
+        self.mainwidget.setLayout(main_layout)
+        self.main_axis = self.main_figure.add_subplot(111)
+        self.main_figure.tight_layout()
+        # canvas for residuals
+        self.residual_figure = Figure()
+        self.residual_canvas = FigureCanvas(self.residual_figure)
+        residual_layout = QtGui.QVBoxLayout()
+        residual_layout.addWidget(self.residual_canvas)
+        self.residualwidget.setLayout(residual_layout)
+        self.residual_axis = self.residual_figure.add_subplot(111, sharex=self.main_axis)
+        self.residual_figure.tight_layout()
         self.connectSignals()
 
     def connectSignals(self):
@@ -1041,7 +1085,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
         self.viewlastdcin_btn.clicked.connect(self.showDcin)
         self.viewlaastdcout_btn.clicked.connect(self.showDcout)
-        self.plotdcresults_btn.clicked.connect(self.PlotResultsWidget.show)
+        # self.plotdcresults_btn.clicked.connect(self.PlotResultsWidget.show)
+        self.plot_btn.clicked.connect(self.plotData)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -1052,6 +1097,61 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.DcinView.close()
         self.DcoutView.close()
         self.PlotResultsWidget.close()
+
+    def getXYfromFile(self, filepath):
+        curve = classes.Curve(filepath)
+        offset = 0.0
+        if str(self.MainWindow.jdphs_combobox.currentText()) == "Phase":
+            offset = float(curve.timeList[0])
+        x = [float(x) - offset for x in curve.timeList]
+        y = [float(y) for y in curve.observationList]
+        return x, y
+
+    def populatePlotCombobox(self):
+        lastindex = self.data_combobox.currentIndex()
+        self.data_combobox.clear()
+        for curve in self.MainWindow.LoadObservationWidget.Curves():
+            self.data_combobox.addItem(os.path.basename(curve.FilePath))
+        try:
+            self.data_combobox.setCurrentIndex(lastindex)
+        except:
+            self.data_combobox.setCurrentIndex(0)
+            self.autoupdate_chk.setChecked(False)
+
+    def plotData(self):
+        if str(self.data_combobox.currentText()) != "":
+            index = self.data_combobox.currentIndex()
+
+            curve = self.MainWindow.LoadObservationWidget.Curves()[index]
+            obs_x, obs_y = self.getXYfromFile(curve.FilePath)
+
+            self.main_axis.clear()
+            self.main_axis.scatter(obs_x, obs_y, s=5)
+            self.main_toolbar.update()
+            self.main_axis.autoscale()
+            self.main_canvas.draw()
+
+            ocTable = methods.getTableFromOutput(self.dcoutpath, "       Unweighted Observational Equations")
+            curvestatTable = methods.getTableFromOutput(self.dcoutpath,
+                "Standard Deviations for Computation of Curve-dependent Weights"
+            )
+            nobsStart = 0
+            i = int(index)
+            t = 0
+            while i != 0:
+                nobsStart = nobsStart + int(curvestatTable[t][1])
+                i = i - 1
+                t = t + 1
+            nobsEnd = nobsStart + int(curvestatTable[index][1])
+            ocTable = ocTable[nobsStart:nobsEnd]
+            resd_x = [float(x[0]) for x in ocTable]
+            resd_y = [float(y[-1]) for y in ocTable]
+
+            self.residual_axis.clear()
+            self.residual_axis.scatter(resd_x, resd_y, s=5)
+            self.residual_axis.autoscale()
+            self.residual_axis.axhline(c="r")
+            self.residual_canvas.draw()
 
     def showDcin(self):
         self.DcinView.setWindowTitle("PyWD - " + self.dcinpath)
@@ -1181,6 +1281,10 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.MainWindow.EclipseWidget.setDisabled(True)
         self.MainWindow.setDisabled(True)
         self.tabWidget_2.setDisabled(True)
+        self.plot_btn.setDisabled(True)
+        self.autoupdate_chk.setDisabled(True)
+        self.popmain_btn.setDisabled(True)
+        self.popresiduals_btn.setDisabled(True)
 
     def enableUi(self):
         self.updateinputs_btn.setDisabled(False)
@@ -1197,102 +1301,107 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.MainWindow.EclipseWidget.setDisabled(False)
         self.MainWindow.setDisabled(False)
         self.tabWidget_2.setDisabled(False)
+        self.plot_btn.setDisabled(False)
+        self.autoupdate_chk.setDisabled(False)
+        self.popmain_btn.setDisabled(False)
+        self.popresiduals_btn.setDisabled(False)
 
     def updateInputFromOutput(self):
-        paramdict = {
-            9: self.MainWindow.a_ipt,
-            10: self.MainWindow.e_ipt,
-            11: self.MainWindow.perr0_ipt,
-            12: self.MainWindow.f1_ipt,
-            13: self.MainWindow.f2_ipt,
-            14: self.MainWindow.pshift_ipt,
-            15: self.MainWindow.vgam_ipt,
-            16: self.MainWindow.xincl_ipt,
-            17: self.MainWindow.gr1_spinbox,
-            18: self.MainWindow.gr2_spinbox,
-            19: self.MainWindow.tavh_ipt,
-            20: self.MainWindow.tavc_ipt,
-            21: self.MainWindow.alb1_spinbox,
-            22: self.MainWindow.alb2_spinbox,
-            23: self.MainWindow.phsv_ipt,
-            24: self.MainWindow.pcsv_ipt,
-            25: self.MainWindow.rm_ipt,
-            26: self.MainWindow.jd0_ipt,
-            27: self.MainWindow.p0_ipt,
-            28: self.MainWindow.dpdt_ipt,
-            29: self.MainWindow.dperdt_ipt,
-            30: self.MainWindow.a3b_ipt,
-            31: self.MainWindow.p3b_ipt,
-            32: self.MainWindow.xinc3b_ipt,
-            33: self.MainWindow.e3b_ipt,
-            34: self.MainWindow.perr3b_ipt,
-            35: self.MainWindow.tc3b_ipt,
-            41: self.MainWindow.dpclog_ipt,
-            42: self.MainWindow.desextinc_ipt
-        }
-        spotparamdict = {
-            1: 3,
-            2: 4,
-            3: 5,
-            4: 6,
-            5: 3,
-            6: 4,
-            7: 5,
-            8: 6,
-            43: 7,
-            44: 8,
-            45: 9,
-            46: 10,
-            47: 7,
-            48: 8,
-            49: 9,
-            50: 10,
-        }
-        # add conditions here
-        spota = (1, 2, 3, 4, 43, 44, 45, 46)
-        spotb = (5, 6, 7, 8, 47, 48, 49, 50)
-        valueparams = (17, 18, 21, 22)
+        if self.lastBaseSet is not None:
+            paramdict = {
+                9: self.MainWindow.a_ipt,
+                10: self.MainWindow.e_ipt,
+                11: self.MainWindow.perr0_ipt,
+                12: self.MainWindow.f1_ipt,
+                13: self.MainWindow.f2_ipt,
+                14: self.MainWindow.pshift_ipt,
+                15: self.MainWindow.vgam_ipt,
+                16: self.MainWindow.xincl_ipt,
+                17: self.MainWindow.gr1_spinbox,
+                18: self.MainWindow.gr2_spinbox,
+                19: self.MainWindow.tavh_ipt,
+                20: self.MainWindow.tavc_ipt,
+                21: self.MainWindow.alb1_spinbox,
+                22: self.MainWindow.alb2_spinbox,
+                23: self.MainWindow.phsv_ipt,
+                24: self.MainWindow.pcsv_ipt,
+                25: self.MainWindow.rm_ipt,
+                26: self.MainWindow.jd0_ipt,
+                27: self.MainWindow.p0_ipt,
+                28: self.MainWindow.dpdt_ipt,
+                29: self.MainWindow.dperdt_ipt,
+                30: self.MainWindow.a3b_ipt,
+                31: self.MainWindow.p3b_ipt,
+                32: self.MainWindow.xinc3b_ipt,
+                33: self.MainWindow.e3b_ipt,
+                34: self.MainWindow.perr3b_ipt,
+                35: self.MainWindow.tc3b_ipt,
+                41: self.MainWindow.dpclog_ipt,
+                42: self.MainWindow.desextinc_ipt
+            }
+            spotparamdict = {
+                1: 3,
+                2: 4,
+                3: 5,
+                4: 6,
+                5: 3,
+                6: 4,
+                7: 5,
+                8: 6,
+                43: 7,
+                44: 8,
+                45: 9,
+                46: 10,
+                47: 7,
+                48: 8,
+                49: 9,
+                50: 10,
+            }
+            # add conditions here
+            spota = (1, 2, 3, 4, 43, 44, 45, 46)
+            spotb = (5, 6, 7, 8, 47, 48, 49, 50)
+            valueparams = (17, 18, 21, 22)
 
-        for result in self.lastBaseSet:
-            index = int(result[0])
-            if result[1] != "0":
-                curveindex = int(result[1]) - 1
-                if result[0] == "56":
-                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l1 = result[4]
-                if result[0] == "57":
-                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l2 = result[4]
-                if result[0] == "58":
-                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x1 = result[4]
-                if result[0] == "59":
-                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x2 = result[4]
-                if result[0] == "60":
-                    self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].el3a = result[4]
-            else:
-                if index in (spota + spotb):
-                    star1spots = self.MainWindow.SpotConfigureWidget.star1ElementList
-                    star2spots = self.MainWindow.SpotConfigureWidget.star2ElementList
-                    radioindex = ""
-                    if index in spota:
-                        radioindex = 1
-                    if index in spotb:
-                        radioindex = 2
-                    for spot in star1spots:
-                        if spot[radioindex].isChecked():
-                            spot[spotparamdict[index]].setText(result[4])
-                    for spot in star2spots:
-                        if spot[radioindex].isChecked():
-                            spot[spotparamdict[index]].setText(result[4])
+            for result in self.lastBaseSet:
+                index = int(result[0])
+                if result[1] != "0":
+                    curveindex = int(result[1]) - 1
+                    if result[0] == "56":
+                        self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l1 = result[4]
+                    if result[0] == "57":
+                        self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l2 = result[4]
+                    if result[0] == "58":
+                        self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x1 = result[4]
+                    if result[0] == "59":
+                        self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x2 = result[4]
+                    if result[0] == "60":
+                        self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].el3a = result[4]
                 else:
-                    if index in (19, 20):
-                        paramdict[index].setText(str(float(result[4]) * 10000.0))
+                    if index in (spota + spotb):
+                        star1spots = self.MainWindow.SpotConfigureWidget.star1ElementList
+                        star2spots = self.MainWindow.SpotConfigureWidget.star2ElementList
+                        radioindex = ""
+                        if index in spota:
+                            radioindex = 1
+                        if index in spotb:
+                            radioindex = 2
+                        for spot in star1spots:
+                            if spot[radioindex].isChecked():
+                                spot[spotparamdict[index]].setText(result[4])
+                        for spot in star2spots:
+                            if spot[radioindex].isChecked():
+                                spot[spotparamdict[index]].setText(result[4])
                     else:
-                        if index is 15:
-                            paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vunit_ipt.text())))
+                        if index in (19, 20):
+                            paramdict[index].setText(str(float(result[4]) * 10000.0))
                         else:
-                            if index in valueparams:  # input is spinbox
-                                paramdict[index].setValue(float(result[4]))
-                            else:  # just slap output into input
-                                paramdict[index].setText(result[4])
+                            if index is 15:
+                                paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vunit_ipt.text())))
+                            else:
+                                if index in valueparams:  # input is spinbox
+                                    paramdict[index].setValue(float(result[4]))
+                                else:  # just slap output into input
+                                    paramdict[index].setText(result[4])
 
     def updateResultTree(self, resultTable):
         def _populateItem(itm, rslt):
@@ -1427,6 +1536,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.enableUi()
             sanity = self.checkSanity()
             if sanity is True:
+                self.populatePlotCombobox()
+                if self.autoupdate_chk.isChecked():
+                    self.plot_btn.click()
                 self.continueIterating()
             else:
                 niter = int(self.lastiteration)

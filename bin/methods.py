@@ -908,11 +908,15 @@ def getTableFromOutput(path, target, offset=3):
     :return: a list of lists containing outputs
     for results:
      [
-       [id, curveid, input, corr, output, stderr, l1/(l1+l2), se]
+        [id, curveid, input, corr, output, stderr, l1/(l1+l2), se]
      ]
      for curvestat:
      [
-       [curveid, n.obs, std.dev, n.obs in pgs rng, std.dev in phs rng, ref.flux, ref.mag]
+        [curveid, n.obs, std.dev, n.obs in pgs rng, std.dev in phs rng, ref.flux, ref.mag]
+     ]
+     for o - c:
+     [
+        [phase, obs, calc, [], [], [], [], [], [], [], [o-c]]
      ]
     """
 

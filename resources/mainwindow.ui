@@ -2426,7 +2426,7 @@
        <string>Estimated spectral temperature</string>
       </property>
       <property name="statusTip">
-       <string>PHOBS</string>
+       <string>TOBS</string>
       </property>
       <property name="text">
        <string>Spectral Temp.</string>
@@ -2605,7 +2605,7 @@
        <string>Phase of spectral temperature estimation</string>
       </property>
       <property name="statusTip">
-       <string>TOBS</string>
+       <string>PHOBS</string>
       </property>
       <property name="text">
        <string>Spec. Temp. Phs.</string>
@@ -2643,7 +2643,7 @@
        <string>Phase Start</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="phaasenorm_ipt">
+     <widget class="QLineEdit" name="phasenorm_ipt">
       <property name="geometry">
        <rect>
         <x>300</x>
