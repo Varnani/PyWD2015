@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
 import numpy as np
-from matplotlib import pyplot
+from matplotlib import pyplot, gridspec
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -79,10 +79,14 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
     def clearWidgets(self):
         # TODO add proper cleaning here (plots, trees, widgets which depend on current project)
         self.DCWidget.data_combobox.clear()
-        self.DCWidget.main_axis.clear()
-        self.DCWidget.residual_axis.clear()
-        self.DCWidget.main_canvas.draw()
-        self.DCWidget.residual_canvas.draw()
+        self.DCWidget.plot_observationAxis.clear()
+        self.DCWidget.plot_residualAxis.clear()
+
+        yticks = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
+        yticks[-1].label1.set_visible(False)
+
+        self.DCWidget.plot_canvas.draw()
+
         self.DCWidget.result_treewidget.clear()
         self.DCWidget.lastBaseSet = None
         self.DCWidget.lastSubSets = None
@@ -1059,23 +1063,22 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.lastSubSets = None
         self.lastiteration = 0
         # canvas for main
-        self.main_figure = Figure()
-        self.main_canvas = FigureCanvas(self.main_figure)
-        self.main_toolbar = NavigationToolbar(self.main_canvas, self.mainwidget)
-        main_layout = QtGui.QVBoxLayout()
-        main_layout.addWidget(self.main_toolbar)
-        main_layout.addWidget(self.main_canvas)
-        self.mainwidget.setLayout(main_layout)
-        self.main_axis = self.main_figure.add_subplot(111)
-        self.main_figure.tight_layout()
-        # canvas for residuals
-        self.residual_figure = Figure()
-        self.residual_canvas = FigureCanvas(self.residual_figure)
-        residual_layout = QtGui.QVBoxLayout()
-        residual_layout.addWidget(self.residual_canvas)
-        self.residualwidget.setLayout(residual_layout)
-        self.residual_axis = self.residual_figure.add_subplot(111, sharex=self.main_axis)
-        self.residual_figure.tight_layout()
+        self.plot_figure = Figure()
+        self.plot_canvas = FigureCanvas(self.plot_figure)
+        self.plot_toolbar = NavigationToolbar(self.plot_canvas, self.plotwidget)
+        plot_layout = QtGui.QVBoxLayout()
+        plot_layout.addWidget(self.plot_toolbar)
+        plot_layout.addWidget(self.plot_canvas)
+        self.plotwidget.setLayout(plot_layout)
+        grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
+        self.plot_observationAxis = self.plot_figure.add_subplot(grid[0])
+        self.plot_residualAxis = self.plot_figure.add_subplot(grid[1], sharex=self.plot_observationAxis)
+        self.plot_observationAxis.get_xaxis().set_visible(False)
+        yticks = self.plot_residualAxis.yaxis.get_major_ticks()
+        yticks[-1].label1.set_visible(False)
+        self.plot_figure.tight_layout()
+        self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
+        # signal connection
         self.connectSignals()
 
     def connectSignals(self):
@@ -1122,19 +1125,21 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         if str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
 
-            curve = self.MainWindow.LoadObservationWidget.Curves()[index]
-            obs_x, obs_y = self.getXYfromFile(curve.FilePath)
-
-            self.main_axis.clear()
-            self.main_axis.scatter(obs_x, obs_y, s=5)
-            self.main_toolbar.update()
-            self.main_axis.autoscale()
-            self.main_canvas.draw()
-
             ocTable = methods.getTableFromOutput(self.dcoutpath, "       Unweighted Observational Equations")
             curvestatTable = methods.getTableFromOutput(self.dcoutpath,
                 "Standard Deviations for Computation of Curve-dependent Weights"
             )
+
+            if len(ocTable[0]) != len(ocTable[1]):
+                currentIndex = 0
+                tempList = []
+                step = 2
+                if len(ocTable[0]) != len(ocTable[2]):
+                    step = 3
+                while currentIndex < len(ocTable):
+                    tempList.append(ocTable[currentIndex] + ocTable[currentIndex + 1])
+                    currentIndex = currentIndex + step
+                ocTable = tempList
             nobsStart = 0
             i = int(index)
             t = 0
@@ -1144,14 +1149,30 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 t = t + 1
             nobsEnd = nobsStart + int(curvestatTable[index][1])
             ocTable = ocTable[nobsStart:nobsEnd]
-            resd_x = [float(x[0]) for x in ocTable]
-            resd_y = [float(y[-1]) for y in ocTable]
+            obsIndex = 1
+            xlabel = "Phase"
+            ylabel = self.MainWindow.maglite_combobox.currentText()
+            if ylabel == "Flux":
+                ylabel = "Norm. Flux"
+            if self.MainWindow.jdphs_combobox.currentText() == "Time":
+                obsIndex = 2
+                xlabel = "HJD"
+            x_axis = [float(x[0]) for x in ocTable]
+            obs = [float(x[obsIndex]) for x in ocTable]
+            resd = [float(x[-1]) for x in ocTable]
 
-            self.residual_axis.clear()
-            self.residual_axis.scatter(resd_x, resd_y, s=5)
-            self.residual_axis.autoscale()
-            self.residual_axis.axhline(c="r")
-            self.residual_canvas.draw()
+            self.plot_observationAxis.clear()
+            self.plot_residualAxis.clear()
+            self.plot_observationAxis.plot(x_axis, obs, linestyle="", marker="o", markersize=4, color="#4286f4")
+            self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color="#4286f4")
+            self.plot_residualAxis.axhline(c="r")
+            self.plot_toolbar.update()
+            yticks = self.plot_residualAxis.yaxis.get_major_ticks()
+            yticks[-1].label1.set_visible(False)
+            self.plot_residualAxis.set_xlabel(xlabel)
+            self.plot_residualAxis.set_ylabel("Residuals")
+            self.plot_observationAxis.set_ylabel(ylabel)
+            self.plot_canvas.draw()
 
     def showDcin(self):
         self.DcinView.setWindowTitle("PyWD - " + self.dcinpath)
@@ -1284,7 +1305,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.plot_btn.setDisabled(True)
         self.autoupdate_chk.setDisabled(True)
         self.popmain_btn.setDisabled(True)
-        self.popresiduals_btn.setDisabled(True)
 
     def enableUi(self):
         self.updateinputs_btn.setDisabled(False)
@@ -1304,7 +1324,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.plot_btn.setDisabled(False)
         self.autoupdate_chk.setDisabled(False)
         self.popmain_btn.setDisabled(False)
-        self.popresiduals_btn.setDisabled(False)
 
     def updateInputFromOutput(self):
         if self.lastBaseSet is not None:
@@ -1421,11 +1440,23 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 corr = str(float(corr) * float(self.MainWindow.vunit_ipt.text()))
                 output = str(float(output) * float(self.MainWindow.vunit_ipt.text()))
                 stderr = str(float(stderr) * float(self.MainWindow.vunit_ipt.text()))
+            input = str(frmt.format(float(input)).rstrip("0"))
+            if input[-1] == ".":
+                input = input + "0"
+            corr = str(frmt.format(float(corr)).rstrip("0"))
+            if corr[-1] == ".":
+                corr = corr + "0"
+            output = str(frmt.format(float(output)).rstrip("0"))
+            if output[-1] == ".":
+                output = output + "0"
+            stderr = str(frmt.format(float(stderr)).rstrip("0"))
+            if stderr[-1] == ".":
+                stderr = stderr + "0"
             itm.setText(0, self.parameterDict[rslt[0]])
-            itm.setText(1, frmt.format(float(input)))
-            itm.setText(2, frmt.format(float(corr)))
-            itm.setText(3, frmt.format(float(output)))
-            itm.setText(4, frmt.format(float(stderr)))
+            itm.setText(1, input)
+            itm.setText(2, corr)
+            itm.setText(3, output)
+            itm.setText(4, stderr)
             if np.absolute(float(stderr)) > np.absolute(float(corr)):
                 #itm.setBackground(0, QtGui.QBrush(QtGui.QColor("green")))
                 #itm.setBackground(1, QtGui.QBrush(QtGui.QColor("green")))

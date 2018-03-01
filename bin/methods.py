@@ -916,7 +916,9 @@ def getTableFromOutput(path, target, offset=3):
      ]
      for o - c:
      [
-        [phase, obs, calc, [], [], [], [], [], [], [], [o-c]]
+        [phase, obs, calc, ..., [o-c]]
+        or
+        [time, phase, obs, calc, ..., [o-c]]
      ]
     """
 
