@@ -1155,6 +1155,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             ylabel = self.MainWindow.maglite_combobox.currentText()
             if ylabel == "Flux":
                 ylabel = "Norm. Flux"
+            if self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].type == "vc":
+                if self.MainWindow.vunit_ipt.text() != "1":
+                    ylabel = "Velocity (V/{0}km/s)".format(str(self.MainWindow.vunit_ipt.text()))
+                else:
+                    ylabel = "Velocity"
             if self.MainWindow.jdphs_combobox.currentText() == "Time":  # wd outputs are in HJD
                 obsIndex = 2
                 xlabel = "HJD"
