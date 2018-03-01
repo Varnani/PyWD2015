@@ -1150,14 +1150,17 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             nobsEnd = nobsStart + int(curvestatTable[index][1])
             ocTable = ocTable[nobsStart:nobsEnd]
             obsIndex = 1
+            timeIndex = 0
             xlabel = "Phase"
             ylabel = self.MainWindow.maglite_combobox.currentText()
             if ylabel == "Flux":
                 ylabel = "Norm. Flux"
-            if self.MainWindow.jdphs_combobox.currentText() == "Time":
+            if self.MainWindow.jdphs_combobox.currentText() == "Time":  # wd outputs are in HJD
                 obsIndex = 2
                 xlabel = "HJD"
-            x_axis = [float(x[0]) for x in ocTable]
+            if self.time_combobox.currentText() == "Phase" and self.MainWindow.jdphs_combobox.currentText() == "Time":
+                timeIndex = 1
+            x_axis = [float(x[timeIndex]) for x in ocTable]
             obs = [float(x[obsIndex]) for x in ocTable]
             resd = [float(x[-1]) for x in ocTable]
 

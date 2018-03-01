@@ -2034,14 +2034,14 @@
   <widget class="QCheckBox" name="autoupdate_chk">
    <property name="geometry">
     <rect>
-     <x>1285</x>
+     <x>1370</x>
      <y>30</y>
      <width>111</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Auto update</string>
+    <string>Auto Update</string>
    </property>
   </widget>
   <widget class="Line" name="line">
@@ -2060,9 +2060,9 @@
   <widget class="QPushButton" name="popmain_btn">
    <property name="geometry">
     <rect>
-     <x>1450</x>
+     <x>1510</x>
      <y>20</y>
-     <width>191</width>
+     <width>150</width>
      <height>41</height>
     </rect>
    </property>
@@ -2073,9 +2073,9 @@
   <widget class="Line" name="line_6">
    <property name="geometry">
     <rect>
-     <x>1390</x>
+     <x>1480</x>
      <y>20</y>
-     <width>51</width>
+     <width>31</width>
      <height>41</height>
     </rect>
    </property>
@@ -2086,7 +2086,7 @@
   <widget class="QPushButton" name="plot_btn">
    <property name="geometry">
     <rect>
-     <x>1165</x>
+     <x>1255</x>
      <y>20</y>
      <width>100</width>
      <height>41</height>
@@ -2131,6 +2131,26 @@
    <property name="orientation">
     <enum>Qt::Vertical</enum>
    </property>
+  </widget>
+  <widget class="QComboBox" name="time_combobox">
+   <property name="geometry">
+    <rect>
+     <x>1160</x>
+     <y>25</y>
+     <width>81</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Phase</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HJD</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>
