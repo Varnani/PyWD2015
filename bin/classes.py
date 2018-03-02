@@ -720,7 +720,7 @@ class lcin(WDInput):
         WDInput.__init__(self)
         self.MainWindow = MainWindow
 
-    def syntheticLightCurve(self, curve, line3=None):
+    def syntheticCurve(self, curve, mpage, line3=None, jdphs=None):
         """
         MPAGE = 1
         running self.output with LC will result in a synthetic light curve
@@ -730,7 +730,7 @@ class lcin(WDInput):
         [jdstart, jdstop, jdincrement, phasestart, phasestop, phaseincrement, phasenorm, phobs, lsp, tobs]
         :return: this fills self.output with ready-to-write data.
         """
-        self.initialFill(self.MainWindow, 1)
+        self.initialFill(self.MainWindow, mpage, jdphs=jdphs)
         if line3 is not None:
             limits = self.formatInput(line3[0], 14, 6, "F") + \
                     self.formatInput(line3[1], 15, 6, "F") + \
@@ -766,9 +766,9 @@ class lcin(WDInput):
         self.output = self.output + lcparams + \
             "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
             "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
-            "150.\n"
+            "150.\n9"
 
-    def initialFill(self, MainWindow, mpage):
+    def initialFill(self, MainWindow, mpage, jdphs):
         try:
             ldDict = {
                 "Linear Cosine": "1",
@@ -818,7 +818,12 @@ class lcin(WDInput):
                 "Square Root": "1",
                 "Linear": "2"
             }
-            line2 = jdDict[str(MainWindow.jdphs_combobox.currentText())] + \
+            jd = None
+            if jdphs is not None:
+                jd = jdphs
+            else:
+                jd = jdDict[str(MainWindow.jdphs_combobox.currentText())]
+            line2 = jd + \
                     self.formatInput(MainWindow.jd0_ipt.text(), 15, 6, "F") + \
                     self.formatInput(MainWindow.p0_ipt.text(), 17, 10, "D") + \
                     self.formatInput(MainWindow.dpdt_ipt.text(), 14, 6, "D") + \

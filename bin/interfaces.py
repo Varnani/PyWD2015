@@ -8,6 +8,7 @@ from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesd
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget
 from functools import partial
 from bin import methods, classes
+import subprocess
 import sys
 import ConfigParser
 import os
@@ -44,29 +45,12 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.saveproject_btn.clicked.connect(self.overwriteProject)
         self.loadproject_btn.clicked.connect(self.loadProjectDialog)
         self.saveas_btn.clicked.connect(self.saveProjectDialog)
-        self.lc_lightcurve_btn.clicked.connect(self.testLcin)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()  # close loadwidget if we exit
         self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
         self.EclipseWidget.close()
         self.DCWidget.close()
-
-    def testLcin(self):
-        lcin = classes.lcin(self)
-        curveprop = self.LoadObservationWidget.lcPropertiesList[0].getSynthetic()
-        curve = classes.Curve(curveprop.FilePath)
-        lcin.syntheticLightCurve(curveprop,
-                                 line3=[50000, 51000, 0.01,
-                                        curve.timeList[0], curve.timeList[-1], 0.0001,
-                                        0.25, 0.25, 1, 0.5940])
-        if lcin.hasError:
-            msg = QtGui.QMessageBox()
-            msg.setText(lcin.error)
-            msg.exec_()
-        else:
-            with open("lcin.active", "w") as f:
-                f.write(lcin.output)
 
     def setPaths(self, lcpath, dcpath):
         self.lcpath = lcpath
@@ -1122,6 +1106,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.autoupdate_chk.setChecked(False)
 
     def plotData(self):
+        # TODO break this function into smaller chunks
         if str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
 
@@ -1129,17 +1114,25 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             curvestatTable = methods.getTableFromOutput(self.dcoutpath,
                 "Standard Deviations for Computation of Curve-dependent Weights"
             )
-
-            if len(ocTable[0]) != len(ocTable[1]):
+            columnLimit = 20
+            baseColumns = 4
+            if self.MainWindow.jdphs_combobox.currentText() == "Time":
+                columnLimit = 23
+                baseColumns = 5
+            currentColumns = len(methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")) + baseColumns
+            if currentColumns > columnLimit:
                 currentIndex = 0
                 tempList = []
                 step = 2
-                if len(ocTable[0]) != len(ocTable[2]):
+                if currentColumns > columnLimit * 2:
                     step = 3
+                if currentColumns > columnLimit * 3:
+                    step = 4
                 while currentIndex < len(ocTable):
                     tempList.append(ocTable[currentIndex] + ocTable[currentIndex + 1])
                     currentIndex = currentIndex + step
                 ocTable = tempList
+
             nobsStart = 0
             i = int(index)
             t = 0
@@ -1169,9 +1162,47 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             obs = [float(x[obsIndex]) for x in ocTable]
             resd = [float(x[-1]) for x in ocTable]
 
+            # get model
+            curveProp = self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].getSynthetic()
+            curveProp.zero = "8"
+            curveProp.factor = "1"
+            curve = classes.Curve(curveProp.FilePath)
+            line3 = []
+            if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
+                line3 = [min(curve.timeList), max(curve.timeList), float(self.MainWindow.p0_ipt.text()) / 100,
+                         0, 1, 0.0001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
+            else:
+                line3 = [self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                         0, 1, 0.0001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
+            model = classes.lcin(self.MainWindow)
+            mpage = 1
+            if curveProp.type == "vc":
+                mpage = 2
+            jdphs = "2"
+            if self.time_combobox.currentText() == "HJD" and self.MainWindow.jdphs_combobox.currentText() == "Time":
+                jdphs = "1"
+            model.syntheticCurve(curveProp, mpage, line3=line3, jdphs=jdphs)
+            with open(self.MainWindow.lcinpath, "w") as f:
+                f.write(model.output)
+            # exec model
+            process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+            process.wait()
+            # get data
+            lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
+            lc_y_index = 5
+            lc_x_index = 1
+            if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
+                lc_x_index = 0
+            if curveProp.type == "vc":
+                lc_y_index = 6 + self.data_combobox.currentIndex()
+
+            lc_x = [float(x[lc_x_index].replace("D", "E")) for x in lcoutTable]
+            lc_y = [float(y[lc_y_index].replace("D", "E")) for y in lcoutTable]
+
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
             self.plot_observationAxis.plot(x_axis, obs, linestyle="", marker="o", markersize=4, color="#4286f4")
+            self.plot_observationAxis.plot(lc_x, lc_y, color="red")
             self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color="#4286f4")
             self.plot_residualAxis.axhline(c="r")
             self.plot_toolbar.update()
