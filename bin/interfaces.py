@@ -1106,7 +1106,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.autoupdate_chk.setChecked(False)
 
     def plotData(self):
-        # TODO break this function into smaller chunks
+        # TODO this is becoming messy. clean up before doing anything else.
         if str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
 
@@ -1189,7 +1189,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             process.wait()
             # get data
             lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
-            lc_y_index = 5
+            lc_y_index = 4
             lc_x_index = 1
             if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
                 lc_x_index = 0
