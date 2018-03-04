@@ -1290,6 +1290,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             else:
                 obs.plot(self.model_x, self.model_y, linestyle="", marker="o", markersize=4, color="red")
             title = "Matplotlib - " + os.path.basename(str(self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].FilePath))
+            resd.axhline(c="r")
             pyplot.get_current_fig_manager().set_window_title(title)
             pyplot.show()
 
