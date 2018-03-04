@@ -5,7 +5,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
-    dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget
+    dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget, syntheticcurvewidget
 from functools import partial
 from bin import methods, classes
 import subprocess
@@ -27,6 +27,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.MainWindow = self
         self.LCDCPickerWidget = LCDCPickerWidget()
         self.LCDCPickerWidget.MainWindow = self
+        self.SyntheticCurveWidget = SyntheticCurveWidget()
+        self.SyntheticCurveWidget.MainWindow = self
         # variables
         self.lcpath = None
         self.lcinpath = None
@@ -46,12 +48,14 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.loadproject_btn.clicked.connect(self.loadProjectDialog)
         self.saveas_btn.clicked.connect(self.saveProjectDialog)
         self.fill_btn.clicked.connect(self.fillLcHJDMenu)
+        self.lc_lightcurve_btn.clicked.connect(self.SyntheticCurveWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
-        self.LoadObservationWidget.close()  # close loadwidget if we exit
-        self.SpotConfigureWidget.close()  # close spotconfigurewidget if we exit
+        self.LoadObservationWidget.close()
+        self.SpotConfigureWidget.close()
         self.EclipseWidget.close()
         self.DCWidget.close()
+        self.SyntheticCurveWidget.close()
 
     def setPaths(self, lcpath, dcpath):
         self.lcpath = lcpath
@@ -67,6 +71,9 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.plot_observationAxis.clear()
         self.DCWidget.plot_residualAxis.clear()
 
+        self.SyntheticCurveWidget.plot_observationAxis.clear()
+        self.SyntheticCurveWidget.plot_residualAxis.clear()
+
         self.DCWidget.obs_x = []
         self.DCWidget.obs_y = []
         self.DCWidget.model_x = []
@@ -77,7 +84,11 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         yticks = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
         yticks[-1].label1.set_visible(False)
 
+        yticks_synthetic = self.SyntheticCurveWidget.plot_residualAxis.yaxis.get_major_ticks()
+        yticks_synthetic[-1].label1.set_visible(False)
+
         self.DCWidget.plot_canvas.draw()
+        self.SyntheticCurveWidget.plot_canvas.draw()
 
         pyplot.cla()
 
@@ -283,29 +294,6 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
                 curves.append(curve)
         return curves
 
-    def createCurveDialog(self, type):
-        curvedialog = CurvePropertiesDialog()
-        curvedialog.type = type
-        if type == "lc":
-            curvedialog.label_53.setText("Load or edit a light curve")
-            curvedialog.type = "lc"
-            return curvedialog
-        if type == "vc":
-            curvedialog.label_53.setText("Load or edit a velocity curve")
-            curvedialog.type = "vc"
-            curvedialog.noise_combobox.setDisabled(True)
-            curvedialog.noise_combobox.addItem("N/A")
-            curvedialog.noise_combobox.setCurrentIndex(3)
-            curvedialog.el3a_ipt.setDisabled(True)
-            curvedialog.el3a_ipt.setText("N/A")
-            curvedialog.aextinc_ipt.setDisabled(True)
-            curvedialog.aextinc_ipt.setText("N/A")
-            curvedialog.calib_ipt.setDisabled(True)
-            curvedialog.calib_ipt.setText("N/A")
-            curvedialog.xunit_ipt.setDisabled(True)
-            curvedialog.xunit_ipt.setText("N/A")
-            return curvedialog
-
     def loadCurveDialog(self, type, vcNumber):
         dialog = QtGui.QFileDialog(self)
         dialog.setAcceptMode(0)
@@ -313,7 +301,7 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
         filePath = (dialog.selectedFiles())[0]
         if filePath != "" and returnCode != 0:
             try:
-                curvedialog = self.createCurveDialog(type)
+                curvedialog = CurvePropertiesDialog.createCurveDialog(type)
                 curvedialog.populateFromFile(filePath)
                 if curvedialog.hasError:
                     pass
@@ -372,13 +360,13 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
         if item is not None:
             curvedialog = None
             if item.text(1) == "Velocity Curve (#1)":
-                curvedialog = self.createCurveDialog("vc")
+                curvedialog = CurvePropertiesDialog.createCurveDialog("vc")
                 curvedialog.populateFromObject(self.vcPropertiesList[0])
             if item.text(1) == "Velocity Curve (#2)":
-                curvedialog = self.createCurveDialog("vc")
+                curvedialog = CurvePropertiesDialog.createCurveDialog("vc")
                 curvedialog.populateFromObject(self.vcPropertiesList[1])
             if item.text(1) == "Light Curve":
-                curvedialog = self.createCurveDialog("lc")
+                curvedialog = CurvePropertiesDialog.createCurveDialog("lc")
                 curvedialog.populateFromObject(self.lcPropertiesList[self.getSelectedLightCurveIndex(item)])
             returnCode = curvedialog.exec_()
             if returnCode == 1:
@@ -423,6 +411,7 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
 
     def updateCurveWidget(self):
         self.curve_treewidget.clear()
+        self.MainWindow.SyntheticCurveWidget.loaded_treewidget.clear()
         self.MainWindow.clearWidgets()
         for curve in self.Curves():
             item = QtGui.QTreeWidgetItem(self.curve_treewidget)
@@ -439,6 +428,12 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
                         curvetype = "Velocity Curve (#2)"
             item.setText(1, curvetype)
             item.setText(2, self.MainWindow.DCWidget.bandpassDict[curve.band])
+            # update synthetic tree widget
+            item2 = QtGui.QTreeWidgetItem(self.MainWindow.SyntheticCurveWidget.loaded_treewidget)
+            item2.setText(0, os.path.basename(curve.FilePath))
+            item2.setToolTip(0, curve.FilePath)
+            item2.setText(1, curvetype)
+            item2.setText(2, self.MainWindow.DCWidget.bandpassDict[curve.band])
 
 
 class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropertiesDialog):
@@ -447,6 +442,7 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
         self.type = ""
+        self.synthetic = False
         self.hasError = False
         self.bandpassdict = {
             "Stromgren u": "1",
@@ -813,40 +809,111 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
                 a = QtGui.QTreeWidgetItem(self.datawidget, x)
 
     def populateFromObject(self, CurveProperties):
-        curve = classes.Curve(CurveProperties.FilePath)
-        if curve.hasError:
-            self.hasError = True
-            msg = QtGui.QMessageBox()
-            msg.setText(curve.error)
-            msg.setWindowTitle("PyWD - Error")
-            msg.exec_()
-        else:
-            self.filepath_label.setText(CurveProperties.FilePath)
-            self.filepath_label.setToolTip(CurveProperties.FilePath)
-            self.band_box.setValue(int(CurveProperties.band))
-            self.ksd_box.setValue(int(CurveProperties.ksd))
-            self.l1_ipt.setText(CurveProperties.l1)
-            self.l2_ipt.setText(CurveProperties.l2)
-            self.x1_ipt.setText(CurveProperties.x1)
-            self.x2_ipt.setText(CurveProperties.x2)
-            self.y1_ipt.setText(CurveProperties.y1)
-            self.y2_ipt.setText(CurveProperties.y2)
-            self.e1_ipt.setText(CurveProperties.e1)
-            self.e2_ipt.setText(CurveProperties.e2)
-            self.e3_ipt.setText(CurveProperties.e3)
-            self.e4_ipt.setText(CurveProperties.e4)
-            self.wla_ipt.setText(CurveProperties.wla)
-            self.opsf_ipt.setText(CurveProperties.opsf)
-            self.sigma_ipt.setText(CurveProperties.sigma)
-            self.datawidget.clear()
+        self.filepath_label.setText(CurveProperties.FilePath)
+        self.filepath_label.setToolTip(CurveProperties.FilePath)
+        self.band_box.setValue(int(CurveProperties.band))
+        self.ksd_box.setValue(int(CurveProperties.ksd))
+        self.l1_ipt.setText(CurveProperties.l1)
+        self.l2_ipt.setText(CurveProperties.l2)
+        self.x1_ipt.setText(CurveProperties.x1)
+        self.x2_ipt.setText(CurveProperties.x2)
+        self.y1_ipt.setText(CurveProperties.y1)
+        self.y2_ipt.setText(CurveProperties.y2)
+        self.e1_ipt.setText(CurveProperties.e1)
+        self.e2_ipt.setText(CurveProperties.e2)
+        self.e3_ipt.setText(CurveProperties.e3)
+        self.e4_ipt.setText(CurveProperties.e4)
+        self.wla_ipt.setText(CurveProperties.wla)
+        self.opsf_ipt.setText(CurveProperties.opsf)
+        self.sigma_ipt.setText(CurveProperties.sigma)
+        self.datawidget.clear()
+        if CurveProperties.synthetic is not True:
+            curve = classes.Curve(CurveProperties.FilePath)
+            if curve.hasError:
+                self.hasError = True
+                msg = QtGui.QMessageBox()
+                msg.setText(curve.error)
+                msg.setWindowTitle("PyWD - Error")
+                msg.exec_()
             for x in curve.lines:
                 a = QtGui.QTreeWidgetItem(self.datawidget, x)
-            if self.type == "lc":
+        if self.type == "lc":
+            if CurveProperties.synthetic is not True:
                 self.noise_combobox.setCurrentIndex(int(CurveProperties.noise))
-                self.el3a_ipt.setText(CurveProperties.el3a)
-                self.aextinc_ipt.setText(CurveProperties.aextinc)
-                self.xunit_ipt.setText(CurveProperties.xunit)
-                self.calib_ipt.setText(CurveProperties.calib)
+            else:
+                self.noise_combobox.addItem("N/A")
+                self.noise_combobox.setCurrentIndex(3)
+            self.el3a_ipt.setText(CurveProperties.el3a)
+            self.aextinc_ipt.setText(CurveProperties.aextinc)
+            self.xunit_ipt.setText(CurveProperties.xunit)
+            self.calib_ipt.setText(CurveProperties.calib)
+        if CurveProperties.synthetic:
+            self.filepath_label.setText("N/A")
+            self.filepath_label.setToolTip("N/A")
+            self.e1_ipt.setText("N/A")
+            self.e2_ipt.setText("N/A")
+            self.e3_ipt.setText("N/A")
+            self.e4_ipt.setText("N/A")
+            self.label_11.setText("ZERO")
+            self.sigma_ipt.setText(CurveProperties.zero)
+            self.xunit_ipt.setText(CurveProperties.factor)
+            self.label_21.setText("FACTOR")
+
+    @staticmethod
+    def createCurveDialog(type, synthetic=False):
+        curvedialog = CurvePropertiesDialog()
+        curvedialog.type = type
+        if type == "lc":
+            curvedialog.label_53.setText("Load or edit a light curve")
+            curvedialog.type = "lc"
+        if type == "vc":
+            curvedialog.label_53.setText("Load or edit a velocity curve")
+            curvedialog.type = "vc"
+            curvedialog.noise_combobox.setDisabled(True)
+            curvedialog.noise_combobox.addItem("N/A")
+            curvedialog.noise_combobox.setCurrentIndex(3)
+            curvedialog.el3a_ipt.setDisabled(True)
+            curvedialog.el3a_ipt.setText("N/A")
+            curvedialog.aextinc_ipt.setDisabled(True)
+            curvedialog.aextinc_ipt.setText("N/A")
+            curvedialog.calib_ipt.setDisabled(True)
+            curvedialog.calib_ipt.setText("N/A")
+            curvedialog.xunit_ipt.setDisabled(True)
+            curvedialog.xunit_ipt.setText("N/A")
+        if synthetic:
+            if type == "lc":
+                curvedialog.label_53.setText("Load or edit a synthetic light curve")
+            if type == "vc":
+                curvedialog.label_53.setText("Load or edit a synthetic velocity curve")
+                curvedialog.aextinc_ipt.setText("0")
+                curvedialog.calib_ipt.setText("0")
+                curvedialog.el3a_ipt.setDisabled(True)
+                curvedialog.el3a_ipt.setText("0")
+            curvedialog.ksd_box.setDisabled(True)
+            curvedialog.datawidget.setDisabled(True)
+            curvedialog.filepath_label.setText("N/A")
+            curvedialog.e1_ipt.setDisabled(True)
+            curvedialog.e1_ipt.setText("N/A")
+            curvedialog.e2_ipt.setDisabled(True)
+            curvedialog.e2_ipt.setText("N/A")
+            curvedialog.e3_ipt.setDisabled(True)
+            curvedialog.e3_ipt.setText("N/A")
+            curvedialog.e4_ipt.setDisabled(True)
+            curvedialog.e4_ipt.setText("N/A")
+            curvedialog.label_11.setText("ZERO")
+            curvedialog.label_11.setToolTip("A reference magnitude that can shift "
+                                            "a magnitude light curve (LC output) vertically")
+            curvedialog.sigma_ipt.setText("8")
+            curvedialog.label_21.setText("FACTOR")
+            curvedialog.label_21.setToolTip("A scaling factor for LC output curves in flux (not magnitude)")
+            curvedialog.xunit_ipt.setText("1")
+            curvedialog.xunit_ipt.setDisabled(False)
+            curvedialog.noise_combobox.setDisabled(True)
+            curvedialog.noise_combobox.addItem("N/A")
+            curvedialog.noise_combobox.setCurrentIndex(3)
+            curvedialog.repick_btn.setDisabled(True)
+            curvedialog.synthetic = True
+        return curvedialog
 
 
 class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWidget):
@@ -1100,6 +1167,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         yticks[-1].label1.set_visible(False)
         self.plot_figure.tight_layout()
         self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
+        self.plot_canvas.draw()
         # signal connection
         self.connectSignals()
 
@@ -1761,6 +1829,177 @@ class PlotResultsWidget(QtGui.QWidget, plotresultswidget.Ui_PlotResultsWidget):
 
     def updateCurveComboBox(self):
         pass
+
+
+class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurveWidget):
+    def __init__(self):
+        super(SyntheticCurveWidget, self).__init__()
+        self.setupUi(self)
+        # variables
+        self.synthCurveParams = []
+        self.MainWindow = None
+        # set up canvas
+        self.plot_figure = Figure()
+        self.plot_canvas = FigureCanvas(self.plot_figure)
+        self.plot_toolbar = NavigationToolbar(self.plot_canvas, self.plot_widget)
+        plot_layout = QtGui.QVBoxLayout()
+        plot_layout.addWidget(self.plot_toolbar)
+        plot_layout.addWidget(self.plot_canvas)
+        self.plot_widget.setLayout(plot_layout)
+        grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
+        self.plot_observationAxis = self.plot_figure.add_subplot(grid[0])
+        self.plot_residualAxis = self.plot_figure.add_subplot(grid[1], sharex=self.plot_observationAxis)
+        self.plot_observationAxis.get_xaxis().set_visible(False)
+        yticks = self.plot_residualAxis.yaxis.get_major_ticks()
+        yticks[-1].label1.set_visible(False)
+        self.plot_figure.tight_layout()
+        self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
+        self.plot_canvas.draw()
+        # signal connection
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.add_btn.clicked.connect(self.addSyntheticCurve)
+        self.edit_btn.clicked.connect(self.editSyntheticCurve)
+        self.remove_btn.clicked.connect(self.removeSyntheticCurve)
+        self.plot_btn.clicked.connect(self.plotSelected)
+
+    def updateSynthCurveWidget(self):
+        self.synthetic_treewidget.clear()
+        for curve in self.synthCurveParams:
+            item = QtGui.QTreeWidgetItem(self.synthetic_treewidget)
+            curveType = ""
+            if curve.type == "lc":
+                curveType = "Light Cuve"
+            if curve.type == "vc":
+                curveType = "Velocity Curve"
+            item.setText(0, curveType)
+            item.setText(1, self.MainWindow.DCWidget.bandpassDict[curve.band])
+
+    def selectedItem(self):
+        selecteditem = self.loaded_treewidget.selectedItems()
+        if len(selecteditem) > 0:
+            return selecteditem[0]
+        else:
+            return None
+
+    def selectedSyntheticItem(self):
+        selecteditem = self.synthetic_treewidget.selectedItems()
+        if len(selecteditem) > 0:
+            return selecteditem[0]
+        else:
+            return None
+
+    def addSyntheticCurve(self):
+        menu = QtGui.QMenu()
+        synth = menu.addMenu("Add New")
+        lc_synth = synth.addAction("Light Curve")
+        vc_synth = synth.addAction("Velocity Curve")
+        obs = menu.addAction("Add From Observation")
+        selection = menu.exec_(QtGui.QCursor.pos())
+        if selection == lc_synth or selection == vc_synth:
+            type = ""
+            if selection == lc_synth:
+                type = "lc"
+            if selection == vc_synth:
+                type = "vc"
+            curvedialog = CurvePropertiesDialog.createCurveDialog(type, synthetic=True)
+            returnCode = curvedialog.exec_()
+            if returnCode == 1:
+                curveProp = classes.CurveProperties(type, synthetic=True)
+                curveProp.populateFromInterface(curvedialog)
+                self.synthCurveParams.append(curveProp)
+                self.updateSynthCurveWidget()
+        if selection == obs:
+            item = self.selectedItem()
+            if item is not None:
+                index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
+                curve = self.MainWindow.LoadObservationWidget.Curves()[index]
+                synthetic = curve.getSynthetic()
+                curvedialog = CurvePropertiesDialog.createCurveDialog(curve.type, synthetic=True)
+                curvedialog.populateFromObject(synthetic)
+                curvedialog.sigma_ipt.setText("8")
+                returnCode = curvedialog.exec_()
+                if returnCode == 1:
+                    newcurve = classes.CurveProperties(curve.type, synthetic=True)
+                    newcurve.populateFromInterface(curvedialog)
+                    self.synthCurveParams.append(newcurve)
+                    self.updateSynthCurveWidget()
+
+    def editSyntheticCurve(self):
+        item = self.selectedSyntheticItem()
+        if item is not None:
+            index = self.synthetic_treewidget.invisibleRootItem().indexOfChild(item)
+            curve = self.synthCurveParams[index]
+            curvedialog = CurvePropertiesDialog.createCurveDialog(curve.type, synthetic=True)
+            curvedialog.populateFromObject(curve)
+            returnCode = curvedialog.exec_()
+            if returnCode == 1:
+                newcurve = classes.CurveProperties(curve.type, synthetic=True)
+                newcurve.populateFromInterface(curvedialog)
+                self.synthCurveParams[index] = newcurve
+            self.updateSynthCurveWidget()
+
+    def removeSyntheticCurve(self):
+        item = self.selectedSyntheticItem()
+        if item is not None:
+            index = self.synthetic_treewidget.invisibleRootItem().indexOfChild(item)
+            self.synthCurveParams.pop(index)
+            self.updateSynthCurveWidget()
+
+    def plotSelected(self):
+        selectedObs = self.selectedItem()
+        selectedSynth = self.selectedSyntheticItem()
+
+        if selectedSynth is not None or selectedObs is not None:
+            self.plot_observationAxis.clear()
+            self.plot_residualAxis.clear()
+            # self.plot_residualAxis.axhline(c="r")
+
+            if selectedObs is not None:
+                index = self.loaded_treewidget.invisibleRootItem().indexOfChild(selectedObs)
+                curveProps = self.MainWindow.LoadObservationWidget.Curves()[index]
+                curve = classes.Curve(curveProps.FilePath)
+                self.plot_observationAxis.plot(
+                    [float(x) for x in curve.timeList],
+                    [float(y) for y in curve.observationList],
+                    linestyle="", marker="o", markersize=4, color="#4286f4")
+
+            if selectedSynth is not None:
+                index = self.synthetic_treewidget.invisibleRootItem().indexOfChild(selectedSynth)
+                curveProps = self.synthCurveParams[index]
+                lcin = classes.lcin(self.MainWindow)
+                mpage = 1
+                if curveProps.type == "vc":
+                    mpage = 2
+                lcin.syntheticCurve(curveProps, mpage)
+                with open(self.MainWindow.lcinpath, "w") as f:
+                    f.write(lcin.output)
+                process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+                process.wait()
+                table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
+                x_index = 1
+                y_index = 4
+                y2_index = 7
+                if self.MainWindow.jdphs_combobox.currentText() == "Time":
+                    x_index = 0
+                if curveProps.type == "vc":
+                    y_index = 6
+                lc_x = [float(x[x_index].replace("D", "E")) for x in table]
+                lc_y = []
+                if curveProps.type == "vc":
+                    lc_y = [float(x[y_index].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for x in table]
+                else:
+                    lc_y = [float(x[y_index].replace("D", "E")) for x in table]
+                self.plot_observationAxis.plot(lc_x, lc_y, color="red")
+                if curveProps.type == "vc":
+                    lc_y2 = [float(x[y2_index].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for x in table]
+                    self.plot_observationAxis.plot(lc_x, lc_y2, color="red")
+
+            self.plot_toolbar.update()
+            yticks = self.plot_residualAxis.yaxis.get_major_ticks()
+            yticks[-1].label1.set_visible(False)
+            self.plot_canvas.draw()
 
 
 if __name__ == "__main__":

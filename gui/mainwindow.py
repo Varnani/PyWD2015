@@ -663,7 +663,7 @@ class Ui_MainWindow(object):
         self.line_18.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_18.setObjectName(_fromUtf8("line_18"))
         self.line_19 = QtGui.QFrame(self.tab_9)
-        self.line_19.setGeometry(QtCore.QRect(410, 60, 81, 231))
+        self.line_19.setGeometry(QtCore.QRect(410, 60, 71, 231))
         self.line_19.setFrameShape(QtGui.QFrame.VLine)
         self.line_19.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_19.setObjectName(_fromUtf8("line_19"))

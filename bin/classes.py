@@ -41,6 +41,8 @@ class CurveProperties:
             self.synthetic = True
             self.zero = ""
             self.factor = ""
+            self.el3a = ""
+            self.aextinc = ""
         else:
             self.synthetic = False
 
@@ -77,13 +79,20 @@ class CurveProperties:
         if curve.type == "vc":
             curve.star = self.star
             curve.noise = "0"
-            curve.el3a = "0"
             curve.aextinc = "0"
             curve.xunit = "0"
             curve.calib = "0"
         curve.synthetic = True
         curve.zero = "0"
         curve.factor = "0"
+        try:
+            curve.el3a = self.el3a
+        except:
+            curve.el3a = "0"
+        try:
+            curve.aextinc = self.aextinc
+        except:
+            curve.aextinc = "0"
         return curve
 
     def populateFromInterface(self, CurvePropertiesDialog):
@@ -105,13 +114,20 @@ class CurveProperties:
         self.sigma = str(CurvePropertiesDialog.sigma_ipt.text())
         if CurvePropertiesDialog.type == "lc":
             self.type = "lc"
-            self.noise = self.noiseDict[str(CurvePropertiesDialog.noise_combobox.currentText())]
+            if self.synthetic is not True:
+                self.noise = self.noiseDict[str(CurvePropertiesDialog.noise_combobox.currentText())]
             self.el3a = str(CurvePropertiesDialog.el3a_ipt.text())
             self.aextinc = str(CurvePropertiesDialog.aextinc_ipt.text())
             self.xunit = str(CurvePropertiesDialog.xunit_ipt.text())
             self.calib = str(CurvePropertiesDialog.calib_ipt.text())
         if CurvePropertiesDialog.type == "vc":
             self.type = "vc"
+        if CurvePropertiesDialog.synthetic:
+            self.el3a = str(CurvePropertiesDialog.el3a_ipt.text())
+            self.zero = str(CurvePropertiesDialog.sigma_ipt.text())
+            self.factor = str(CurvePropertiesDialog.xunit_ipt.text())
+            self.aextinc = str(CurvePropertiesDialog.aextinc_ipt.text())
+            self.calib = str(CurvePropertiesDialog.calib_ipt.text())
 
     def populateFromParserSection(self, parser, section):
         self.FilePath = parser.get(section, "filepath")
