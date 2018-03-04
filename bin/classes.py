@@ -763,8 +763,36 @@ class lcin(WDInput):
                    self.formatInput(curve.wla, 10, 6, "F") + \
                    self.formatInput(curve.aextinc, 8, 4, "F") + \
                    self.formatInput(curve.calib, 12, 5, "D") + "\n"
+        star1spotline = ""
+        star2spotline = ""
+        if self.MainWindow.SpotConfigureWidget.star1RowCount != 0:
+            star1spotparams = self.MainWindow.SpotConfigureWidget.star1ElementList
+            for spot in star1spotparams:
+                star1spotline = star1spotline + \
+                                self.formatInput(spot[3].text(), 9, 5, "F") + \
+                                self.formatInput(spot[4].text(), 9, 5, "F") + \
+                                self.formatInput(spot[5].text(), 9, 5, "F") + \
+                                self.formatInput(spot[6].text(), 9, 5, "F") + \
+                                self.formatInput(spot[7].text(), 14, 5, "F") + \
+                                self.formatInput(spot[8].text(), 14, 5, "F") + \
+                                self.formatInput(spot[9].text(), 14, 5, "F") + \
+                                self.formatInput(spot[10].text(), 14, 5, "F") + "\n"
+
+        if self.MainWindow.SpotConfigureWidget.star2RowCount != 0:
+            star2spotparams = self.MainWindow.SpotConfigureWidget.star2ElementList
+            for spot in star2spotparams:
+                star2spotline = star2spotline + \
+                                self.formatInput(spot[3].text(), 9, 5, "F") + \
+                                self.formatInput(spot[4].text(), 9, 5, "F") + \
+                                self.formatInput(spot[5].text(), 9, 5, "F") + \
+                                self.formatInput(spot[6].text(), 9, 5, "F") + \
+                                self.formatInput(spot[7].text(), 14, 5, "F") + \
+                                self.formatInput(spot[8].text(), 14, 5, "F") + \
+                                self.formatInput(spot[9].text(), 14, 5, "F") + \
+                                self.formatInput(spot[10].text(), 14, 5, "F") + "\n"
         self.output = self.output + lcparams + \
             "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
+            star1spotline + star2spotline + \
             "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
             "150.\n9"
 
