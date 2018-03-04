@@ -485,7 +485,7 @@ class Ui_DCWidget(object):
         self.plotwidget.setGeometry(QtCore.QRect(900, 80, 761, 601))
         self.plotwidget.setObjectName(_fromUtf8("plotwidget"))
         self.autoupdate_chk = QtGui.QCheckBox(DCWidget)
-        self.autoupdate_chk.setGeometry(QtCore.QRect(1370, 30, 111, 21))
+        self.autoupdate_chk.setGeometry(QtCore.QRect(1370, 20, 111, 21))
         self.autoupdate_chk.setObjectName(_fromUtf8("autoupdate_chk"))
         self.line = QtGui.QFrame(DCWidget)
         self.line.setGeometry(QtCore.QRect(900, 60, 761, 20))
@@ -521,6 +521,10 @@ class Ui_DCWidget(object):
         self.time_combobox.setObjectName(_fromUtf8("time_combobox"))
         self.time_combobox.addItem(_fromUtf8(""))
         self.time_combobox.addItem(_fromUtf8(""))
+        self.uselc_chk = QtGui.QCheckBox(DCWidget)
+        self.uselc_chk.setGeometry(QtCore.QRect(1370, 40, 111, 21))
+        self.uselc_chk.setChecked(True)
+        self.uselc_chk.setObjectName(_fromUtf8("uselc_chk"))
 
         self.retranslateUi(DCWidget)
         self.tabWidget_2.setCurrentIndex(0)
@@ -712,4 +716,9 @@ class Ui_DCWidget(object):
         self.plot_btn.setText(_translate("DCWidget", "Plot", None))
         self.time_combobox.setItemText(0, _translate("DCWidget", "Phase", None))
         self.time_combobox.setItemText(1, _translate("DCWidget", "HJD", None))
+        self.uselc_chk.setToolTip(_translate("DCWidget", "Use LC to output higher resolution model curve. [?]", None))
+        self.uselc_chk.setWhatsThis(_translate("DCWidget", "This will generate a lcin.active file and run LC, then plot synthetic results onto the observations, instead of reading from dcout.active file. UI will freeze for a moment to compute synthetic points.\n"
+"\n"
+"Line plotting will be used for LC synthetic points. DC outputs will be plotted with scatter plot.", None))
+        self.uselc_chk.setText(_translate("DCWidget", "Use LC", None))
 

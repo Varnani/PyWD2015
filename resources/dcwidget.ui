@@ -2035,7 +2035,7 @@
    <property name="geometry">
     <rect>
      <x>1370</x>
-     <y>30</y>
+     <y>20</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -2151,6 +2151,30 @@
      <string>HJD</string>
     </property>
    </item>
+  </widget>
+  <widget class="QCheckBox" name="uselc_chk">
+   <property name="geometry">
+    <rect>
+     <x>1370</x>
+     <y>40</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Use LC to output higher resolution model curve. [?]</string>
+   </property>
+   <property name="whatsThis">
+    <string>This will generate a lcin.active file and run LC, then plot synthetic results onto the observations, instead of reading from dcout.active file. UI will freeze for a moment to compute synthetic points.
+
+Line plotting will be used for LC synthetic points. DC outputs will be plotted with scatter plot.</string>
+   </property>
+   <property name="text">
+    <string>Use LC</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources/>

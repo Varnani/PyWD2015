@@ -66,10 +66,19 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.plot_observationAxis.clear()
         self.DCWidget.plot_residualAxis.clear()
 
+        self.DCWidget.obs_x = []
+        self.DCWidget.obs_y = []
+        self.DCWidget.model_x = []
+        self.DCWidget.model_y = []
+        self.DCWidget.resd_x = []
+        self.DCWidget.resd_y = []
+
         yticks = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
         yticks[-1].label1.set_visible(False)
 
         self.DCWidget.plot_canvas.draw()
+
+        pyplot.cla()
 
         self.DCWidget.result_treewidget.clear()
         self.DCWidget.lastBaseSet = None
@@ -1046,6 +1055,13 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.lastBaseSet = None
         self.lastSubSets = None
         self.lastiteration = 0
+        # variables for plot
+        self.obs_x = []
+        self.obs_y = []
+        self.model_x = []
+        self.model_y = []
+        self.resd_x = []
+        self.resd_y = []
         # canvas for main
         self.plot_figure = Figure()
         self.plot_canvas = FigureCanvas(self.plot_figure)
@@ -1074,6 +1090,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.viewlaastdcout_btn.clicked.connect(self.showDcout)
         # self.plotdcresults_btn.clicked.connect(self.PlotResultsWidget.show)
         self.plot_btn.clicked.connect(self.plotData)
+        self.popmain_btn.clicked.connect(self.popPlotWindow)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -1110,8 +1127,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         if str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
 
-            ocTable = methods.getTableFromOutput(self.dcoutpath, "       Unweighted Observational Equations")
-            curvestatTable = methods.getTableFromOutput(self.dcoutpath,
+            ocTable = methods.getTableFromOutput(self.dcoutpath, "Unweighted Observational Equations")
+            curvestatTable = methods.getTableFromOutput(
+                self.dcoutpath,
                 "Standard Deviations for Computation of Curve-dependent Weights"
             )
             columnLimit = 20
@@ -1144,7 +1162,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             ocTable = ocTable[nobsStart:nobsEnd]
             obsIndex = 1
             timeIndex = 0
-            xlabel = "Phase"
+            xlabel = self.time_combobox.currentText()
             ylabel = self.MainWindow.maglite_combobox.currentText()
             if ylabel == "Flux":
                 ylabel = "Norm. Flux"
@@ -1155,54 +1173,66 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     ylabel = "Velocity"
             if self.MainWindow.jdphs_combobox.currentText() == "Time":  # wd outputs are in HJD
                 obsIndex = 2
-                xlabel = "HJD"
             if self.time_combobox.currentText() == "Phase" and self.MainWindow.jdphs_combobox.currentText() == "Time":
                 timeIndex = 1
             x_axis = [float(x[timeIndex]) for x in ocTable]
             obs = [float(x[obsIndex]) for x in ocTable]
             resd = [float(x[-1]) for x in ocTable]
 
-            # get model
-            curveProp = self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].getSynthetic()
-            curveProp.zero = "8"
-            curveProp.factor = "1"
-            curve = classes.Curve(curveProp.FilePath)
-            line3 = []
-            if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
-                line3 = [min(curve.timeList), max(curve.timeList), float(self.MainWindow.p0_ipt.text()) / 100,
-                         0, 1, 0.0001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
-            else:
-                line3 = [self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
-                         0, 1, 0.0001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
-            model = classes.lcin(self.MainWindow)
-            mpage = 1
-            if curveProp.type == "vc":
-                mpage = 2
-            jdphs = "2"
-            if self.time_combobox.currentText() == "HJD" and self.MainWindow.jdphs_combobox.currentText() == "Time":
-                jdphs = "1"
-            model.syntheticCurve(curveProp, mpage, line3=line3, jdphs=jdphs)
-            with open(self.MainWindow.lcinpath, "w") as f:
-                f.write(model.output)
-            # exec model
-            process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
-            process.wait()
-            # get data
-            lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
-            lc_y_index = 4
-            lc_x_index = 1
-            if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
-                lc_x_index = 0
-            if curveProp.type == "vc":
-                lc_y_index = 6 + self.data_combobox.currentIndex()
+            lc_x = []
+            lc_y = []
 
-            lc_x = [float(x[lc_x_index].replace("D", "E")) for x in lcoutTable]
-            lc_y = [float(y[lc_y_index].replace("D", "E")) for y in lcoutTable]
+            if self.uselc_chk.isChecked():
+                # get model
+                curveProp = self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].getSynthetic()
+                curveProp.zero = "8"
+                curveProp.factor = "1"
+                curve = classes.Curve(curveProp.FilePath)
+                line3 = []
+                if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
+                    line3 = [min(curve.timeList), max(curve.timeList), float(self.MainWindow.p0_ipt.text()) / 100,
+                             0, 1, 0.001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
+                else:
+                    line3 = [self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                             0, 1, 0.001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
+                model = classes.lcin(self.MainWindow)
+                mpage = 1
+                if curveProp.type == "vc":
+                    mpage = 2
+                jdphs = "2"
+                if self.time_combobox.currentText() == "HJD" and self.MainWindow.jdphs_combobox.currentText() == "Time":
+                    jdphs = "1"
+                model.syntheticCurve(curveProp, mpage, line3=line3, jdphs=jdphs)
+                with open(self.MainWindow.lcinpath, "w") as f:
+                    f.write(model.output)
+                # exec model
+                process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+                process.wait()
+                # get data
+                lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
+                lc_y_index = 4
+                lc_x_index = 1
+                if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
+                    lc_x_index = 0
+                if curveProp.type == "vc":
+                    lc_y_index = 6 + self.data_combobox.currentIndex()
+
+                lc_x = [float(x[lc_x_index].replace("D", "E")) for x in lcoutTable]
+                lc_y = [float(y[lc_y_index].replace("D", "E")) for y in lcoutTable]
+            else:
+                lc_x = x_axis
+                idx = 2
+                if self.MainWindow.jdphs_combobox.currentText() == "Time":
+                    idx = 3
+                lc_y = [float(x[idx]) for x in ocTable]
 
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
             self.plot_observationAxis.plot(x_axis, obs, linestyle="", marker="o", markersize=4, color="#4286f4")
-            self.plot_observationAxis.plot(lc_x, lc_y, color="red")
+            if self.uselc_chk.isChecked():
+                self.plot_observationAxis.plot(lc_x, lc_y, color="red")
+            else:
+                self.plot_observationAxis.plot(lc_x, lc_y, linestyle="", marker="o", markersize=4, color="red")
             self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color="#4286f4")
             self.plot_residualAxis.axhline(c="r")
             self.plot_toolbar.update()
@@ -1212,6 +1242,34 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.plot_residualAxis.set_ylabel("Residuals")
             self.plot_observationAxis.set_ylabel(ylabel)
             self.plot_canvas.draw()
+            # store plot data
+            self.obs_x = x_axis
+            self.obs_y = obs
+            self.model_x = lc_x
+            self.model_y = lc_y
+            self.resd_x = x_axis
+            self.resd_y = resd
+
+    def popPlotWindow(self):
+        if self.data_combobox.currentText() != "":
+            self.plot_btn.click()
+            pyplot.cla()
+            grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
+            obs = pyplot.subplot(grid[0])
+            resd = pyplot.subplot(grid[1], sharex=obs)
+            pyplot.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
+            yticks = resd.yaxis.get_major_ticks()
+            yticks[-1].label1.set_visible(False)
+
+            obs.plot(self.obs_x, self.obs_y, linestyle="", marker="o", markersize=4, color="#4286f4")
+            resd.plot(self.resd_x, self.resd_y, linestyle="", marker="o", markersize=4, color="#4286f4")
+            if self.uselc_chk.isChecked():
+                obs.plot(self.model_x, self.model_y, color="red")
+            else:
+                obs.plot(self.model_x, self.model_y, linestyle="", marker="o", markersize=4, color="red")
+            title = "Matplotlib - " + os.path.basename(str(self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].FilePath))
+            pyplot.get_current_fig_manager().set_window_title(title)
+            pyplot.show()
 
     def showDcin(self):
         self.DcinView.setWindowTitle("PyWD - " + self.dcinpath)
