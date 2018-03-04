@@ -45,6 +45,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.saveproject_btn.clicked.connect(self.overwriteProject)
         self.loadproject_btn.clicked.connect(self.loadProjectDialog)
         self.saveas_btn.clicked.connect(self.saveProjectDialog)
+        self.fill_btn.clicked.connect(self.fillLcHJDMenu)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()  # close loadwidget if we exit
@@ -108,6 +109,27 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
                 return 0
             else:
                 return 1
+
+    def fillLcHJDMenu(self):
+        curves = self.LoadObservationWidget.Curves()
+        if len(curves) >= 1:
+            menu = QtGui.QMenu()
+            for index, curve in enumerate(curves):
+                a = menu.addAction(os.path.basename(curve.FilePath))
+                a.idx = index
+            selection = menu.exec_(QtGui.QCursor.pos())
+            if selection is not None:
+                curve = classes.Curve(self.LoadObservationWidget.Curves()[selection.idx].FilePath)
+                start = min(curve.timeList)
+                stop = max(curve.timeList)
+                if self.jdphs_combobox.currentText() == "Time":
+                    self.jdstart_ipt.setText(start)
+                    self.jdstop_ipt.setText(stop)
+                    self.jdincrement_ipt.setText(str(float(self.p0_ipt.text()) / 100.0))
+                if self.jdphs_combobox.currentText() == "Phase":
+                    self.phasestart_ipt.setText(start)
+                    self.phasestop_ipt.setText(stop)
+                    self.phaseincrement_ipt.setText("0.001")
 
     def overwriteProject(self):
         if self.lastProjectPath is None:
