@@ -80,6 +80,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.model_y = []
         self.DCWidget.resd_x = []
         self.DCWidget.resd_y = []
+        self.DCWidget.obslabel = ""
+        self.DCWidget.timelabel = ""
 
         yticks = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
         yticks[-1].label1.set_visible(False)
@@ -1151,6 +1153,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.model_y = []
         self.resd_x = []
         self.resd_y = []
+        self.obslabel = ""
+        self.timelabel = ""
         # canvas for main
         self.plot_figure = Figure()
         self.plot_canvas = FigureCanvas(self.plot_figure)
@@ -1257,10 +1261,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             if ylabel == "Flux":
                 ylabel = "Norm. Flux"
             if self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].type == "vc":
-                if self.MainWindow.vunit_ipt.text() != "1":
-                    ylabel = "Velocity (V/{0}km/s)".format(str(self.MainWindow.vunit_ipt.text()))
-                else:
-                    ylabel = "Velocity"
+                ylabel = "Radial Velocity (km s$^{-1}$)"
             if self.MainWindow.jdphs_combobox.currentText() == "Time":  # wd outputs are in HJD
                 obsIndex = 2
             if self.time_combobox.currentText() == "Phase" and self.MainWindow.jdphs_combobox.currentText() == "Time":
@@ -1309,6 +1310,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
                 lc_x = [float(x[lc_x_index].replace("D", "E")) for x in lcoutTable]
                 lc_y = [float(y[lc_y_index].replace("D", "E")) for y in lcoutTable]
+
+                if curveProp.type == "vc":
+                    t = [x * float(str(self.MainWindow.vunit_ipt.text())) for x in lc_y]
+                    lc_y = t
+                    t = [x * float(str(self.MainWindow.vunit_ipt.text())) for x in obs]
+                    obs = t
             else:
                 lc_x = x_axis
                 idx = 2
@@ -1326,8 +1333,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color="#4286f4")
             self.plot_residualAxis.axhline(c="r")
             self.plot_toolbar.update()
-            yticks = self.plot_residualAxis.yaxis.get_major_ticks()
-            yticks[-1].label1.set_visible(False)
+            # yticks = self.plot_residualAxis.yaxis.get_major_ticks()
+            # yticks[-1].label1.set_visible(False)
             self.plot_residualAxis.set_xlabel(xlabel)
             self.plot_residualAxis.set_ylabel("Residuals")
             self.plot_observationAxis.set_ylabel(ylabel)
@@ -1339,6 +1346,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.model_y = lc_y
             self.resd_x = x_axis
             self.resd_y = resd
+            self.obslabel = ylabel
+            self.timelabel = xlabel
 
     def popPlotWindow(self):
         if self.data_combobox.currentText() != "":
@@ -1360,6 +1369,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             title = "Matplotlib - " + os.path.basename(str(self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].FilePath))
             resd.axhline(c="r")
             pyplot.get_current_fig_manager().set_window_title(title)
+            obs.set_ylabel(self.obslabel)
+            resd.set_ylabel("Residuals")
+            resd.set_xlabel(self.timelabel)
             pyplot.show()
 
     def showDcin(self):
@@ -1954,6 +1966,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         if selectedSynth is not None or selectedObs is not None:
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
+            self.plot_residualAxis.ticklabel_format(useOffset=False)
             # self.plot_residualAxis.axhline(c="r")
 
             if selectedObs is not None:

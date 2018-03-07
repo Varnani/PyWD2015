@@ -421,7 +421,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>0</string>
+    <string>0.55</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_12">
@@ -482,7 +482,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>0</string>
+    <string>0.45</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="e4_ipt">
@@ -495,7 +495,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>0</string>
+    <string>0.95</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_15">
@@ -524,7 +524,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>0</string>
+    <string>0.05</string>
    </property>
   </widget>
   <widget class="Line" name="line">
@@ -671,7 +671,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <item>
     <property name="text">
@@ -857,6 +857,34 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>l1_ipt</tabstop>
+  <tabstop>l2_ipt</tabstop>
+  <tabstop>x1_ipt</tabstop>
+  <tabstop>x2_ipt</tabstop>
+  <tabstop>y1_ipt</tabstop>
+  <tabstop>y2_ipt</tabstop>
+  <tabstop>e1_ipt</tabstop>
+  <tabstop>e2_ipt</tabstop>
+  <tabstop>e3_ipt</tabstop>
+  <tabstop>e4_ipt</tabstop>
+  <tabstop>el3a_ipt</tabstop>
+  <tabstop>sigma_ipt</tabstop>
+  <tabstop>opsf_ipt</tabstop>
+  <tabstop>noise_combobox</tabstop>
+  <tabstop>wla_ipt</tabstop>
+  <tabstop>aextinc_ipt</tabstop>
+  <tabstop>xunit_ipt</tabstop>
+  <tabstop>calib_ipt</tabstop>
+  <tabstop>accept_btn</tabstop>
+  <tabstop>discard_btn</tabstop>
+  <tabstop>datawidget</tabstop>
+  <tabstop>whatsthis_btn</tabstop>
+  <tabstop>band_box</tabstop>
+  <tabstop>ksd_box</tabstop>
+  <tabstop>repick_btn</tabstop>
+  <tabstop>bandpasscontextlist_btn</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

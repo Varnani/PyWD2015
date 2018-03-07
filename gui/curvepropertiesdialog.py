@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'curvepropertiesdialog.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Wed Mar  7 11:36:47 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -223,8 +224,33 @@ class Ui_CurvePropertiesDialog(object):
         self.bandpasscontextlist_btn.setObjectName(_fromUtf8("bandpasscontextlist_btn"))
 
         self.retranslateUi(CurvePropertiesDialog)
-        self.noise_combobox.setCurrentIndex(1)
+        self.noise_combobox.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(CurvePropertiesDialog)
+        CurvePropertiesDialog.setTabOrder(self.l1_ipt, self.l2_ipt)
+        CurvePropertiesDialog.setTabOrder(self.l2_ipt, self.x1_ipt)
+        CurvePropertiesDialog.setTabOrder(self.x1_ipt, self.x2_ipt)
+        CurvePropertiesDialog.setTabOrder(self.x2_ipt, self.y1_ipt)
+        CurvePropertiesDialog.setTabOrder(self.y1_ipt, self.y2_ipt)
+        CurvePropertiesDialog.setTabOrder(self.y2_ipt, self.e1_ipt)
+        CurvePropertiesDialog.setTabOrder(self.e1_ipt, self.e2_ipt)
+        CurvePropertiesDialog.setTabOrder(self.e2_ipt, self.e3_ipt)
+        CurvePropertiesDialog.setTabOrder(self.e3_ipt, self.e4_ipt)
+        CurvePropertiesDialog.setTabOrder(self.e4_ipt, self.el3a_ipt)
+        CurvePropertiesDialog.setTabOrder(self.el3a_ipt, self.sigma_ipt)
+        CurvePropertiesDialog.setTabOrder(self.sigma_ipt, self.opsf_ipt)
+        CurvePropertiesDialog.setTabOrder(self.opsf_ipt, self.noise_combobox)
+        CurvePropertiesDialog.setTabOrder(self.noise_combobox, self.wla_ipt)
+        CurvePropertiesDialog.setTabOrder(self.wla_ipt, self.aextinc_ipt)
+        CurvePropertiesDialog.setTabOrder(self.aextinc_ipt, self.xunit_ipt)
+        CurvePropertiesDialog.setTabOrder(self.xunit_ipt, self.calib_ipt)
+        CurvePropertiesDialog.setTabOrder(self.calib_ipt, self.accept_btn)
+        CurvePropertiesDialog.setTabOrder(self.accept_btn, self.discard_btn)
+        CurvePropertiesDialog.setTabOrder(self.discard_btn, self.datawidget)
+        CurvePropertiesDialog.setTabOrder(self.datawidget, self.whatsthis_btn)
+        CurvePropertiesDialog.setTabOrder(self.whatsthis_btn, self.band_box)
+        CurvePropertiesDialog.setTabOrder(self.band_box, self.ksd_box)
+        CurvePropertiesDialog.setTabOrder(self.ksd_box, self.repick_btn)
+        CurvePropertiesDialog.setTabOrder(self.repick_btn, self.bandpasscontextlist_btn)
 
     def retranslateUi(self, CurvePropertiesDialog):
         CurvePropertiesDialog.setWindowTitle(_translate("CurvePropertiesDialog", "Curve Properties", None))
@@ -264,18 +290,18 @@ class Ui_CurvePropertiesDialog(object):
         self.label_11.setToolTip(_translate("CurvePropertiesDialog", "Estimated standard deviation of observed light", None))
         self.label_11.setText(_translate("CurvePropertiesDialog", "SIGMA", None))
         self.sigma_ipt.setText(_translate("CurvePropertiesDialog", "0", None))
-        self.e3_ipt.setText(_translate("CurvePropertiesDialog", "0", None))
+        self.e3_ipt.setText(_translate("CurvePropertiesDialog", "0.55", None))
         self.label_12.setToolTip(_translate("CurvePropertiesDialog", "Phase 1", None))
         self.label_12.setText(_translate("CurvePropertiesDialog", "E1", None))
         self.label_13.setToolTip(_translate("CurvePropertiesDialog", "Phase 4", None))
         self.label_13.setText(_translate("CurvePropertiesDialog", "E4", None))
         self.label_14.setToolTip(_translate("CurvePropertiesDialog", "Phase 3", None))
         self.label_14.setText(_translate("CurvePropertiesDialog", "E3", None))
-        self.e2_ipt.setText(_translate("CurvePropertiesDialog", "0", None))
-        self.e4_ipt.setText(_translate("CurvePropertiesDialog", "0", None))
+        self.e2_ipt.setText(_translate("CurvePropertiesDialog", "0.45", None))
+        self.e4_ipt.setText(_translate("CurvePropertiesDialog", "0.95", None))
         self.label_15.setToolTip(_translate("CurvePropertiesDialog", "Phase 2", None))
         self.label_15.setText(_translate("CurvePropertiesDialog", "E2", None))
-        self.e1_ipt.setText(_translate("CurvePropertiesDialog", "0", None))
+        self.e1_ipt.setText(_translate("CurvePropertiesDialog", "0.05", None))
         self.label_16.setToolTip(_translate("CurvePropertiesDialog", "Set standard deviation apply method. [?]", None))
         self.label_16.setWhatsThis(_translate("CurvePropertiesDialog", "<html><head/><body><p>An integer array that is 0, 1, or 2 for each input sub-dataset (velocity, light, or eclipse timings). </p><p>The KSDs tell DC whether to apply the input standard deviations (σ’s) to compute curvedependent weights (KSD=0), </p><p>to apply DC’s internally computed σ’s for the weights (KSD=1),</p><p>or to apply σ’s based on one or two restricted phase ranges for the weights (KSD=2).</p><p><span style=\" font-weight:600;\">If unsure, set to 1.</span></p></body></html>", None))
         self.label_16.setText(_translate("CurvePropertiesDialog", "KSD", None))

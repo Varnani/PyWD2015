@@ -2954,7 +2954,7 @@ zero for zero output noise</string>
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <item>
        <property name="text">
@@ -3391,6 +3391,104 @@ zero for zero output noise</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>jd0_ipt</tabstop>
+  <tabstop>p0_ipt</tabstop>
+  <tabstop>dpdt_ipt</tabstop>
+  <tabstop>pshift_ipt</tabstop>
+  <tabstop>delph_ipt</tabstop>
+  <tabstop>nga_spinbox</tabstop>
+  <tabstop>a_ipt</tabstop>
+  <tabstop>e_ipt</tabstop>
+  <tabstop>perr0_ipt</tabstop>
+  <tabstop>dperdt_ipt</tabstop>
+  <tabstop>xincl_ipt</tabstop>
+  <tabstop>vgam_ipt</tabstop>
+  <tabstop>rm_ipt</tabstop>
+  <tabstop>abunin_ipt</tabstop>
+  <tabstop>tavh_ipt</tabstop>
+  <tabstop>tavc_ipt</tabstop>
+  <tabstop>phsv_ipt</tabstop>
+  <tabstop>pcsv_ipt</tabstop>
+  <tabstop>f1_ipt</tabstop>
+  <tabstop>f2_ipt</tabstop>
+  <tabstop>the_ipt</tabstop>
+  <tabstop>vunit_ipt</tabstop>
+  <tabstop>dpclog_ipt</tabstop>
+  <tabstop>ifat1_combobox</tabstop>
+  <tabstop>ifat2_combobox</tabstop>
+  <tabstop>alb1_spinbox</tabstop>
+  <tabstop>alb2_spinbox</tabstop>
+  <tabstop>gr1_spinbox</tabstop>
+  <tabstop>gr2_spinbox</tabstop>
+  <tabstop>ld1_combobox</tabstop>
+  <tabstop>ld2_combobox</tabstop>
+  <tabstop>ld1_chk</tabstop>
+  <tabstop>ld2_chk</tabstop>
+  <tabstop>xbol1_ipt</tabstop>
+  <tabstop>xbol2_ipt</tabstop>
+  <tabstop>ybol1_ipt</tabstop>
+  <tabstop>ybol2_ipt</tabstop>
+  <tabstop>n1_spinbox</tabstop>
+  <tabstop>n2_spinbox</tabstop>
+  <tabstop>n1l_spinbox</tabstop>
+  <tabstop>n2l_spinbox</tabstop>
+  <tabstop>ipb_chk</tabstop>
+  <tabstop>mref_chk</tabstop>
+  <tabstop>nref_spinbox</tabstop>
+  <tabstop>a3b_ipt</tabstop>
+  <tabstop>p3b_ipt</tabstop>
+  <tabstop>xinc3b_ipt</tabstop>
+  <tabstop>e3b_ipt</tabstop>
+  <tabstop>perr3b_ipt</tabstop>
+  <tabstop>tc3b_ipt</tabstop>
+  <tabstop>systemname_ipt</tabstop>
+  <tabstop>mode_combobox</tabstop>
+  <tabstop>jdphs_combobox</tabstop>
+  <tabstop>ifcgs_chk</tabstop>
+  <tabstop>icor1_chk</tabstop>
+  <tabstop>icor2_chk</tabstop>
+  <tabstop>jdstart_ipt</tabstop>
+  <tabstop>jdstop_ipt</tabstop>
+  <tabstop>jdincrement_ipt</tabstop>
+  <tabstop>fill_btn</tabstop>
+  <tabstop>phasestart_ipt</tabstop>
+  <tabstop>phasestop_ipt</tabstop>
+  <tabstop>phaseincrement_ipt</tabstop>
+  <tabstop>lsp_spinbox</tabstop>
+  <tabstop>tobs_ipt</tabstop>
+  <tabstop>phobs_ipt</tabstop>
+  <tabstop>phasenorm_ipt</tabstop>
+  <tabstop>inputtabwidget</tabstop>
+  <tabstop>defaultseed_btn</tabstop>
+  <tabstop>loadproject_btn</tabstop>
+  <tabstop>randomizeseed_btn</tabstop>
+  <tabstop>seed_spinbox</tabstop>
+  <tabstop>stdev_ipt</tabstop>
+  <tabstop>saveas_btn</tabstop>
+  <tabstop>saveproject_btn</tabstop>
+  <tabstop>eclipsewidget_btn</tabstop>
+  <tabstop>maintabwidget</tabstop>
+  <tabstop>if3b_chk</tabstop>
+  <tabstop>whatsthis_btn</tabstop>
+  <tabstop>lc_lightcurve_btn</tabstop>
+  <tabstop>lc_speclineprof_btn</tabstop>
+  <tabstop>lc_stardimphase_btn</tabstop>
+  <tabstop>lc_coordinates_btn</tabstop>
+  <tabstop>lc_conjunction_btn</tabstop>
+  <tabstop>loadwidget_btn</tabstop>
+  <tabstop>lcnoise_combobox</tabstop>
+  <tabstop>spotconfigure_btn</tabstop>
+  <tabstop>dc_rundc_btn</tabstop>
+  <tabstop>maglite_combobox</tabstop>
+  <tabstop>isym_combobox</tabstop>
+  <tabstop>linkext_spinbox</tabstop>
+  <tabstop>desextinc_ipt</tabstop>
+  <tabstop>dchistory_btn</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>theme_combobox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
