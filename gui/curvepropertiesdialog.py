@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'curvepropertiesdialog.ui'
 #
-# Created: Wed Mar  7 11:36:47 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -51,7 +50,7 @@ class Ui_CurvePropertiesDialog(object):
         self.discard_btn.setFont(font)
         self.discard_btn.setObjectName(_fromUtf8("discard_btn"))
         self.band_box = QtGui.QSpinBox(CurvePropertiesDialog)
-        self.band_box.setGeometry(QtCore.QRect(60, 60, 31, 20))
+        self.band_box.setGeometry(QtCore.QRect(62, 57, 30, 25))
         self.band_box.setButtonSymbols(QtGui.QAbstractSpinBox.NoButtons)
         self.band_box.setMinimum(1)
         self.band_box.setMaximum(94)
@@ -219,7 +218,7 @@ class Ui_CurvePropertiesDialog(object):
         self.repick_btn.setGeometry(QtCore.QRect(580, 50, 50, 20))
         self.repick_btn.setObjectName(_fromUtf8("repick_btn"))
         self.bandpasscontextlist_btn = QtGui.QPushButton(CurvePropertiesDialog)
-        self.bandpasscontextlist_btn.setGeometry(QtCore.QRect(100, 60, 50, 20))
+        self.bandpasscontextlist_btn.setGeometry(QtCore.QRect(100, 57, 50, 25))
         self.bandpasscontextlist_btn.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.bandpasscontextlist_btn.setObjectName(_fromUtf8("bandpasscontextlist_btn"))
 

@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Wed Mar  7 11:40:51 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -812,7 +811,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.maintabwidget.setCurrentIndex(0)
+        self.maintabwidget.setCurrentIndex(1)
         self.inputtabwidget.setCurrentIndex(0)
         self.mode_combobox.setCurrentIndex(1)
         self.lcnoise_combobox.setCurrentIndex(0)
@@ -1147,7 +1146,7 @@ class Ui_MainWindow(object):
         self.inputtabwidget.setTabText(self.inputtabwidget.indexOf(self.tab_4), _translate("MainWindow", "3rd Body", None))
         self.maintabwidget.setTabText(self.maintabwidget.indexOf(self.tab_8), _translate("MainWindow", "Input", None))
         self.phasestop_ipt.setText(_translate("MainWindow", "1", None))
-        self.jdstop_ipt.setText(_translate("MainWindow", "0", None))
+        self.jdstop_ipt.setText(_translate("MainWindow", "50010", None))
         self.label_73.setToolTip(_translate("MainWindow", "A seed number that determines individual noise excursions of output light or RV points", None))
         self.label_73.setStatusTip(_translate("MainWindow", "SEED", None))
         self.label_73.setText(_translate("MainWindow", "Seed", None))
@@ -1171,12 +1170,12 @@ class Ui_MainWindow(object):
         self.label_279.setToolTip(_translate("MainWindow", "Phase at which spectral temperature was estimated", None))
         self.label_279.setStatusTip(_translate("MainWindow", "PHOBS", None))
         self.label_279.setText(_translate("MainWindow", "Spec. T. Phs.", None))
-        self.jdincrement_ipt.setText(_translate("MainWindow", "0", None))
+        self.jdincrement_ipt.setText(_translate("MainWindow", "0.001", None))
         self.label_284.setToolTip(_translate("MainWindow", "Start phase of output points", None))
         self.label_284.setStatusTip(_translate("MainWindow", "PHSTRT", None))
         self.label_284.setText(_translate("MainWindow", "Phase Start", None))
         self.phasenorm_ipt.setText(_translate("MainWindow", "0.25", None))
-        self.jdstart_ipt.setText(_translate("MainWindow", "0", None))
+        self.jdstart_ipt.setText(_translate("MainWindow", "50000", None))
         self.label_282.setToolTip(_translate("MainWindow", "Increment for phase of output points", None))
         self.label_282.setStatusTip(_translate("MainWindow", "PHIN", None))
         self.label_282.setText(_translate("MainWindow", "Phase Incr.", None))

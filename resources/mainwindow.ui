@@ -61,7 +61,7 @@
      <enum>QTabWidget::West</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_8">
      <attribute name="title">
@@ -2391,7 +2391,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>0</string>
+       <string>50010</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_73">
@@ -2621,7 +2621,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>0</string>
+       <string>0.001</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_284">
@@ -2666,7 +2666,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>0</string>
+       <string>50000</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_282">

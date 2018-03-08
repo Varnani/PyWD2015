@@ -86,9 +86,6 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         yticks = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
         yticks[-1].label1.set_visible(False)
 
-        yticks_synthetic = self.SyntheticCurveWidget.plot_residualAxis.yaxis.get_major_ticks()
-        yticks_synthetic[-1].label1.set_visible(False)
-
         self.DCWidget.plot_canvas.draw()
         self.SyntheticCurveWidget.plot_canvas.draw()
 
@@ -296,6 +293,13 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
                 curves.append(curve)
         return curves
 
+    def numberOfVelocityCurves(self):
+        i = 0
+        for curve in self.vcPropertiesList:
+            if curve is not 0:
+                i = i + 1
+        return i
+
     def loadCurveDialog(self, type, vcNumber):
         dialog = QtGui.QFileDialog(self)
         dialog.setAcceptMode(0)
@@ -414,6 +418,9 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
     def updateCurveWidget(self):
         self.curve_treewidget.clear()
         self.MainWindow.SyntheticCurveWidget.loaded_treewidget.clear()
+        self.MainWindow.SyntheticCurveWidget.loaded_treewidget.model().dataChanged.disconnect(
+            self.MainWindow.SyntheticCurveWidget.updateObservations
+        )
         self.MainWindow.clearWidgets()
         for curve in self.Curves():
             item = QtGui.QTreeWidgetItem(self.curve_treewidget)
@@ -430,12 +437,12 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
                         curvetype = "Velocity Curve (#2)"
             item.setText(1, curvetype)
             item.setText(2, self.MainWindow.DCWidget.bandpassDict[curve.band])
-            # update synthetic tree widget
-            item2 = QtGui.QTreeWidgetItem(self.MainWindow.SyntheticCurveWidget.loaded_treewidget)
-            item2.setText(0, os.path.basename(curve.FilePath))
-            item2.setToolTip(0, curve.FilePath)
-            item2.setText(1, curvetype)
-            item2.setText(2, self.MainWindow.DCWidget.bandpassDict[curve.band])
+        self.curve_treewidget.header().setResizeMode(3)
+        self.MainWindow.SyntheticCurveWidget.populateSyntheticCurveWidget()
+        self.MainWindow.SyntheticCurveWidget.appendSynthetics()
+        self.MainWindow.SyntheticCurveWidget.loaded_treewidget.model().dataChanged.connect(
+            self.MainWindow.SyntheticCurveWidget.updateObservations
+        )
 
 
 class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropertiesDialog):
@@ -542,7 +549,9 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
             "WIRE V+R": "93",
             "Lunar Ultraviolet Telescope": "94"
         }
+        self.reverseBandpassDict = {self.bandpassdict[key]: key for key in self.bandpassdict.keys()}
         self.bandpassContextMenu = self.createBandpassContextMenu()
+        self.datawidget.header().setResizeMode(3)
         self.connectSignals()
 
     def connectSignals(self):
@@ -1621,6 +1630,15 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                                     paramdict[index].setValue(float(result[4]))
                                 else:  # just slap output into input
                                     paramdict[index].setText(result[4])
+            self.MainWindow.SyntheticCurveWidget.loaded_treewidget.model().dataChanged.disconnect(
+                self.MainWindow.SyntheticCurveWidget.updateObservations
+            )
+            self.MainWindow.SyntheticCurveWidget.loaded_treewidget.clear()
+            self.MainWindow.SyntheticCurveWidget.populateSyntheticCurveWidget()
+            self.MainWindow.SyntheticCurveWidget.appendSynthetics()
+            self.MainWindow.SyntheticCurveWidget.loaded_treewidget.model().dataChanged.connect(
+                self.MainWindow.SyntheticCurveWidget.updateObservations
+            )
 
     def updateResultTree(self, resultTable):
         def _populateItem(itm, rslt):
@@ -1691,6 +1709,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 item = _populateItem(QtGui.QTreeWidgetItem(self.result_treewidget), result)
                 self.result_treewidget.addTopLevelItem(item)
         self.result_treewidget.expandAll()
+        self.result_treewidget.header().setResizeMode(1)
+        self.curvestat_treewidget.header().setResizeMode(1)
 
     def updateCurveInfoTree(self, curveinfoTable):
         self.curvestat_treewidget.clear()
@@ -1847,9 +1867,11 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
     def __init__(self):
         super(SyntheticCurveWidget, self).__init__()
         self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
         # variables
-        self.synthCurveParams = []
         self.MainWindow = None
+        self.lastEditedIndex = None
+        self.lastEditedColumn = None
         # set up canvas
         self.plot_figure = Figure()
         self.plot_canvas = FigureCanvas(self.plot_figure)
@@ -1862,31 +1884,22 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         self.plot_observationAxis = self.plot_figure.add_subplot(grid[0])
         self.plot_residualAxis = self.plot_figure.add_subplot(grid[1], sharex=self.plot_observationAxis)
         self.plot_observationAxis.get_xaxis().set_visible(False)
-        yticks = self.plot_residualAxis.yaxis.get_major_ticks()
-        yticks[-1].label1.set_visible(False)
         self.plot_figure.tight_layout()
         self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
         self.plot_canvas.draw()
+        # add synthetic curves
+        self.appendSynthetics()
+        self.loaded_treewidget.setEditTriggers(self.loaded_treewidget.NoEditTriggers)
+        self.loaded_treewidget.header().setResizeMode(3)
         # signal connection
         self.connectSignals()
 
     def connectSignals(self):
-        self.add_btn.clicked.connect(self.addSyntheticCurve)
-        self.edit_btn.clicked.connect(self.editSyntheticCurve)
-        self.remove_btn.clicked.connect(self.removeSyntheticCurve)
+        self.phase_spinbox.valueChanged.connect(self.phaseValueChanged)
+        self.drawstars_chk.stateChanged.connect(self.drawstarsChanged)
+        self.loaded_treewidget.model().dataChanged.connect(self.updateObservations)
+        self.loaded_treewidget.itemDoubleClicked.connect(self.checkEditable)
         self.plot_btn.clicked.connect(self.plotSelected)
-
-    def updateSynthCurveWidget(self):
-        self.synthetic_treewidget.clear()
-        for curve in self.synthCurveParams:
-            item = QtGui.QTreeWidgetItem(self.synthetic_treewidget)
-            curveType = ""
-            if curve.type == "lc":
-                curveType = "Light Cuve"
-            if curve.type == "vc":
-                curveType = "Velocity Curve"
-            item.setText(0, curveType)
-            item.setText(1, self.MainWindow.DCWidget.bandpassDict[curve.band])
 
     def selectedItem(self):
         selecteditem = self.loaded_treewidget.selectedItems()
@@ -1895,124 +1908,261 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         else:
             return None
 
-    def selectedSyntheticItem(self):
-        selecteditem = self.synthetic_treewidget.selectedItems()
-        if len(selecteditem) > 0:
-            return selecteditem[0]
-        else:
-            return None
-
-    def addSyntheticCurve(self):
-        menu = QtGui.QMenu()
-        synth = menu.addMenu("Add New")
-        lc_synth = synth.addAction("Light Curve")
-        vc_synth = synth.addAction("Velocity Curve")
-        obs = menu.addAction("Add From Observation")
-        selection = menu.exec_(QtGui.QCursor.pos())
-        if selection == lc_synth or selection == vc_synth:
-            type = ""
-            if selection == lc_synth:
-                type = "lc"
-            if selection == vc_synth:
-                type = "vc"
-            curvedialog = CurvePropertiesDialog.createCurveDialog(type, synthetic=True)
-            returnCode = curvedialog.exec_()
-            if returnCode == 1:
-                curveProp = classes.CurveProperties(type, synthetic=True)
-                curveProp.populateFromInterface(curvedialog)
-                self.synthCurveParams.append(curveProp)
-                self.updateSynthCurveWidget()
-        if selection == obs:
-            item = self.selectedItem()
-            if item is not None:
-                index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
-                curve = self.MainWindow.LoadObservationWidget.Curves()[index]
-                synthetic = curve.getSynthetic()
-                curvedialog = CurvePropertiesDialog.createCurveDialog(curve.type, synthetic=True)
-                curvedialog.populateFromObject(synthetic)
-                curvedialog.sigma_ipt.setText("8")
-                returnCode = curvedialog.exec_()
-                if returnCode == 1:
-                    newcurve = classes.CurveProperties(curve.type, synthetic=True)
-                    newcurve.populateFromInterface(curvedialog)
-                    self.synthCurveParams.append(newcurve)
-                    self.updateSynthCurveWidget()
-
-    def editSyntheticCurve(self):
-        item = self.selectedSyntheticItem()
-        if item is not None:
-            index = self.synthetic_treewidget.invisibleRootItem().indexOfChild(item)
-            curve = self.synthCurveParams[index]
-            curvedialog = CurvePropertiesDialog.createCurveDialog(curve.type, synthetic=True)
-            curvedialog.populateFromObject(curve)
-            returnCode = curvedialog.exec_()
-            if returnCode == 1:
-                newcurve = classes.CurveProperties(curve.type, synthetic=True)
-                newcurve.populateFromInterface(curvedialog)
-                self.synthCurveParams[index] = newcurve
-            self.updateSynthCurveWidget()
-
-    def removeSyntheticCurve(self):
-        item = self.selectedSyntheticItem()
-        if item is not None:
-            index = self.synthetic_treewidget.invisibleRootItem().indexOfChild(item)
-            self.synthCurveParams.pop(index)
-            self.updateSynthCurveWidget()
-
     def plotSelected(self):
-        selectedObs = self.selectedItem()
-        selectedSynth = self.selectedSyntheticItem()
-
-        if selectedSynth is not None or selectedObs is not None:
+        if self.selectedItem() is not None:
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
-            self.plot_residualAxis.ticklabel_format(useOffset=False)
-            # self.plot_residualAxis.axhline(c="r")
-
-            if selectedObs is not None:
-                index = self.loaded_treewidget.invisibleRootItem().indexOfChild(selectedObs)
-                curveProps = self.MainWindow.LoadObservationWidget.Curves()[index]
-                curve = classes.Curve(curveProps.FilePath)
-                self.plot_observationAxis.plot(
-                    [float(x) for x in curve.timeList],
-                    [float(y) for y in curve.observationList],
-                    linestyle="", marker="o", markersize=4, color="#4286f4")
-
-            if selectedSynth is not None:
-                index = self.synthetic_treewidget.invisibleRootItem().indexOfChild(selectedSynth)
-                curveProps = self.synthCurveParams[index]
+            item = self.selectedItem()
+            type = ""
+            if str(item.text(1)) in ("Velocity Curve", "Velocity Curve #1", "Velocity Curve #2"):
+                type = "vc"
+            else:
+                type = "lc"
+            syntheticCurve = classes.CurveProperties(type, synthetic=True)
+            curveProps = CurvePropertiesDialog()
+            if str(item.text(0)) == "[Synthetic]" and str(item.text(1)) == "Velocity Curve":
+                syntheticCurve.band = "7"
+                syntheticCurve.l1 = "1"
+                syntheticCurve.l2 = "1"
+                syntheticCurve.x1 = "1"
+                syntheticCurve.x2 = "1"
+                syntheticCurve.y1 = "1"
+                syntheticCurve.y2 = "1"
+                syntheticCurve.el3a = "1"
+                syntheticCurve.opsf = "1"
+                syntheticCurve.zero = "8"
+                syntheticCurve.factor = "1"
+                syntheticCurve.wla = "0.55"
+                syntheticCurve.aextinc = "0"
+                syntheticCurve.calib = "0"
+            elif str(item.text(0)) == "[Synthetic]" and str(item.text(1)) == "Light Curve":
+                button = self.loaded_treewidget.itemWidget(item, 2)
+                syntheticCurve.band = curveProps.bandpassdict[str(button.text())]
+                syntheticCurve.l1 = item.text(3)
+                syntheticCurve.l2 = item.text(4)
+                syntheticCurve.x1 = item.text(6)
+                syntheticCurve.x2 = item.text(7)
+                syntheticCurve.y1 = item.text(8)
+                syntheticCurve.y2 = item.text(9)
+                syntheticCurve.el3a = item.text(5)
+                syntheticCurve.opsf = item.text(10)
+                syntheticCurve.zero = "8"
+                syntheticCurve.factor = "1"
+                syntheticCurve.wla = "0.55"
+                syntheticCurve.aextinc = item.text(11)
+                syntheticCurve.calib = item.text(12)
+            else:
+                index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
+                curve = self.MainWindow.LoadObservationWidget.Curves()[index]
+                syntheticCurve = curve.getSynthetic()
+                syntheticCurve.zero = "8"
+                syntheticCurve.factor = "1"
+            if self.plotobs_chk.isChecked():
+                if str(item.text(0)) != "[Synthetic]":
+                    index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
+                    curve = classes.Curve(self.MainWindow.LoadObservationWidget.Curves()[index].FilePath)
+                    x = [float(x) for x in curve.timeList]
+                    y = [float(y) for y in curve.observationList]
+                    if self.time_combobox.currentText() == "Phase" and self.MainWindow.jdphs_combobox.currentText() == "Time":
+                        t0 = float(self.MainWindow.jd0_ipt.text())
+                        p = float(self.MainWindow.p0_ipt.text())
+                        x2 = []
+                        for t in x:
+                            obs = ((t - t0) / p) - int((t - t0) / p)
+                            while obs < 0.0:
+                                obs = obs + 1
+                            x2.append(obs)
+                        x = x2
+                    self.plot_observationAxis.plot(x, y, linestyle="", marker="o", markersize=4, color="#4286f4")
+            if self.plotmodel_chk.isChecked():
                 lcin = classes.lcin(self.MainWindow)
                 mpage = 1
-                if curveProps.type == "vc":
+                if syntheticCurve.type == "vc":
                     mpage = 2
-                lcin.syntheticCurve(curveProps, mpage)
+                jdphs = None
+                if str(self.time_combobox.currentText()) == "HJD":
+                    jdphs = "1"
+                else:
+                    jdphs = "2"
+                lcin.syntheticCurve(syntheticCurve, mpage, jdphs=jdphs)
                 with open(self.MainWindow.lcinpath, "w") as f:
                     f.write(lcin.output)
                 process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
                 process.wait()
                 table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
-                x_index = 1
-                y_index = 4
-                y2_index = 7
-                if self.MainWindow.jdphs_combobox.currentText() == "Time":
-                    x_index = 0
-                if curveProps.type == "vc":
+                # set data indexes
+                x_index = None
+                y_index = None
+                y2_index = None
+                if syntheticCurve.type == "vc":
                     y_index = 6
-                lc_x = [float(x[x_index].replace("D", "E")) for x in table]
-                lc_y = []
-                if curveProps.type == "vc":
-                    lc_y = [float(x[y_index].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for x in table]
+                    y2_index = 7
+                if syntheticCurve.type == "lc":
+                    y_index = 4
+                if self.time_combobox.currentText() == "HJD":
+                    x_index = 0
                 else:
-                    lc_y = [float(x[y_index].replace("D", "E")) for x in table]
-                self.plot_observationAxis.plot(lc_x, lc_y, color="red")
-                if curveProps.type == "vc":
-                    lc_y2 = [float(x[y2_index].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for x in table]
-                    self.plot_observationAxis.plot(lc_x, lc_y2, color="red")
-
+                    x_index = 1
+                # get data from table
+                x = [float(line[x_index].replace("D", "E")) for line in table]
+                y = [float(line[y_index].replace("D", "E")) for line in table]
+                y2 = []
+                if syntheticCurve.type == "vc":
+                    vunit = float(str(self.MainWindow.vunit_ipt.text()))
+                    y1 = [y1 * vunit for y1 in y]
+                    y = y1
+                    y2 = [float(line[y2_index].replace("D", "E")) * vunit for line in table]
+                # plot data
+                self.plot_observationAxis.plot(x, y, color="red")
+                if syntheticCurve.type == "vc":
+                    self.plot_observationAxis.plot(x, y2, color="red")
             self.plot_toolbar.update()
             yticks = self.plot_residualAxis.yaxis.get_major_ticks()
             yticks[-1].label1.set_visible(False)
             self.plot_canvas.draw()
+
+    def updateObservations(self):
+        item = self.loaded_treewidget.invisibleRootItem().child(self.lastEditedIndex)
+        if item.text(0) != "[Synthetic]":
+            curve = self.MainWindow.LoadObservationWidget.Curves()[self.lastEditedIndex]
+            if self.lastEditedColumn == 2:
+                curveProp = CurvePropertiesDialog()
+                button = self.loaded_treewidget.itemWidget(item, 2)
+                curve.band = curveProp.bandpassdict[str(button.text())]
+                item2 = self.MainWindow.LoadObservationWidget.curve_treewidget.invisibleRootItem().child(self.lastEditedIndex)
+                item2.setText(2, button.text())
+            elif self.lastEditedColumn == 3:
+                curve.l1 = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 4:
+                curve.l2 = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 5:
+                curve.el3a = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 6:
+                curve.x1 = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 7:
+                curve.x2 = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 8:
+                curve.y1 = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 9:
+                curve.y2 = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 10:
+                curve.opsf = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 11:
+                curve.aextinc = str(item.text(self.lastEditedColumn))
+            elif self.lastEditedColumn == 12:
+                curve.calib = str(item.text(self.lastEditedColumn))
+            self.MainWindow.LoadObservationWidget.lcPropertiesList[
+                self.lastEditedIndex - self.MainWindow.LoadObservationWidget.numberOfVelocityCurves()
+            ] = curve
+
+    def checkEditable(self, item, column):  # item and column are the clicked hex's properties
+        if column not in (0, 1):
+            if str(item.text(1)) not in ("Velocity Curve", "Velocity Curve #1", "Velocity Curve #2"):
+                self.lastEditedIndex = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
+                self.lastEditedColumn = column
+                self.loaded_treewidget.editItem(item, column)
+
+    def appendSynthetics(self):
+        item = QtGui.QTreeWidgetItem(self.loaded_treewidget)
+        item.setText(0, "[Synthetic]")
+        item.setText(1, "Velocity Curve")
+        item.setText(2, "-")
+        item.setText(3, "-")
+        item.setText(4, "-")
+        item.setText(5, "-")
+        item.setText(6, "-")
+        item.setText(7, "-")
+        item.setText(8, "-")
+        item.setText(9, "-")
+        item.setText(10, "-")
+        item.setText(11, "-")
+        item.setText(12, "-")
+        item = QtGui.QTreeWidgetItem(self.loaded_treewidget)
+        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+        item.setText(0, "[Synthetic]")
+        item.setText(1, "Light Curve")
+        curveProps = CurvePropertiesDialog()
+        button = QtGui.QPushButton(self)
+        button.setText("Select a filter")
+        button.setMaximumHeight(20)
+        button.clicked.connect(partial(self.selectBand, button, item))
+        self.loaded_treewidget.setItemWidget(item, 2, button)
+        item.setText(3, "0")
+        item.setText(4, "0")
+        item.setText(5, "0")
+        item.setText(6, "0")
+        item.setText(7, "0")
+        item.setText(8, "0")
+        item.setText(9, "0")
+        item.setText(10, "0")
+        item.setText(11, "0")
+        item.setText(12, "0")
+
+    def populateSyntheticCurveWidget(self):
+        for curve in self.MainWindow.LoadObservationWidget.Curves():
+            item = QtGui.QTreeWidgetItem(self.loaded_treewidget)
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            if curve.type == "vc":
+                item.setText(0, os.path.basename(curve.FilePath))
+                item.setText(1, "Velocity Curve #{0}".format(curve.star))
+                item.setText(2, "-")
+                item.setText(3, "-")
+                item.setText(4, "-")
+                item.setText(5, "-")
+                item.setText(6, "-")
+                item.setText(7, "-")
+                item.setText(8, "-")
+                item.setText(9, "-")
+                item.setText(10, "-")
+                item.setText(11, "-")
+                item.setText(12, "-")
+            if curve.type == "lc":
+                curveProps = CurvePropertiesDialog()
+                item.setText(0, os.path.basename(curve.FilePath))
+                item.setText(1, "Light Curve")
+                button = QtGui.QPushButton(self)
+                button.setText(curveProps.reverseBandpassDict[curve.band])
+                button.setMaximumHeight(20)
+                button.clicked.connect(partial(self.selectBand, button, item))
+                self.loaded_treewidget.setItemWidget(item, 2, button)
+                item.setText(3, curve.l1)
+                item.setText(4, curve.l2)
+                item.setText(5, curve.el3a)
+                item.setText(6, curve.x1)
+                item.setText(7, curve.x2)
+                item.setText(8, curve.y1)
+                item.setText(9, curve.y2)
+                item.setText(10, curve.opsf)
+                item.setText(11, curve.aextinc)
+                item.setText(12, curve.calib)
+        self.loaded_treewidget.header().setResizeMode(3)
+
+    def selectBand(self, button, item):
+        curve = CurvePropertiesDialog()
+        menu = curve.bandpassContextMenu
+        band = menu.exec_(QtGui.QCursor.pos())
+        if band is not None:
+            button.setText(band.objectName())
+            self.lastEditedIndex = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
+            self.lastEditedColumn = 2
+            self.loaded_treewidget.model().dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
+
+    def drawstarsChanged(self):
+        if self.drawstars_chk.isChecked() is not True:
+            self.phase_spinbox.setDisabled(True)
+            self.roche_chk.setDisabled(True)
+            self.roche_chk.setChecked(False)
+        else:
+            self.phase_spinbox.setDisabled(False)
+            self.roche_chk.setDisabled(False)
+            self.phaseValueChanged()
+
+    def phaseValueChanged(self):
+        if float(self.phase_spinbox.value()) != 0.25:
+            self.roche_chk.setDisabled(True)
+            self.roche_chk.setChecked(False)
+        else:
+            self.roche_chk.setDisabled(False)
 
 
 if __name__ == "__main__":
