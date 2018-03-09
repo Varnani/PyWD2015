@@ -1895,8 +1895,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         self.connectSignals()
 
     def connectSignals(self):
-        self.phase_spinbox.valueChanged.connect(self.phaseValueChanged)
-        self.drawstars_chk.stateChanged.connect(self.drawstarsChanged)
+        self.roche_chk.stateChanged.connect(self.rocheChanged)
         self.loaded_treewidget.model().dataChanged.connect(self.updateObservations)
         self.loaded_treewidget.itemDoubleClicked.connect(self.checkEditable)
         self.plot_btn.clicked.connect(self.plotSelected)
@@ -2016,6 +2015,27 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 self.plot_observationAxis.plot(x, y, color="red")
                 if syntheticCurve.type == "vc":
                     self.plot_observationAxis.plot(x, y2, color="red")
+            if self.drawstars_chk.isChecked() or self.roche_chk.isChecked():
+                if self.drawstars_chk.isChecked():
+                    lcin = classes.lcin(self.MainWindow)
+                    phase = self.phase_spinbox.value()
+                    lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                                 phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000], jdphs="2")
+                    with open(self.MainWindow.lcinpath, "w") as f:
+                        f.write(lcin.output)
+                    process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+                    process.wait()
+                    table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+                    x = [float(x[0]) for x in table]
+                    y = [float(y[1]) for y in table]
+                    pyplot.cla()
+                    pyplot.plot(x, y, 'ko', markersize=0.2)
+                if self.roche_chk.isChecked():
+                    pass
+                pyplot.xlabel('x')
+                pyplot.ylabel('y')
+                pyplot.axis('equal')
+                pyplot.show()
             self.plot_toolbar.update()
             yticks = self.plot_residualAxis.yaxis.get_major_ticks()
             yticks[-1].label1.set_visible(False)
@@ -2147,22 +2167,12 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
             self.lastEditedColumn = 2
             self.loaded_treewidget.model().dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
 
-    def drawstarsChanged(self):
-        if self.drawstars_chk.isChecked() is not True:
+    def rocheChanged(self):
+        if self.roche_chk.isChecked():
             self.phase_spinbox.setDisabled(True)
-            self.roche_chk.setDisabled(True)
-            self.roche_chk.setChecked(False)
+            self.phase_spinbox.setValue(float(0.25))
         else:
             self.phase_spinbox.setDisabled(False)
-            self.roche_chk.setDisabled(False)
-            self.phaseValueChanged()
-
-    def phaseValueChanged(self):
-        if float(self.phase_spinbox.value()) != 0.25:
-            self.roche_chk.setDisabled(True)
-            self.roche_chk.setChecked(False)
-        else:
-            self.roche_chk.setDisabled(False)
 
 
 if __name__ == "__main__":

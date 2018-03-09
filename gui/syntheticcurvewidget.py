@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'syntheticcurvewidget.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Fri Mar  9 13:24:37 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -36,7 +37,7 @@ class Ui_SyntheticCurveWidget(object):
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 8, 0, 1, 1)
         self.phase_spinbox = QtGui.QDoubleSpinBox(SyntheticCurveWidget)
-        self.phase_spinbox.setEnabled(False)
+        self.phase_spinbox.setEnabled(True)
         self.phase_spinbox.setDecimals(2)
         self.phase_spinbox.setMaximum(1.0)
         self.phase_spinbox.setSingleStep(0.1)
@@ -76,7 +77,7 @@ class Ui_SyntheticCurveWidget(object):
         self.line_3.setObjectName(_fromUtf8("line_3"))
         self.gridLayout.addWidget(self.line_3, 6, 0, 1, 2)
         self.roche_chk = QtGui.QCheckBox(SyntheticCurveWidget)
-        self.roche_chk.setEnabled(False)
+        self.roche_chk.setEnabled(True)
         self.roche_chk.setObjectName(_fromUtf8("roche_chk"))
         self.gridLayout.addWidget(self.roche_chk, 9, 0, 1, 2)
         self.gridLayout_2.addLayout(self.gridLayout, 0, 2, 1, 1)

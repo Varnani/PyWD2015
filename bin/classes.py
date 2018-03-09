@@ -736,12 +736,31 @@ class lcin(WDInput):
         WDInput.__init__(self)
         self.MainWindow = MainWindow
 
+    def starPositions(self, line3=None, jdphs=None):
+        curve = CurveProperties("lc")
+        curve.band = "7"
+        curve.l1 = "1"
+        curve.l2 = "1"
+        curve.x1 = "0"
+        curve.x2 = "0"
+        curve.y1 = "0"
+        curve.y2 = "0"
+        curve.el3a = "0"
+        curve.opsf = "0"
+        curve.zero = "8"
+        curve.factor = "1"
+        curve.wla = "0.55"
+        curve.aextinc = "0"
+        curve.calib = "0"
+        self.syntheticCurve(curve, 5, line3=line3, jdphs=jdphs)
+
     def syntheticCurve(self, curve, mpage, line3=None, jdphs=None):
         """
         MPAGE = 1
         running self.output with LC will result in a synthetic light curve
         :param curve: a SyntheticCurveProperties object
         :param line3: an optinal list with start and end points of data
+        :param mpage: mpage parameter
         it should be in this format:
         [jdstart, jdstop, jdincrement, phasestart, phasestop, phaseincrement, phasenorm, phobs, lsp, tobs]
         :return: this fills self.output with ready-to-write data.
