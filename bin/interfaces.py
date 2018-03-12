@@ -1,5 +1,6 @@
 from PyQt4 import QtGui, QtCore
 import numpy as np
+from scipy.optimize import fsolve
 from matplotlib import pyplot, gridspec
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
@@ -2016,7 +2017,12 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 if syntheticCurve.type == "vc":
                     self.plot_observationAxis.plot(x, y2, color="red")
             if self.drawstars_chk.isChecked() or self.roche_chk.isChecked():
+                center_of_mass = 1 - (1 / (1 + float(self.MainWindow.rm_ipt.text())))
+                pyplot.cla()
                 if self.drawstars_chk.isChecked():
+                    if self.roche_chk.isChecked():
+                        stored_inclination = str(self.MainWindow.xincl_ipt.text())
+                        self.MainWindow.xincl_ipt.setText("90")
                     lcin = classes.lcin(self.MainWindow)
                     phase = self.phase_spinbox.value()
                     lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
@@ -2026,15 +2032,69 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
                     process.wait()
                     table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
-                    x = [float(x[0]) for x in table]
-                    y = [float(y[1]) for y in table]
-                    pyplot.cla()
+                    x = [float(x[0].replace("D", "E")) + center_of_mass for x in table]
+                    y = [float(y[1].replace("D", "E")) for y in table]
                     pyplot.plot(x, y, 'ko', markersize=0.2)
+                    pyplot.plot([center_of_mass], [0], linestyle="", marker="+", markersize=5, color="#ff3a3a")
+                    if self.roche_chk.isChecked():
+                        self.MainWindow.xincl_ipt.setText(stored_inclination)
                 if self.roche_chk.isChecked():
-                    pass
+
+                    # This snippet is only for e = 0 and f = 1, for now
+                    # For in-depth discussion about calculating Roche potentials, refer to:
+                    # Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
+
+                    w = float(self.MainWindow.perr0_ipt.text())
+                    # e = float(self.MainWindow.e_ipt.text())
+                    e = 0.0
+                    phase = float(self.phase_spinbox.value())
+                    phase_shift = float(self.MainWindow.pshift_ipt.text())
+
+                    true_anomaly = (np.pi / 2.0) - w
+                    eccentric_anomaly = 2.0 * np.arctan(np.sqrt((1.0 - e) / (1.0 + e)) * np.tan(true_anomaly / 2.0))
+                    mean_anomaly = eccentric_anomaly - e * np.sin(eccentric_anomaly)
+                    conjuction = ((mean_anomaly + w) / (2.0 * np.pi)) - 0.25 + phase_shift  # superior conjunction phase
+                    periastron_passage = 1.0 - mean_anomaly / (2.0 * np.pi)
+                    periastron_phase = conjuction + periastron_passage  # phase of periastron
+                    while periastron_phase > 1.0:
+                        periastron_phase = periastron_phase - int(periastron_phase)
+                    M = 2.0 * np.pi * (phase - periastron_phase)
+                    while M < 0.0:
+                        M = M + 2.0 * np.pi
+                    f_E = lambda E: E - e * np.sin(E) - M
+                    E = fsolve(f_E, M)
+                    separation_at_phase = 1.0 - e * np.cos(E)
+
+                    print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
+
+                    q = float(self.MainWindow.rm_ipt.text())
+                    f = 1.0
+
+                    f_inner_critical = lambda x: (-1 / x ** 2) - \
+                                                 (q * ((x - separation_at_phase) / pow(np.absolute(separation_at_phase - x), 3))) + \
+                                                 (x * f ** 2 * (q + 1)) - (q / separation_at_phase ** 2)  # Appendix E.12.4
+
+                    inner_critical_x = fsolve(f_inner_critical, separation_at_phase / 2.0)
+                    inner_potential = (1 / inner_critical_x) + (q * ((1 / np.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
+                            ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
+
+                    print "Inner critical potential: {0}".format(inner_potential)
+
+                    x_axis = np.linspace(-1, 2, 2000)
+                    z_axis = np.linspace(-1, 2, 2000)
+                    (X, Z) = np.meshgrid(x_axis, z_axis)
+                    all_pots = ((1 / np.sqrt(X ** 2 + Z ** 2)) + (q * (
+                            (1 / np.sqrt((separation_at_phase ** 2) - (2 * X * separation_at_phase) + (np.sqrt(X ** 2 + Z ** 2) ** 2))) - (
+                            X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
+                    pyplot.contour(X, Z, all_pots, inner_potential, colors="red")
+                    pyplot.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
+
+                pyplot.axis('equal')
+                pyplot.xlim(-1, 2)
+                pyplot.ylim(-1, 1)
                 pyplot.xlabel('x')
                 pyplot.ylabel('y')
-                pyplot.axis('equal')
+                pyplot.get_current_fig_manager().set_window_title("Matplotlib - Star Positions | Roche Potentials")
                 pyplot.show()
             self.plot_toolbar.update()
             yticks = self.plot_residualAxis.yaxis.get_major_ticks()
