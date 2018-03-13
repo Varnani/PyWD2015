@@ -75,6 +75,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
 
         self.SyntheticCurveWidget.plot_observationAxis.clear()
         self.SyntheticCurveWidget.plot_residualAxis.clear()
+        self.SyntheticCurveWidget.plot_starposAxis.clear()
 
         self.DCWidget.obs_x = []
         self.DCWidget.obs_y = []
@@ -85,8 +86,11 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.obslabel = ""
         self.DCWidget.timelabel = ""
 
-        yticks = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
-        yticks[-1].label1.set_visible(False)
+        yticks_resd = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
+        yticks_resd[-1].label1.set_visible(False)
+        yticks_star = self.SyntheticCurveWidget.plot_starposAxis.yaxis.get_major_ticks()
+        yticks_star[0].label1.set_visible(False)
+        yticks_star[-1].label1.set_visible(False)
 
         self.DCWidget.plot_canvas.draw()
         self.SyntheticCurveWidget.plot_canvas.draw()
@@ -1882,9 +1886,14 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         plot_layout.addWidget(self.plot_toolbar)
         plot_layout.addWidget(self.plot_canvas)
         self.plot_widget.setLayout(plot_layout)
-        grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
-        self.plot_observationAxis = self.plot_figure.add_subplot(grid[0])
-        self.plot_residualAxis = self.plot_figure.add_subplot(grid[1], sharex=self.plot_observationAxis)
+        self.dual_grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
+        self.triple_grid = gridspec.GridSpec(2, 2, height_ratios=[1.5, 1], width_ratios=[2, 1])
+        self.plot_observationAxis = self.plot_figure.add_subplot(self.dual_grid[0])
+        self.plot_residualAxis = self.plot_figure.add_subplot(self.dual_grid[1], sharex=self.plot_observationAxis)
+        self.plot_starposAxis = self.plot_figure.add_subplot(self.triple_grid[0:, -1])
+        self.plot_starposAxis.axis("equal")
+        self.plot_starposAxis.set_visible(False)
+        self.plot_starposAxis.tick_params(axis="y", direction="in", pad=-25)
         self.plot_observationAxis.get_xaxis().set_visible(False)
         self.plot_figure.tight_layout()
         self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
@@ -1913,12 +1922,29 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         if self.selectedItem() is not None:
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
+            self.plot_starposAxis.clear()
+            self.plot_observationAxis.set_position(self.dual_grid[0].get_position(self.plot_figure))
+            self.plot_residualAxis.set_position(self.dual_grid[1].get_position(self.plot_figure))
+            self.plot_starposAxis.set_visible(False)
             item = self.selectedItem()
+            ylabel = None
             type = ""
             if str(item.text(1)) in ("Velocity Curve", "Velocity Curve #1", "Velocity Curve #2"):
                 type = "vc"
+                ylabel = "Radial Velocity (km s$^{-1}$)"
             else:
                 type = "lc"
+                ylabel = str(self.MainWindow.maglite_combobox.currentText())
+                if ylabel == "Flux":
+                    ylabel = "Norm. Flux"
+            xlabel = None
+            print str(self.time_combobox.currentText())
+            if str(self.time_combobox.currentText()) == "Phase":
+                xlabel = "Phase"
+            if str(self.time_combobox.currentText()) == "HJD" and str(self.MainWindow.jdphs_combobox.currentText()) == "Time":
+                xlabel = "HJD"
+            self.plot_observationAxis.set_ylabel(ylabel)
+            self.plot_residualAxis.set_xlabel(xlabel)
             syntheticCurve = classes.CurveProperties(type, synthetic=True)
             curveProps = CurvePropertiesDialog()
             if str(item.text(0)) == "[Synthetic]" and str(item.text(1)) == "Velocity Curve":
@@ -2026,10 +2052,13 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     for o, c in izip(y_obs, interpolated_y_model):
                         y_residuals.append(o - c)
                     self.plot_residualAxis.plot(x_obs, y_residuals, linestyle="", marker="o", markersize=4, color="#4286f4")
+                self.plot_residualAxis.set_ylabel("Residuals")
                     
             if self.drawstars_chk.isChecked() or self.roche_chk.isChecked():
                 center_of_mass = 1 - (1 / (1 + float(self.MainWindow.rm_ipt.text())))
-                pyplot.cla()
+                self.plot_observationAxis.set_position(self.triple_grid[0, :-1].get_position(self.plot_figure))
+                self.plot_residualAxis.set_position(self.triple_grid[1, :-1].get_position(self.plot_figure))
+                self.plot_starposAxis.set_visible(True)
                 if self.drawstars_chk.isChecked():
                     if self.roche_chk.isChecked():
                         stored_inclination = str(self.MainWindow.xincl_ipt.text())
@@ -2045,8 +2074,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
                     x = [float(x[0].replace("D", "E")) + center_of_mass for x in table]
                     y = [float(y[1].replace("D", "E")) for y in table]
-                    pyplot.plot(x, y, 'ko', markersize=0.2)
-                    pyplot.plot([center_of_mass], [0], linestyle="", marker="+", markersize=5, color="#ff3a3a")
+                    self.plot_starposAxis.plot(x, y, 'ko', markersize=0.2)
+                    self.plot_starposAxis.plot([center_of_mass], [0], linestyle="", marker="+", markersize=5, color="#ff3a3a")
                     if self.roche_chk.isChecked():
                         self.MainWindow.xincl_ipt.setText(stored_inclination)
                 if self.roche_chk.isChecked():
@@ -2105,23 +2134,22 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                             (1 / numpy.sqrt((separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
                             X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
                     if qIsInverse:
-                        pyplot.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
-                        pyplot.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
+                        self.plot_starposAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
+                        self.plot_starposAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
                     else:
-                        pyplot.contour(X, Z, all_pots, inner_potential, colors="red")
-                        pyplot.contour(X, Z, all_pots, outer_potential, colors="blue")
-                    pyplot.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
-
-                pyplot.axis("equal")
-                pyplot.xlim(-1, 2)
-                pyplot.ylim(-1, 1)
-                pyplot.xlabel('x')
-                pyplot.ylabel('y')
-                pyplot.get_current_fig_manager().set_window_title("Matplotlib - Star Positions | Roche Potentials")
-                pyplot.show()
+                        self.plot_starposAxis.contour(X, Z, all_pots, inner_potential, colors="red")
+                        self.plot_starposAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
+                    self.plot_starposAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
+                self.plot_starposAxis.set_xlim(-1, 2)
+                self.plot_starposAxis.set_ylim(-1, 1)
+                self.plot_starposAxis.set_xlabel('x')
+                self.plot_starposAxis.set_ylabel('y')
             self.plot_toolbar.update()
-            yticks = self.plot_residualAxis.yaxis.get_major_ticks()
-            yticks[-1].label1.set_visible(False)
+            yticks_resd = self.plot_residualAxis.yaxis.get_major_ticks()
+            yticks_resd[-1].label1.set_visible(False)
+            yticks_star = self.plot_starposAxis.yaxis.get_major_ticks()
+            yticks_star[0].label1.set_visible(False)
+            yticks_star[-1].label1.set_visible(False)
             self.plot_residualAxis.axhline(0, color="red")
             self.plot_canvas.draw()
 
