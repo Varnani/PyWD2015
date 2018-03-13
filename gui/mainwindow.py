@@ -811,7 +811,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.maintabwidget.setCurrentIndex(1)
+        self.maintabwidget.setCurrentIndex(0)
         self.inputtabwidget.setCurrentIndex(0)
         self.mode_combobox.setCurrentIndex(1)
         self.lcnoise_combobox.setCurrentIndex(0)

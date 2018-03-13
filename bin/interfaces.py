@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-import numpy as np
+import numpy
 from scipy.optimize import fsolve
 from matplotlib import pyplot, gridspec
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -9,10 +9,12 @@ from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesd
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget, syntheticcurvewidget
 from functools import partial
 from bin import methods, classes
+from itertools import izip
 import subprocess
 import sys
 import ConfigParser
 import os
+
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
     def __init__(self):  # constructor
@@ -1675,7 +1677,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             itm.setText(2, corr)
             itm.setText(3, output)
             itm.setText(4, stderr)
-            if np.absolute(float(stderr)) > np.absolute(float(corr)):
+            if numpy.absolute(float(stderr)) > numpy.absolute(float(corr)):
                 #itm.setBackground(0, QtGui.QBrush(QtGui.QColor("green")))
                 #itm.setBackground(1, QtGui.QBrush(QtGui.QColor("green")))
                 #itm.setBackground(2, QtGui.QBrush(QtGui.QColor("green")))
@@ -1960,19 +1962,19 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 if str(item.text(0)) != "[Synthetic]":
                     index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
                     curve = classes.Curve(self.MainWindow.LoadObservationWidget.Curves()[index].FilePath)
-                    x = [float(x) for x in curve.timeList]
-                    y = [float(y) for y in curve.observationList]
+                    x_obs = [float(x) for x in curve.timeList]
+                    y_obs = [float(y) for y in curve.observationList]
                     if self.time_combobox.currentText() == "Phase" and self.MainWindow.jdphs_combobox.currentText() == "Time":
                         t0 = float(self.MainWindow.jd0_ipt.text())
                         p = float(self.MainWindow.p0_ipt.text())
                         x2 = []
-                        for t in x:
+                        for t in x_obs:
                             obs = ((t - t0) / p) - int((t - t0) / p)
                             while obs < 0.0:
                                 obs = obs + 1
                             x2.append(obs)
-                        x = x2
-                    self.plot_observationAxis.plot(x, y, linestyle="", marker="o", markersize=4, color="#4286f4")
+                        x_obs = x2
+                    self.plot_observationAxis.plot(x_obs, y_obs, linestyle="", marker="o", markersize=4, color="#4286f4")
             if self.plotmodel_chk.isChecked():
                 lcin = classes.lcin(self.MainWindow)
                 mpage = 1
@@ -2003,18 +2005,28 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 else:
                     x_index = 1
                 # get data from table
-                x = [float(line[x_index].replace("D", "E")) for line in table]
-                y = [float(line[y_index].replace("D", "E")) for line in table]
-                y2 = []
+                x_model = [float(line[x_index].replace("D", "E")) for line in table]
+                y_model = [float(line[y_index].replace("D", "E")) for line in table]
+                y2_model = []
                 if syntheticCurve.type == "vc":
                     vunit = float(str(self.MainWindow.vunit_ipt.text()))
-                    y1 = [y1 * vunit for y1 in y]
-                    y = y1
-                    y2 = [float(line[y2_index].replace("D", "E")) * vunit for line in table]
+                    y1 = [y * vunit for y in y_model]
+                    y_model = y1
+                    y2_model = [float(line[y2_index].replace("D", "E")) * vunit for line in table]
                 # plot data
-                self.plot_observationAxis.plot(x, y, color="red")
+                self.plot_observationAxis.plot(x_model, y_model, color="red")
                 if syntheticCurve.type == "vc":
-                    self.plot_observationAxis.plot(x, y2, color="red")
+                    self.plot_observationAxis.plot(x_model, y2_model, color="red")
+                if self.plotobs_chk.isChecked() and str(item.text(0)) != "[Synthetic]":
+                    if syntheticCurve.type == "vc":
+                        if syntheticCurve.star == 1:
+                            y_model = y2_model
+                    interpolated_y_model = numpy.interp(x_obs, x_model, y_model)
+                    y_residuals = []
+                    for o, c in izip(y_obs, interpolated_y_model):
+                        y_residuals.append(o - c)
+                    self.plot_residualAxis.plot(x_obs, y_residuals, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    
             if self.drawstars_chk.isChecked() or self.roche_chk.isChecked():
                 center_of_mass = 1 - (1 / (1 + float(self.MainWindow.rm_ipt.text())))
                 pyplot.cla()
@@ -2049,53 +2061,48 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     phase = float(self.phase_spinbox.value())
                     phase_shift = float(self.MainWindow.pshift_ipt.text())
 
-                    true_anomaly = (np.pi / 2.0) - w
-                    eccentric_anomaly = 2.0 * np.arctan(np.sqrt((1.0 - e) / (1.0 + e)) * np.tan(true_anomaly / 2.0))
-                    mean_anomaly = eccentric_anomaly - e * np.sin(eccentric_anomaly)
-                    conjuction = ((mean_anomaly + w) / (2.0 * np.pi)) - 0.25 + phase_shift  # superior conjunction phase
-                    periastron_passage = 1.0 - mean_anomaly / (2.0 * np.pi)
-                    periastron_phase = conjuction + periastron_passage  # phase of periastron
+                    true_anomaly = (numpy.pi / 2.0) - w
+                    eccentric_anomaly = 2.0 * numpy.arctan(numpy.sqrt((1.0 - e) / (1.0 + e)) * numpy.tan(true_anomaly / 2.0))
+                    mean_anomaly = eccentric_anomaly - e * numpy.sin(eccentric_anomaly)
+                    conjunction = ((mean_anomaly + w) / (2.0 * numpy.pi)) - 0.25 + phase_shift  # superior conjunction phase
+                    periastron_passage = 1.0 - mean_anomaly / (2.0 * numpy.pi)
+                    periastron_phase = conjunction + periastron_passage  # phase of periastron
                     while periastron_phase > 1.0:
                         periastron_phase = periastron_phase - int(periastron_phase)
-                    M = 2.0 * np.pi * (phase - periastron_phase)
+                    M = 2.0 * numpy.pi * (phase - periastron_phase)
                     while M < 0.0:
-                        M = M + 2.0 * np.pi
-                    f_E = lambda E: E - e * np.sin(E) - M
+                        M = M + 2.0 * numpy.pi
+                    f_E = lambda E: E - e * numpy.sin(E) - M
                     E = fsolve(f_E, M)
-                    separation_at_phase = 1.0 - e * np.cos(E)
-
+                    separation_at_phase = 1.0 - e * numpy.cos(E)
                     print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
-
                     q = float(self.MainWindow.rm_ipt.text())
                     qIsInverse = False
                     if q > 1.0:
                         q = 1 / q
                         qIsInverse = True
                     f = 1.0
-
                     f_critical = lambda x: (-1 / x ** 2) - \
-                                                 (q * ((x - separation_at_phase) / pow(np.absolute(separation_at_phase - x), 3))) + \
+                                                 (q * ((x - separation_at_phase) / pow(numpy.absolute(separation_at_phase - x), 3))) + \
                                                  (x * f ** 2 * (q + 1)) - (q / separation_at_phase ** 2)  # Appendix E.12.4
-
                     inner_critical_x = fsolve(f_critical, separation_at_phase / 2.0)
-                    inner_potential = (1 / inner_critical_x) + (q * ((1 / np.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
+                    inner_potential = (1 / inner_critical_x) + (q * ((1 / numpy.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
                             ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
-
                     print "Inner critical potential: {0}".format(inner_potential)
                     mu = (1.0 / 3.0) * q / (1.0 + q)
                     outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** (3.0 / 3.0)
                     outer_critical_x = fsolve(f_critical, outer_critical_estimation)
-                    outer_potential = (1.0 / outer_critical_x) + (q * ((1.0 / np.absolute(separation_at_phase - outer_critical_x)) - (outer_critical_x / (separation_at_phase ** 2)))) + (
+                    outer_potential = (1.0 / outer_critical_x) + (q * ((1.0 / numpy.absolute(separation_at_phase - outer_critical_x)) - (outer_critical_x / (separation_at_phase ** 2)))) + (
                             ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
-                    f_outer_critical = lambda x: 1.0/(np.sqrt(x**2)) + q*(1.0 / (np.sqrt(separation_at_phase**2-2.0*x*separation_at_phase+x**2)) - x/separation_at_phase**2) + f**2*((q+1.0)/2.0)*(x**2) - outer_potential
+                    print "Outer critical potential: {0}".format(outer_potential)
+                    f_outer_critical = lambda x: 1.0/(numpy.sqrt(x**2)) + q*(1.0 / (numpy.sqrt(separation_at_phase**2-2.0*x*separation_at_phase+x**2)) - x/separation_at_phase**2) + f**2*((q+1.0)/2.0)*(x**2) - outer_potential
                     left_limit = fsolve(f_outer_critical, -1.0 * (separation_at_phase / 2.0))
                     right_limit = outer_critical_x
-                    print left_limit, right_limit
-                    x_axis = np.linspace(left_limit, right_limit, 2000)
-                    z_axis = np.linspace(-1, 2, 2000)
-                    (X, Z) = np.meshgrid(x_axis, z_axis)
-                    all_pots = ((1 / np.sqrt(X ** 2 + Z ** 2)) + (q * (
-                            (1 / np.sqrt((separation_at_phase ** 2) - (2 * X * separation_at_phase) + (np.sqrt(X ** 2 + Z ** 2) ** 2))) - (
+                    x_axis = numpy.linspace(left_limit, right_limit, 2000)
+                    z_axis = numpy.linspace(-1, 2, 2000)
+                    (X, Z) = numpy.meshgrid(x_axis, z_axis)
+                    all_pots = ((1 / numpy.sqrt(X ** 2 + Z ** 2)) + (q * (
+                            (1 / numpy.sqrt((separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
                             X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
                     if qIsInverse:
                         pyplot.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
@@ -2105,7 +2112,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                         pyplot.contour(X, Z, all_pots, outer_potential, colors="blue")
                     pyplot.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
 
-                pyplot.axis('equal')
+                pyplot.axis("equal")
                 pyplot.xlim(-1, 2)
                 pyplot.ylim(-1, 1)
                 pyplot.xlabel('x')
@@ -2115,6 +2122,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
             self.plot_toolbar.update()
             yticks = self.plot_residualAxis.yaxis.get_major_ticks()
             yticks[-1].label1.set_visible(False)
+            self.plot_residualAxis.axhline(0, color="red")
             self.plot_canvas.draw()
 
     def updateObservations(self):
