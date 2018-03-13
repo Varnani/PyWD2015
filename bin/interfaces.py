@@ -2,6 +2,7 @@ from PyQt4 import QtGui, QtCore
 import numpy
 from scipy.optimize import fsolve
 from matplotlib import pyplot, gridspec
+from matplotlib.lines import Line2D
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
@@ -1938,7 +1939,6 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 if ylabel == "Flux":
                     ylabel = "Norm. Flux"
             xlabel = None
-            print str(self.time_combobox.currentText())
             if str(self.time_combobox.currentText()) == "Phase":
                 xlabel = "Phase"
             if str(self.time_combobox.currentText()) == "HJD" and str(self.MainWindow.jdphs_combobox.currentText()) == "Time":
@@ -2000,7 +2000,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                                 obs = obs + 1
                             x2.append(obs)
                         x_obs = x2
-                    self.plot_observationAxis.plot(x_obs, y_obs, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    self.plot_observationAxis.plot(x_obs, y_obs, linestyle="", marker="o", markersize=4, color="#4286f4", label=str(item.text(0)))
             if self.plotmodel_chk.isChecked():
                 lcin = classes.lcin(self.MainWindow)
                 mpage = 1
@@ -2040,18 +2040,20 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     y_model = y1
                     y2_model = [float(line[y2_index].replace("D", "E")) * vunit for line in table]
                 # plot data
-                self.plot_observationAxis.plot(x_model, y_model, color="red")
+                if syntheticCurve.type == "lc":
+                    self.plot_observationAxis.plot(x_model, y_model, color="red", label="Model")
                 if syntheticCurve.type == "vc":
-                    self.plot_observationAxis.plot(x_model, y2_model, color="red")
+                    self.plot_observationAxis.plot(x_model, y_model, color="red", label="Vr1")
+                    self.plot_observationAxis.plot(x_model, y2_model, color="#f48942", label="Vr2")
                 if self.plotobs_chk.isChecked() and str(item.text(0)) != "[Synthetic]":
                     if syntheticCurve.type == "vc":
-                        if syntheticCurve.star == 1:
+                        if syntheticCurve.star == 2:
                             y_model = y2_model
                     interpolated_y_model = numpy.interp(x_obs, x_model, y_model)
                     y_residuals = []
                     for o, c in izip(y_obs, interpolated_y_model):
                         y_residuals.append(o - c)
-                    self.plot_residualAxis.plot(x_obs, y_residuals, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    self.plot_residualAxis.plot(x_obs, y_residuals, linestyle="", marker="o", markersize=4, color="#4286f4", label="Residuals")
                 self.plot_residualAxis.set_ylabel("Residuals")
                     
             if self.drawstars_chk.isChecked() or self.roche_chk.isChecked():
@@ -2074,7 +2076,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
                     x = [float(x[0].replace("D", "E")) + center_of_mass for x in table]
                     y = [float(y[1].replace("D", "E")) for y in table]
-                    self.plot_starposAxis.plot(x, y, 'ko', markersize=0.2)
+                    self.plot_starposAxis.plot(x, y, 'ko', markersize=0.2, label="Surface Grids")
                     self.plot_starposAxis.plot([center_of_mass], [0], linestyle="", marker="+", markersize=5, color="#ff3a3a")
                     if self.roche_chk.isChecked():
                         self.MainWindow.xincl_ipt.setText(stored_inclination)
@@ -2151,6 +2153,15 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
             yticks_star[0].label1.set_visible(False)
             yticks_star[-1].label1.set_visible(False)
             self.plot_residualAxis.axhline(0, color="red")
+            self.plot_residualAxis.legend()
+            self.plot_observationAxis.legend()
+            if self.roche_chk.isChecked():
+                legend = [Line2D([0], [0], color="red", lw=2, label="Inner Critical Potential"),
+                          Line2D([0], [0], color="blue", lw=2, label="Outer Critical Potential"),
+                          Line2D([0], [0], color="black", marker='o', linestyle="", markersize=0.2, label="Surface Grids")]
+                self.plot_starposAxis.legend(handles=legend, loc="upper right")
+            else:
+                self.plot_starposAxis.legend()
             self.plot_canvas.draw()
 
     def updateObservations(self):
