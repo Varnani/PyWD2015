@@ -14,7 +14,6 @@ import sys
 import ConfigParser
 import os
 
-
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
     def __init__(self):  # constructor
         super(MainWindow, self).__init__()
@@ -2068,25 +2067,42 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
 
                     q = float(self.MainWindow.rm_ipt.text())
+                    qIsInverse = False
+                    if q > 1.0:
+                        q = 1 / q
+                        qIsInverse = True
                     f = 1.0
 
-                    f_inner_critical = lambda x: (-1 / x ** 2) - \
+                    f_critical = lambda x: (-1 / x ** 2) - \
                                                  (q * ((x - separation_at_phase) / pow(np.absolute(separation_at_phase - x), 3))) + \
                                                  (x * f ** 2 * (q + 1)) - (q / separation_at_phase ** 2)  # Appendix E.12.4
 
-                    inner_critical_x = fsolve(f_inner_critical, separation_at_phase / 2.0)
+                    inner_critical_x = fsolve(f_critical, separation_at_phase / 2.0)
                     inner_potential = (1 / inner_critical_x) + (q * ((1 / np.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
                             ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
 
                     print "Inner critical potential: {0}".format(inner_potential)
-
-                    x_axis = np.linspace(-1, 2, 2000)
+                    mu = (1.0 / 3.0) * q / (1.0 + q)
+                    outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** (3.0 / 3.0)
+                    outer_critical_x = fsolve(f_critical, outer_critical_estimation)
+                    outer_potential = (1.0 / outer_critical_x) + (q * ((1.0 / np.absolute(separation_at_phase - outer_critical_x)) - (outer_critical_x / (separation_at_phase ** 2)))) + (
+                            ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
+                    f_outer_critical = lambda x: 1.0/(np.sqrt(x**2)) + q*(1.0 / (np.sqrt(separation_at_phase**2-2.0*x*separation_at_phase+x**2)) - x/separation_at_phase**2) + f**2*((q+1.0)/2.0)*(x**2) - outer_potential
+                    left_limit = fsolve(f_outer_critical, -1.0 * (separation_at_phase / 2.0))
+                    right_limit = outer_critical_x
+                    print left_limit, right_limit
+                    x_axis = np.linspace(left_limit, right_limit, 2000)
                     z_axis = np.linspace(-1, 2, 2000)
                     (X, Z) = np.meshgrid(x_axis, z_axis)
                     all_pots = ((1 / np.sqrt(X ** 2 + Z ** 2)) + (q * (
                             (1 / np.sqrt((separation_at_phase ** 2) - (2 * X * separation_at_phase) + (np.sqrt(X ** 2 + Z ** 2) ** 2))) - (
                             X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
-                    pyplot.contour(X, Z, all_pots, inner_potential, colors="red")
+                    if qIsInverse:
+                        pyplot.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
+                        pyplot.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
+                    else:
+                        pyplot.contour(X, Z, all_pots, inner_potential, colors="red")
+                        pyplot.contour(X, Z, all_pots, outer_potential, colors="blue")
                     pyplot.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
 
                 pyplot.axis('equal')
