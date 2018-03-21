@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'dcwidget.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Wed Mar 21 11:38:04 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -469,7 +470,6 @@ class Ui_DCWidget(object):
         self.result_treewidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.result_treewidget.setHeaderHidden(False)
         self.result_treewidget.setObjectName(_fromUtf8("result_treewidget"))
-        self.result_treewidget.header().setDefaultSectionSize(160)
         self.tabWidget_3.addTab(self.tab_2, _fromUtf8(""))
         self.tab_5 = QtGui.QWidget()
         self.tab_5.setObjectName(_fromUtf8("tab_5"))
@@ -479,7 +479,6 @@ class Ui_DCWidget(object):
         self.curvestat_treewidget.setIndentation(0)
         self.curvestat_treewidget.setColumnCount(5)
         self.curvestat_treewidget.setObjectName(_fromUtf8("curvestat_treewidget"))
-        self.curvestat_treewidget.header().setDefaultSectionSize(160)
         self.tabWidget_3.addTab(self.tab_5, _fromUtf8(""))
         self.plotwidget = QtGui.QWidget(DCWidget)
         self.plotwidget.setGeometry(QtCore.QRect(900, 80, 761, 601))

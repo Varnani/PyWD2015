@@ -1647,7 +1647,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 self.MainWindow.SyntheticCurveWidget.updateObservations
             )
 
-    def updateResultTree(self, resultTable):
+    def updateResultTree(self, resultTable, residualTable):
+        frmt = "{:11.8f}"
+
         def _populateItem(itm, rslt):
             frmt = "{:11.8f}"  # TODO add this as a user setting
             id = int(rslt[0])
@@ -1715,6 +1717,21 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             else:
                 item = _populateItem(QtGui.QTreeWidgetItem(self.result_treewidget), result)
                 self.result_treewidget.addTopLevelItem(item)
+        emptyrow = QtGui.QTreeWidgetItem(self.result_treewidget)  # empty row
+        headerRow = QtGui.QTreeWidgetItem(self.result_treewidget)
+        headerRow.setText(0, "Mean Residual for Input Values")
+        headerRow.setToolTip(0, "Mean Residual for Input Values")
+        headerRow.setText(1, "Mean Residual Predicted")
+        headerRow.setToolTip(1, "Mean Residual Predicted")
+        headerRow.setText(2, "Determinant")
+        headerRow.setToolTip(2, "Determinant")
+        residualRow = QtGui.QTreeWidgetItem(self.result_treewidget)
+        residualRow.setText(0, residualTable[0])
+        residualRow.setText(1, residualTable[1])
+        residualRow.setText(2, residualTable[2])
+        self.result_treewidget.addTopLevelItem(emptyrow)
+        self.result_treewidget.addTopLevelItem(headerRow)
+        self.result_treewidget.addTopLevelItem(residualRow)
         self.result_treewidget.expandAll()
         self.result_treewidget.header().setResizeMode(1)
         self.curvestat_treewidget.header().setResizeMode(1)
@@ -1787,7 +1804,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             # self.iterator.deleteLater()  # dispose iterator
             self.iterator = None
             self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")
-            self.updateResultTree(self.lastBaseSet)
+            residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1)[0]
+            self.updateResultTree(self.lastBaseSet, residualTable)
             self.updateCurveInfoTree(methods.getTableFromOutput(self.dcoutpath,
                 "Standard Deviations for Computation of Curve-dependent Weights")
             )
@@ -1987,7 +2005,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 if str(item.text(0)) != "[Synthetic]":
                     index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
                     curve = classes.Curve(self.MainWindow.LoadObservationWidget.Curves()[index].FilePath)
-                    curveProperties = self.MainWindow.LoadObservationWidget.vcPropertiesList[index]
+                    curveProperties = self.MainWindow.LoadObservationWidget.Curves()[index]
                     x_obs = [float(x) for x in curve.timeList]
                     y_obs = [float(y) for y in curve.observationList]
                     print curveProps.type
@@ -2072,11 +2090,11 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
                     self.plot_observationAxis.plot(x_model, y2_model, color="#f48942")
                 if self.plotobs_chk.isChecked() and str(item.text(0)) != "[Synthetic]":
-                    if syntheticCurve.star == 2:
-                        a = y_model
-                        y_model = y2_model
-                        y2_model = a
                     if syntheticCurve.type == "vc":
+                        if syntheticCurve.star == 2:
+                            a = y_model
+                            y_model = y2_model
+                            y2_model = a
                         interpolated_y2_model = numpy.interp(x2_obs, x_model, y2_model)
                         y2_residuals = []
                         for o, c in izip(y2_obs, interpolated_y2_model):

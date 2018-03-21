@@ -1923,9 +1923,6 @@
      <property name="headerHidden">
       <bool>false</bool>
      </property>
-     <attribute name="headerDefaultSectionSize">
-      <number>160</number>
-     </attribute>
      <column>
       <property name="text">
        <string>Parameter</string>
@@ -1975,9 +1972,6 @@
      <property name="columnCount">
       <number>5</number>
      </property>
-     <attribute name="headerDefaultSectionSize">
-      <number>160</number>
-     </attribute>
      <column>
       <property name="text">
        <string>Band</string>
