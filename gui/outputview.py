@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'outputview.ui'
 #
-# Created: Thu Feb 22 11:23:55 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -26,7 +25,7 @@ except AttributeError:
 class Ui_OutputView(object):
     def setupUi(self, OutputView):
         OutputView.setObjectName(_fromUtf8("OutputView"))
-        OutputView.resize(500, 250)
+        OutputView.resize(850, 500)
         OutputView.setMinimumSize(QtCore.QSize(500, 250))
         self.horizontalLayout = QtGui.QHBoxLayout(OutputView)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))

@@ -666,8 +666,6 @@ def saveMainWindowParameters(MainWindow):
     parser.set("DC2015", "isym", str(MainWindow.isym_combobox.currentIndex()))
     parser.set("DC2015", "linkext", str(MainWindow.linkext_spinbox.value()))
     parser.set("DC2015", "desextinc", str(MainWindow.desextinc_ipt.text()))
-    parser.set("DC2015", "ifoc", str(MainWindow.DCWidget.ifoc_chk.isChecked()))
-    parser.set("DC2015", "ifder", str(MainWindow.DCWidget.ifder_chk.isChecked()))
 
     return parser
 
@@ -819,8 +817,6 @@ def loadMainWindowParameters(MainWindow, parser):
     MainWindow.isym_combobox.setCurrentIndex(parser.getint("DC2015", "isym"))
     MainWindow.linkext_spinbox.setValue(parser.getfloat("DC2015", "linkext"))
     MainWindow.desextinc_ipt.setText(parser.get("DC2015", "desextinc"))
-    MainWindow.DCWidget.ifoc_chk.setChecked(parser.getboolean("DC2015", "ifoc"))
-    MainWindow.DCWidget.ifder_chk.setChecked(parser.getboolean("DC2015", "ifder"))
 
 
 def loadCurveParameters(MainWindow, parser):

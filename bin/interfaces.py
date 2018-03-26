@@ -99,6 +99,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         pyplot.cla()
 
         self.DCWidget.result_treewidget.clear()
+        self.DCWidget.component_treewidget.clear()
+        self.DCWidget.residual_treewidget.clear()
         self.DCWidget.lastBaseSet = None
         self.DCWidget.lastSubSets = None
         self.DCWidget.curvestat_treewidget.clear()
@@ -1001,6 +1003,10 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         super(DCWidget, self).__init__()
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.result_treewidget.header().setResizeMode(3)
+        self.residual_treewidget.header().setResizeMode(3)
+        self.component_treewidget.header().setResizeMode(3)
+        self.curvestat_treewidget.header().setResizeMode(3)
         # variables
         self.dcpath = None
         self.dcinpath = None
@@ -1509,8 +1515,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         # self.viewlastdcin_btn.setDisabled(True)
         self.rundc2015_btn.clicked.disconnect()
         self.rundc2015_btn.clicked.connect(self.abort)
-        self.result_treewidget.setDisabled(True)
-        self.curvestat_treewidget.setDisabled(True)
         self.DcinView.fill(self.dcinpath)
         self.DcoutView.hide()
         self.MainWindow.LoadObservationWidget.setDisabled(True)
@@ -1530,8 +1534,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.rundc2015_btn.setText("Run DC")
         self.rundc2015_btn.clicked.disconnect()
         self.rundc2015_btn.clicked.connect(self.runDc)
-        self.result_treewidget.setDisabled(False)
-        self.curvestat_treewidget.setDisabled(False)
         self.MainWindow.LoadObservationWidget.setDisabled(False)
         self.MainWindow.SpotConfigureWidget.setDisabled(False)
         self.MainWindow.EclipseWidget.setDisabled(False)
@@ -1647,7 +1649,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 self.MainWindow.SyntheticCurveWidget.updateObservations
             )
 
-    def updateResultTree(self, resultTable, residualTable):
+    def updateResultTree(self, resultTable):
         frmt = "{:11.8f}"
 
         def _populateItem(itm, rslt):
@@ -1717,24 +1719,36 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             else:
                 item = _populateItem(QtGui.QTreeWidgetItem(self.result_treewidget), result)
                 self.result_treewidget.addTopLevelItem(item)
-        emptyrow = QtGui.QTreeWidgetItem(self.result_treewidget)  # empty row
-        headerRow = QtGui.QTreeWidgetItem(self.result_treewidget)
-        headerRow.setText(0, "Mean Residual for Input Values")
-        headerRow.setToolTip(0, "Mean Residual for Input Values")
-        headerRow.setText(1, "Mean Residual Predicted")
-        headerRow.setToolTip(1, "Mean Residual Predicted")
-        headerRow.setText(2, "Determinant")
-        headerRow.setToolTip(2, "Determinant")
-        residualRow = QtGui.QTreeWidgetItem(self.result_treewidget)
-        residualRow.setText(0, residualTable[0])
-        residualRow.setText(1, residualTable[1])
-        residualRow.setText(2, residualTable[2])
-        self.result_treewidget.addTopLevelItem(emptyrow)
-        self.result_treewidget.addTopLevelItem(headerRow)
-        self.result_treewidget.addTopLevelItem(residualRow)
         self.result_treewidget.expandAll()
-        self.result_treewidget.header().setResizeMode(1)
-        self.curvestat_treewidget.header().setResizeMode(1)
+
+    def updateResidualTree(self, residualData):
+        self.residual_treewidget.clear()
+        item = QtGui.QTreeWidgetItem(self.residual_treewidget)
+        item.setText(0, residualData[0].replace("D", "E"))
+        item.setText(1, residualData[1].replace("D", "E"))
+        item.setText(2, residualData[2].replace("D", "E"))
+
+    def updateComponentTree(self, first, second):
+        self.component_treewidget.clear()
+        star1ParentItem = QtGui.QTreeWidgetItem(self.component_treewidget)
+        star1ParentItem.setText(0, "Star 1")
+        for component in first:
+            item = QtGui.QTreeWidgetItem(star1ParentItem)
+            item.setText(0, component[1].title())
+            item.setText(1, component[2])
+            item.setText(2, component[5])
+            star1ParentItem.addChild(item)
+
+        star2ParentItem = QtGui.QTreeWidgetItem(self.component_treewidget)
+        star2ParentItem.setText(0, "Star 2")
+        for component in second:
+            item = QtGui.QTreeWidgetItem(star2ParentItem)
+            item.setText(0, component[1].title())
+            item.setText(1, component[2])
+            item.setText(2, component[5])
+            star2ParentItem.addChild(item)
+
+        self.component_treewidget.expandAll()
 
     def updateCurveInfoTree(self, curveinfoTable):
         self.curvestat_treewidget.clear()
@@ -1805,7 +1819,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.iterator = None
             self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")
             residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1)[0]
-            self.updateResultTree(self.lastBaseSet, residualTable)
+            firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0)
+            secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0)
+            self.updateResultTree(self.lastBaseSet)
+            self.updateComponentTree(firstComponentTable, secondComponentTable)
+            self.updateResidualTree(residualTable)
             self.updateCurveInfoTree(methods.getTableFromOutput(self.dcoutpath,
                 "Standard Deviations for Computation of Curve-dependent Weights")
             )

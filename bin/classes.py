@@ -446,9 +446,7 @@ class dcin(WDInput):
             nlc = ((2 - len(str(lcCount))) * "0") + str(lcCount)
             line6 = ifvc1 + " " + ifvc2 + " " + nlc \
                     + " " + self.evalCheckBox(MainWindow.EclipseWidget.iftime_chk) + " 2" + " 0" + " " + \
-                    isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " " + \
-                    self.evalCheckBox(MainWindow.DCWidget.ifder_chk) + " " + "1" \
-                    + " " + self.evalCheckBox(MainWindow.DCWidget.ifoc_chk) + "\n"
+                    isymDict[str(MainWindow.isym_combobox.currentText())] + " 1" + " 1" + " 1" + " 1" + "\n"
             ldDict = {
                 "Linear Cosine": "1",
                 "Logarithmic": "2",
