@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>600</height>
+    <width>1203</width>
+    <height>793</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -131,16 +131,10 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>500</width>
-           <height>200</height>
-          </size>
-         </property>
          <property name="maximumSize">
           <size>
            <width>850</width>
-           <height>250</height>
+           <height>230</height>
           </size>
          </property>
          <property name="tabPosition">
@@ -174,6 +168,9 @@
                  </property>
                  <property name="verticalSpacing">
                   <number>0</number>
+                 </property>
+                 <property name="margin">
+                  <number>10</number>
                  </property>
                  <item row="3" column="0">
                   <widget class="QCheckBox" name="f1_chk">
@@ -916,6 +913,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <layout class="QGridLayout" name="gridLayout_3">
+             <property name="margin">
+              <number>10</number>
+             </property>
              <item row="5" column="0">
               <widget class="QLineEdit" name="del_g1_ipt">
                <property name="sizePolicy">
@@ -1975,6 +1975,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <layout class="QGridLayout" name="gridLayout_4">
+             <property name="margin">
+              <number>10</number>
+             </property>
              <item row="0" column="2">
               <widget class="QTreeWidget" name="component_treewidget">
                <property name="sizePolicy">
@@ -2114,63 +2117,70 @@
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
-            <widget class="QTreeWidget" name="curvestat_treewidget">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="margin">
+              <number>10</number>
              </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::NoSelection</enum>
-             </property>
-             <property name="indentation">
-              <number>0</number>
-             </property>
-             <property name="columnCount">
-              <number>5</number>
-             </property>
-             <column>
-              <property name="text">
-               <string>Band</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string># of Observations</string>
-              </property>
-              <property name="toolTip">
-               <string>Number of observations.</string>
-              </property>
-              <property name="statusTip">
-               <string>Number of observations.</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Standard Deviation</string>
-              </property>
-              <property name="toolTip">
-               <string>Standard deviation.</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string># of Obs. in Phs. Rng.</string>
-              </property>
-              <property name="toolTip">
-               <string>Number of observations in phase range as configured in curve properties.</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Std. Dev. in Phs. Rng.</string>
-              </property>
-              <property name="toolTip">
-               <string>Standard deviation in phase range as configured in curve properties.</string>
-              </property>
-             </column>
-            </widget>
+             <item>
+              <widget class="QTreeWidget" name="curvestat_treewidget">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::NoSelection</enum>
+               </property>
+               <property name="indentation">
+                <number>0</number>
+               </property>
+               <property name="columnCount">
+                <number>5</number>
+               </property>
+               <column>
+                <property name="text">
+                 <string>Band</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string># of Observations</string>
+                </property>
+                <property name="toolTip">
+                 <string>Number of observations.</string>
+                </property>
+                <property name="statusTip">
+                 <string>Number of observations.</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Standard Deviation</string>
+                </property>
+                <property name="toolTip">
+                 <string>Standard deviation.</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string># of Obs. in Phs. Rng.</string>
+                </property>
+                <property name="toolTip">
+                 <string>Number of observations in phase range as configured in curve properties.</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Std. Dev. in Phs. Rng.</string>
+                </property>
+                <property name="toolTip">
+                 <string>Standard deviation in phase range as configured in curve properties.</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -2238,10 +2248,23 @@
           </widget>
          </item>
          <item row="0" column="0" rowspan="2">
-          <widget class="QComboBox" name="data_combobox"/>
+          <widget class="QComboBox" name="data_combobox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
          <item row="0" column="1" rowspan="2">
           <widget class="QComboBox" name="time_combobox">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>125</width>

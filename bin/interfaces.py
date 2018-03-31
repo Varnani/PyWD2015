@@ -2,12 +2,12 @@ from PyQt4 import QtGui, QtCore
 import numpy
 from scipy.optimize import fsolve
 from matplotlib import pyplot, gridspec
-from matplotlib.lines import Line2D
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
-    dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget, syntheticcurvewidget
+    dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget, \
+    syntheticcurvewidget, starpositionswidget
 from functools import partial
 from bin import methods, classes
 from itertools import izip
@@ -31,6 +31,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.LCDCPickerWidget = LCDCPickerWidget()
         self.LCDCPickerWidget.MainWindow = self
         self.SyntheticCurveWidget = SyntheticCurveWidget()
+        self.StarPositionWidget = StarPositionWidget()
+        self.StarPositionWidget.MainWindow = self
         self.SyntheticCurveWidget.MainWindow = self
         # variables
         self.lcpath = None
@@ -52,6 +54,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.saveas_btn.clicked.connect(self.saveProjectDialog)
         self.fill_btn.clicked.connect(self.fillLcHJDMenu)
         self.lc_lightcurve_btn.clicked.connect(self.SyntheticCurveWidget.show)
+        self.lc_coordinates_btn.clicked.connect(self.StarPositionWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -59,6 +62,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.EclipseWidget.close()
         self.DCWidget.close()
         self.SyntheticCurveWidget.close()
+        self.StarPositionWidget.close()
 
     def setPaths(self, lcpath, dcpath):
         self.lcpath = lcpath
@@ -1012,7 +1016,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.dcinpath = None
         self.dcoutpath = None
         self.MainWindow = None  # mainwindow sets itself here
-        self.PlotResultsWidget = PlotResultsWidget()
         self.DcinView = OutputView()
         self.DcoutView = OutputView()
         self.iterator = None
@@ -1216,7 +1219,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
         self.DcinView.close()
         self.DcoutView.close()
-        self.PlotResultsWidget.close()
 
     def getXYfromFile(self, filepath):
         curve = classes.Curve(filepath)
@@ -1893,19 +1895,6 @@ class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
         self.output_textedit.setPlainText(text)
 
 
-class PlotResultsWidget(QtGui.QWidget, plotresultswidget.Ui_PlotResultsWidget):
-    def __init__(self):
-        super(PlotResultsWidget, self).__init__()
-        self.setupUi(self)
-        self.connectSignals()
-
-    def connectSignals(self):
-        pass
-
-    def updateCurveComboBox(self):
-        pass
-
-
 class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurveWidget):
     def __init__(self):
         super(SyntheticCurveWidget, self).__init__()
@@ -2354,6 +2343,68 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
             self.phase_spinbox.setValue(float(0.25))
         else:
             self.phase_spinbox.setDisabled(False)
+
+
+class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidget):
+    def __init__(self):
+        super(StarPositionWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.start_btn.setIcon(QtGui.QIcon("resources/play.png"))
+        self.skip_btn.setIcon(QtGui.QIcon("resources/jump.png"))
+        self.backtostart_btn.setIcon(QtGui.QIcon("resources/start.png"))
+        # variables
+        self.MainWindow = None
+        # set up canvas
+        self.plot_figure = Figure()
+        self.plot_canvas = FigureCanvas(self.plot_figure)
+        plot_layout = QtGui.QVBoxLayout()
+        plot_layout.addWidget(self.plot_canvas)
+        self.plot_widget.setLayout(plot_layout)
+        self.plot_starPositionAxis = self.plot_figure.add_subplot(111)
+        self.plot_starPositionAxis.set_xlabel("x")
+        self.plot_starPositionAxis.set_ylabel("y")
+        self.plot_starPositionAxis.set_xlim(-1, 1)
+        self.plot_starPositionAxis.set_ylim(-1, 1)
+        self.plot_starPositionAxis.axis("equal")
+        self.plot_figure.tight_layout()
+        # signals
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.setlimits_btn.clicked.connect(self.setPlotLimits)
+        self.single_chk.stateChanged.connect(self.checkSingle)
+        self.render_btn.clicked.connect(self.renderStars)
+
+    def checkSingle(self):
+        if self.single_chk.isChecked():
+            self.phase_spinbox.setDisabled(False)
+        else:
+            self.phase_spinbox.setDisabled(True)
+
+    def setPlotLimits(self):
+        self.plot_starPositionAxis.set_xbound(lower=self.min_spinbox.value(), upper=self.max_spinbox.value())
+        self.plot_starPositionAxis.set_ybound(lower=self.min_spinbox.value(), upper=self.max_spinbox.value())
+        self.plot_canvas.draw()
+
+    def renderStars(self):
+        self.plot_starPositionAxis.clear()
+        lcin = classes.lcin(self.MainWindow)
+        phase = self.phase_spinbox.value()
+        lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                                  phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000],
+                           jdphs="2")
+        with open(self.MainWindow.lcinpath, "w") as f:
+            f.write(lcin.output)
+        process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+        process.wait()
+        table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+        x = [float(x[0].replace("D", "E")) for x in table]
+        y = [float(y[1].replace("D", "E")) for y in table]
+        self.plot_starPositionAxis.plot(x, y, 'ko', markersize=0.2)
+        self.plot_starPositionAxis.plot([0], [0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
+        self.setPlotLimits()
+        self.plot_canvas.draw()
 
 
 if __name__ == "__main__":
