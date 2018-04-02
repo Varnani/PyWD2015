@@ -824,8 +824,9 @@ class lcin(WDInput):
                                 self.formatInput(spot[9].text(), 14, 5, "F") + \
                                 self.formatInput(spot[10].text(), 14, 5, "F") + "\n"
         self.output = self.output + lcparams + \
+            star1spotline + \
             "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
-            star1spotline + star2spotline + \
+            star2spotline + \
             "300.00000  0.00000  0.00000  0.00000       0.00000       0.00000       0.00000       0.00000\n" + \
             "150.\n9"
 

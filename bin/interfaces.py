@@ -2367,6 +2367,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.plot_starPositionAxis.set_xlim(-1, 1)
         self.plot_starPositionAxis.set_ylim(-1, 1)
         self.plot_starPositionAxis.axis("equal")
+        self.plot_starPositionAxis.set(adjustable="box-forced")
         self.plot_figure.tight_layout()
         # signals
         self.connectSignals()
