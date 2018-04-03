@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore, QtOpenGL
 import numpy
 from scipy.optimize import fsolve
 from matplotlib import pyplot, gridspec
@@ -15,7 +15,8 @@ import subprocess
 import sys
 import ConfigParser
 import os
-
+import time
+import io
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
     def __init__(self):  # constructor
@@ -108,6 +109,10 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.lastBaseSet = None
         self.DCWidget.lastSubSets = None
         self.DCWidget.curvestat_treewidget.clear()
+
+        self.StarPositionWidget.plot_starPositionAxis.clear()
+        self.StarPositionWidget.starRenderData = None
+        self.starsRendered = False
 
     def begin(self):  # check for wd.conf
         wdconf = "wd.conf"
@@ -2355,10 +2360,23 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.backtostart_btn.setIcon(QtGui.QIcon("resources/start.png"))
         # variables
         self.MainWindow = None
+        self.starRenderData = None
+        self.starsRendered = False
+        self.stopwatch = None
+        self.lastFrameShown = 0
+        self.iterator = None
+        # animation variables
+        self.framesPerSecond = 25.0  # 25 frames per second
+        self.frameTime = 1.0 / self.framesPerSecond  # 0.04ms per frame (25fps)
+        self.duration = 5.0  # duration of animation in seconds
+        self.totalFrames = 5.0 * self.framesPerSecond  # 125 frames total
+        self.phaseIncrement = 1.0 / self.totalFrames  # 0.008
         # set up canvas
         self.plot_figure = Figure()
         self.plot_canvas = FigureCanvas(self.plot_figure)
+        self.plot_toolbar = NavigationToolbar(self.plot_canvas, self.plot_widget)
         plot_layout = QtGui.QVBoxLayout()
+        plot_layout.addWidget(self.plot_toolbar)
         plot_layout.addWidget(self.plot_canvas)
         self.plot_widget.setLayout(plot_layout)
         self.plot_starPositionAxis = self.plot_figure.add_subplot(111)
@@ -2367,28 +2385,65 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.plot_starPositionAxis.set_xlim(-1, 1)
         self.plot_starPositionAxis.set_ylim(-1, 1)
         self.plot_starPositionAxis.axis("equal")
-        self.plot_starPositionAxis.set(adjustable="box-forced")
         self.plot_figure.tight_layout()
+        # render area
+        self.renderArea = self.RenderArea(self)
+        render_layout = QtGui.QVBoxLayout()
+        render_layout.addWidget(self.renderArea)
+        self.render_widget.setLayout(render_layout)
         # signals
         self.connectSignals()
 
+    class RenderArea(QtOpenGL.QGLWidget):
+        def __init__(self, parent):
+            QtOpenGL.QGLWidget.__init__(self)
+            self.StarPositionWidget = parent
+            self.imageToRender = None
+
+        def paintEvent(self, QPaintEvent):
+            QtOpenGL.QGLWidget.paintEvent(self, QPaintEvent)
+            if self.imageToRender is not None:
+                painter = QtGui.QPainter(self)
+                painter.drawImage(0, 0, self.imageToRender, 0, 0, -1, -1)
+                painter.setRenderHint(painter.SmoothPixmapTransform)
+                painter.end()
+
+        def showImage(self, image):
+            start = time.time()
+            self.imageToRender = image
+            self.repaint()
+            print "frametime", time.time() - start
+
+    def playRender(self):
+        for image in self.starRenderData:
+            start = time.time()
+            self.renderArea.showImage(image)
+            time.sleep(self.frameTime - (time.time() - start))
+
+    def closeEvent(self, QCloseEvent):
+        try:
+            self.iterator.stop()
+        except:
+            pass
+
     def connectSignals(self):
-        self.setlimits_btn.clicked.connect(self.setPlotLimits)
         self.single_chk.stateChanged.connect(self.checkSingle)
         self.render_btn.clicked.connect(self.renderStars)
+        self.start_btn.clicked.connect(self.playRender)
+        self.plot_btn.clicked.connect(self.plotSingle)
 
     def checkSingle(self):
         if self.single_chk.isChecked():
-            self.phase_spinbox.setDisabled(False)
+            self.render_phaseSpinbox.setDisabled(False)
         else:
-            self.phase_spinbox.setDisabled(True)
+            self.render_phaseSpinbox.setDisabled(True)
 
     def setPlotLimits(self):
         self.plot_starPositionAxis.set_xbound(lower=self.min_spinbox.value(), upper=self.max_spinbox.value())
         self.plot_starPositionAxis.set_ybound(lower=self.min_spinbox.value(), upper=self.max_spinbox.value())
         self.plot_canvas.draw()
 
-    def renderStars(self):
+    def plotSingle(self):
         self.plot_starPositionAxis.clear()
         lcin = classes.lcin(self.MainWindow)
         phase = self.phase_spinbox.value()
@@ -2404,8 +2459,118 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         y = [float(y[1].replace("D", "E")) for y in table]
         self.plot_starPositionAxis.plot(x, y, 'ko', markersize=0.2)
         self.plot_starPositionAxis.plot([0], [0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
-        self.setPlotLimits()
+        self.plot_starPositionAxis.set_xlabel("x")
+        self.plot_starPositionAxis.set_ylabel("y")
+        self.plot_toolbar.update()
         self.plot_canvas.draw()
+
+    def renderFrame(self, x, y):
+        pyplot.cla()
+        pyplot.axis("equal")
+        pyplot.xlabel("x")
+        pyplot.ylabel("y")
+        pyplot.xlim(self.min_spinbox.value(), self.max_spinbox.value())
+        pyplot.ylim(self.min_spinbox.value(), self.max_spinbox.value())
+        pyplot.plot(x, y, 'ko', markersize=0.2)
+        pyplot.plot([0], [0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
+        image = io.BytesIO()
+        dpiDict = {
+            "64dpi": 64,
+            "128dpi": 128,
+            "256dpi": 256
+        }
+        pyplot.savefig(image, dpi=dpiDict[str(self.dpi_combobox.currentText())], format="png")
+        image.seek(0)
+        qbyte = QtCore.QByteArray(image.getvalue())
+        qimage = QtGui.QImage()
+        qimage.loadFromData(qbyte)
+        return qimage
+
+    def renderStars(self):
+        if self.single_chk.isChecked():
+            self.starRenderData = None
+            self.starsRendered = False
+            lcin = classes.lcin(self.MainWindow)
+            phase = self.render_phaseSpinbox.value()
+            lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                                      phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000],
+                               jdphs="2")
+            with open(self.MainWindow.lcinpath, "w") as f:
+                f.write(lcin.output)
+            process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+            process.wait()
+            table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+            x = [float(x[0].replace("D", "E")) for x in table]
+            y = [float(y[1].replace("D", "E")) for y in table]
+            self.renderArea.showImage(self.renderFrame(x, y))
+        else:
+            lcin = classes.lcin(self.MainWindow)
+            lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                                      0, 1, self.phaseIncrement, 0.25, 0.75, 1,
+                                      float(self.MainWindow.tavh_ipt.text()) / 10000], jdphs="2")
+            with open(self.MainWindow.lcinpath, "w") as f:
+                f.write(lcin.output)
+            self.iterator = classes.IteratorThread(self.MainWindow.lcpath)
+            self.connect(self.iterator, QtCore.SIGNAL("finished()"), self.afterIteration)
+            self.disableUi()
+            self.message_label.setText("Running LC...")
+            self.iterator.start()
+            self.disableUi()
+
+    def abortRender(self):
+        self.iterator.stop()
+        self.enableUi()
+
+    def disableUi(self):
+        self.render_btn.clicked.disconnect()
+        self.render_btn.clicked.connect(self.abortRender)
+        self.render_btn.setText("Abort")
+        self.min_spinbox.setDisabled(True)
+        self.max_spinbox.setDisabled(True)
+        self.dpi_combobox.setDisabled(True)
+        self.saveframe_btn.setDisabled(True)
+        self.saveall_btn.setDisabled(True)
+        self.start_btn.setDisabled(True)
+        self.skip_btn.setDisabled(True)
+        self.backtostart_btn.setDisabled(True)
+        self.horizontalSlider.setDisabled(True)
+
+    def enableUi(self):
+        self.render_btn.clicked.disconnect()
+        self.render_btn.clicked.connect(self.renderStars)
+        self.render_btn.setText("Render")
+        self.min_spinbox.setDisabled(False)
+        self.max_spinbox.setDisabled(False)
+        self.dpi_combobox.setDisabled(False)
+        self.saveframe_btn.setDisabled(False)
+        self.saveall_btn.setDisabled(False)
+        self.start_btn.setDisabled(False)
+        self.skip_btn.setDisabled(False)
+        self.backtostart_btn.setDisabled(False)
+        self.horizontalSlider.setDisabled(False)
+        self.message_label.setText("Ready")
+
+    def afterIteration(self):
+        self.render_btn.setDisabled(True)
+        self.message_label.setText("Rendering Plots...")
+        data = methods.getAllTablesFromOutput(self.MainWindow.lcoutpath, "Y Sky Coordinate", "Z Sky Coordinate",
+                                              offset=1)
+        renderedFrames = []
+        plotnumber = len(data)
+        percentage = (1.0 / plotnumber) * 100
+        currentPercentage = 0.0
+        for line in data:
+            lx = [float(x[0].replace("D", "E")) for x in line]
+            ly = [float(x[1].replace("D", "E")) for x in line]
+            frame = self.renderFrame(lx, ly)
+            renderedFrames.append(frame)
+            currentPercentage = percentage + currentPercentage
+            self.progressBar.setValue(currentPercentage)
+            self.progressBar.repaint()
+        self.starRenderData = renderedFrames
+        self.starsRendered = True
+        self.enableUi()
+        self.render_btn.setDisabled(False)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ import itertools
 import subprocess
 import os
 import sys
+import time
 from PyQt4 import QtCore
 
 
@@ -1053,6 +1054,15 @@ class IteratorThread(QtCore.QThread):
         except:
             self.exception.emit(str(sys.exc_info()))
             self.blockSignals(True)
+
+
+class Stopwatch(QtCore.QThread):
+    def __init__(self, wait):
+        QtCore.QThread.__init__(self)
+        self.wait = wait
+
+    def run(self):
+        time.sleep(self.wait)
 
 
 # class bidict(dict):

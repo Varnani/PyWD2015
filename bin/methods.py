@@ -936,5 +936,27 @@ def getTableFromOutput(path, target, offset=3):
     return table
 
 
+def getAllTablesFromOutput(path, target, secondTarget, offset=3):
+    with open(path, "r") as f:
+        rawdata = f.read().split(target)
+    rawdata.pop(0)
+    data = []
+    for list in rawdata:
+        a = list.split("\n")
+        # trim front
+        currentOffset = offset
+        while currentOffset > 0:
+            a.pop(currentOffset - 1)
+            currentOffset = currentOffset - 1
+        b = []
+        for line in a:
+            if line == "":
+                break
+            else:
+                b.append(line.split())
+        data.append(b)
+    return data
+
+
 if __name__ == "__main__":
     pass
