@@ -3,6 +3,8 @@ import StringIO
 from functools import partial
 from PyQt4 import QtGui
 from bin import classes
+import numpy
+from scipy.optimize import  fsolve
 
 
 __configver__ = "0.1.0"
@@ -956,6 +958,77 @@ def getAllTablesFromOutput(path, target, secondTarget, offset=3):
                 b.append(line.split())
         data.append(b)
     return data
+
+
+def computeRochePotentials(MainWindow, phase, plotAxis):
+    # This snippet is only for e = 0 and f = 1, for now
+    # For in-depth discussion about calculating Roche potentials, refer to:
+    # Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
+
+    w = float(MainWindow.perr0_ipt.text())
+    # e = float(self.MainWindow.e_ipt.text())
+    e = 0.0
+    phase_shift = float(MainWindow.pshift_ipt.text())
+
+    true_anomaly = (numpy.pi / 2.0) - w
+    eccentric_anomaly = 2.0 * numpy.arctan(numpy.sqrt((1.0 - e) / (1.0 + e)) * numpy.tan(true_anomaly / 2.0))
+    mean_anomaly = eccentric_anomaly - e * numpy.sin(eccentric_anomaly)
+    conjunction = ((mean_anomaly + w) / (2.0 * numpy.pi)) - 0.25 + phase_shift  # superior conjunction phase
+    periastron_passage = 1.0 - mean_anomaly / (2.0 * numpy.pi)
+    periastron_phase = conjunction + periastron_passage  # phase of periastron
+    while periastron_phase > 1.0:
+        periastron_phase = periastron_phase - int(periastron_phase)
+    M = 2.0 * numpy.pi * (phase - periastron_phase)
+    while M < 0.0:
+        M = M + 2.0 * numpy.pi
+    f_E = lambda E: E - e * numpy.sin(E) - M
+    E = fsolve(f_E, M)
+    separation_at_phase = 1.0 - e * numpy.cos(E)
+    print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
+    q = float(MainWindow.rm_ipt.text())
+    qIsInverse = False
+    if q > 1.0:
+        q = 1 / q
+        qIsInverse = True
+    f = 1.0
+    f_critical = lambda x: (-1 / x ** 2) - \
+                           (q * ((x - separation_at_phase) / pow(numpy.absolute(separation_at_phase - x), 3))) + \
+                           (x * f ** 2 * (q + 1)) - (q / separation_at_phase ** 2)  # Appendix E.12.4
+    inner_critical_x = fsolve(f_critical, separation_at_phase / 2.0)
+    inner_potential = (1 / inner_critical_x) + (q * (
+    (1 / numpy.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
+                          ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
+    print "Inner critical potential: {0}".format(inner_potential)
+    mu = (1.0 / 3.0) * q / (1.0 + q)
+    outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** (
+    3.0 / 3.0)
+    outer_critical_x = fsolve(f_critical, outer_critical_estimation)
+    outer_potential = (1.0 / outer_critical_x) + (q * (
+    (1.0 / numpy.absolute(separation_at_phase - outer_critical_x)) - (
+    outer_critical_x / (separation_at_phase ** 2)))) + (
+                          ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
+    print "Outer critical potential: {0}".format(outer_potential)
+    f_outer_critical = lambda x: 1.0 / (numpy.sqrt(x ** 2)) + q * (1.0 / (numpy.sqrt(
+        separation_at_phase ** 2 - 2.0 * x * separation_at_phase + x ** 2)) - x / separation_at_phase ** 2) + f ** 2 * (
+    (q + 1.0) / 2.0) * (x ** 2) - outer_potential
+    left_limit = fsolve(f_outer_critical, -1.0 * (separation_at_phase / 2.0))
+    right_limit = outer_critical_x
+    x_axis = numpy.linspace(left_limit, right_limit, 2000)
+    z_axis = numpy.linspace(-1, 2, 2000)
+    (X, Z) = numpy.meshgrid(x_axis, z_axis)
+    all_pots = ((1 / numpy.sqrt(X ** 2 + Z ** 2)) + (q * (
+        (1 / numpy.sqrt(
+            (separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
+            X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
+    center_of_mass = 1 - (1 / (1 + float(MainWindow.rm_ipt.text())))
+    if qIsInverse:
+        plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
+        plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
+    else:
+        plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
+        plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
+    plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
+                               markersize=10, color="#ff3a3a")
 
 
 if __name__ == "__main__":

@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'starpositionswidget.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Wed Apr  4 11:14:19 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -33,7 +34,6 @@ class Ui_StarPositionWidget(object):
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.verticalLayout_3 = QtGui.QVBoxLayout(self.tab_2)
-        self.verticalLayout_3.setMargin(0)
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.verticalLayout_2 = QtGui.QVBoxLayout()
         self.verticalLayout_2.setMargin(10)
@@ -53,6 +53,8 @@ class Ui_StarPositionWidget(object):
         self.phase_spinbox.setProperty("value", 0.25)
         self.phase_spinbox.setObjectName(_fromUtf8("phase_spinbox"))
         self.gridLayout_2.addWidget(self.phase_spinbox, 1, 0, 1, 1)
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.gridLayout_2.addItem(spacerItem, 1, 2, 1, 1)
         self.plot_btn = QtGui.QPushButton(self.tab_2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -60,9 +62,10 @@ class Ui_StarPositionWidget(object):
         sizePolicy.setHeightForWidth(self.plot_btn.sizePolicy().hasHeightForWidth())
         self.plot_btn.setSizePolicy(sizePolicy)
         self.plot_btn.setObjectName(_fromUtf8("plot_btn"))
-        self.gridLayout_2.addWidget(self.plot_btn, 0, 2, 2, 1)
-        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.gridLayout_2.addItem(spacerItem, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.plot_btn, 0, 3, 2, 1)
+        self.roche_chk = QtGui.QCheckBox(self.tab_2)
+        self.roche_chk.setObjectName(_fromUtf8("roche_chk"))
+        self.gridLayout_2.addWidget(self.roche_chk, 1, 1, 1, 1)
         self.verticalLayout_2.addLayout(self.gridLayout_2)
         self.line_6 = QtGui.QFrame(self.tab_2)
         self.line_6.setFrameShape(QtGui.QFrame.HLine)
@@ -82,7 +85,6 @@ class Ui_StarPositionWidget(object):
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.tab)
-        self.horizontalLayout_2.setMargin(0)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.gridLayout_3 = QtGui.QGridLayout()
         self.gridLayout_3.setMargin(10)
@@ -247,6 +249,7 @@ class Ui_StarPositionWidget(object):
         StarPositionWidget.setWindowTitle(_translate("StarPositionWidget", "Star Positions", None))
         self.label_7.setText(_translate("StarPositionWidget", "Phase", None))
         self.plot_btn.setText(_translate("StarPositionWidget", "Plot", None))
+        self.roche_chk.setText(_translate("StarPositionWidget", "Critical Roche Potentials", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("StarPositionWidget", "Single Plot", None))
         self.message_label.setText(_translate("StarPositionWidget", "Ready", None))
         self.dpi_combobox.setItemText(0, _translate("StarPositionWidget", "64dpi", None))

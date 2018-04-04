@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1203</width>
+    <width>1240</width>
     <height>793</height>
    </rect>
   </property>
@@ -2221,19 +2221,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="5" rowspan="2">
-          <widget class="QPushButton" name="popmain_btn">
-           <property name="maximumSize">
-            <size>
-             <width>100</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Pop</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="2">
           <widget class="QCheckBox" name="autoupdate_chk">
            <property name="maximumSize">
@@ -2247,7 +2234,20 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0" rowspan="2">
+         <item row="2" column="4">
+          <widget class="QPushButton" name="popmain_btn">
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pop</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" rowspan="3">
           <widget class="QComboBox" name="data_combobox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -2257,8 +2257,14 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1" rowspan="2">
+         <item row="0" column="1" rowspan="3">
           <widget class="QComboBox" name="time_combobox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>75</width>
@@ -2283,7 +2289,7 @@
            </item>
           </widget>
          </item>
-         <item row="1" column="2">
+         <item row="2" column="2">
           <widget class="QCheckBox" name="uselc_chk">
            <property name="maximumSize">
             <size>
@@ -2307,7 +2313,7 @@ Line plotting will be used for LC synthetic points. DC outputs will be plotted w
            </property>
           </widget>
          </item>
-         <item row="0" column="3" rowspan="2">
+         <item row="0" column="3" rowspan="3">
           <widget class="Line" name="line_11">
            <property name="orientation">
             <enum>Qt::Vertical</enum>

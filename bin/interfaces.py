@@ -1364,6 +1364,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.plot_toolbar.update()
             # yticks = self.plot_residualAxis.yaxis.get_major_ticks()
             # yticks[-1].label1.set_visible(False)
+            self.plot_observationAxis.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
+                                                  labelright=False, labelleft=True, labelsize=11)
             self.plot_residualAxis.set_xlabel(xlabel)
             self.plot_residualAxis.set_ylabel("Residuals")
             self.plot_observationAxis.set_ylabel(ylabel)
@@ -1388,7 +1390,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             pyplot.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
             yticks = resd.yaxis.get_major_ticks()
             yticks[-1].label1.set_visible(False)
-
+            obs.xaxis.get_major_ticks()
             obs.plot(self.obs_x, self.obs_y, linestyle="", marker="o", markersize=4, color="#4286f4")
             resd.plot(self.resd_x, self.resd_y, linestyle="", marker="o", markersize=4, color="#4286f4")
             if self.uselc_chk.isChecked():
@@ -1401,6 +1403,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             obs.set_ylabel(self.obslabel)
             resd.set_ylabel("Residuals")
             resd.set_xlabel(self.timelabel)
+            obs.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
+                                                  labelright=False, labelleft=True, labelsize=11)
             pyplot.show()
 
     def showDcin(self):
@@ -2145,67 +2149,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     if self.roche_chk.isChecked():
                         self.MainWindow.xincl_ipt.setText(stored_inclination)
                 if self.roche_chk.isChecked():
-
-                    # This snippet is only for e = 0 and f = 1, for now
-                    # For in-depth discussion about calculating Roche potentials, refer to:
-                    # Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
-
-                    w = float(self.MainWindow.perr0_ipt.text())
-                    # e = float(self.MainWindow.e_ipt.text())
-                    e = 0.0
-                    phase = float(self.phase_spinbox.value())
-                    phase_shift = float(self.MainWindow.pshift_ipt.text())
-
-                    true_anomaly = (numpy.pi / 2.0) - w
-                    eccentric_anomaly = 2.0 * numpy.arctan(numpy.sqrt((1.0 - e) / (1.0 + e)) * numpy.tan(true_anomaly / 2.0))
-                    mean_anomaly = eccentric_anomaly - e * numpy.sin(eccentric_anomaly)
-                    conjunction = ((mean_anomaly + w) / (2.0 * numpy.pi)) - 0.25 + phase_shift  # superior conjunction phase
-                    periastron_passage = 1.0 - mean_anomaly / (2.0 * numpy.pi)
-                    periastron_phase = conjunction + periastron_passage  # phase of periastron
-                    while periastron_phase > 1.0:
-                        periastron_phase = periastron_phase - int(periastron_phase)
-                    M = 2.0 * numpy.pi * (phase - periastron_phase)
-                    while M < 0.0:
-                        M = M + 2.0 * numpy.pi
-                    f_E = lambda E: E - e * numpy.sin(E) - M
-                    E = fsolve(f_E, M)
-                    separation_at_phase = 1.0 - e * numpy.cos(E)
-                    print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
-                    q = float(self.MainWindow.rm_ipt.text())
-                    qIsInverse = False
-                    if q > 1.0:
-                        q = 1 / q
-                        qIsInverse = True
-                    f = 1.0
-                    f_critical = lambda x: (-1 / x ** 2) - \
-                                                 (q * ((x - separation_at_phase) / pow(numpy.absolute(separation_at_phase - x), 3))) + \
-                                                 (x * f ** 2 * (q + 1)) - (q / separation_at_phase ** 2)  # Appendix E.12.4
-                    inner_critical_x = fsolve(f_critical, separation_at_phase / 2.0)
-                    inner_potential = (1 / inner_critical_x) + (q * ((1 / numpy.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
-                            ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
-                    print "Inner critical potential: {0}".format(inner_potential)
-                    mu = (1.0 / 3.0) * q / (1.0 + q)
-                    outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** (3.0 / 3.0)
-                    outer_critical_x = fsolve(f_critical, outer_critical_estimation)
-                    outer_potential = (1.0 / outer_critical_x) + (q * ((1.0 / numpy.absolute(separation_at_phase - outer_critical_x)) - (outer_critical_x / (separation_at_phase ** 2)))) + (
-                            ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
-                    print "Outer critical potential: {0}".format(outer_potential)
-                    f_outer_critical = lambda x: 1.0/(numpy.sqrt(x**2)) + q*(1.0 / (numpy.sqrt(separation_at_phase**2-2.0*x*separation_at_phase+x**2)) - x/separation_at_phase**2) + f**2*((q+1.0)/2.0)*(x**2) - outer_potential
-                    left_limit = fsolve(f_outer_critical, -1.0 * (separation_at_phase / 2.0))
-                    right_limit = outer_critical_x
-                    x_axis = numpy.linspace(left_limit, right_limit, 2000)
-                    z_axis = numpy.linspace(-1, 2, 2000)
-                    (X, Z) = numpy.meshgrid(x_axis, z_axis)
-                    all_pots = ((1 / numpy.sqrt(X ** 2 + Z ** 2)) + (q * (
-                            (1 / numpy.sqrt((separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
-                            X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
-                    if qIsInverse:
-                        self.plot_starposAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
-                        self.plot_starposAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
-                    else:
-                        self.plot_starposAxis.contour(X, Z, all_pots, inner_potential, colors="red")
-                        self.plot_starposAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
-                    self.plot_starposAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
+                    methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starposAxis)
                 self.plot_starposAxis.set_xlim(-1, 2)
                 self.plot_starposAxis.set_ylim(-1, 1)
                 self.plot_starposAxis.set_xlabel('x')
@@ -2431,6 +2375,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.render_btn.clicked.connect(self.renderStars)
         self.start_btn.clicked.connect(self.playRender)
         self.plot_btn.clicked.connect(self.plotSingle)
+        self.roche_chk.stateChanged.connect(self.checkRoche)
 
     def checkSingle(self):
         if self.single_chk.isChecked():
@@ -2443,7 +2388,19 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.plot_starPositionAxis.set_ybound(lower=self.min_spinbox.value(), upper=self.max_spinbox.value())
         self.plot_canvas.draw()
 
+    def checkRoche(self):
+        if self.roche_chk.isChecked():
+            self.phase_spinbox.setValue(0.25)
+            self.phase_spinbox.setDisabled(True)
+        else:
+            self.phase_spinbox.setDisabled(False)
+
     def plotSingle(self):
+        tempIncl = self.MainWindow.xincl_ipt.text()
+        center_of_mass = 0
+        if self.roche_chk.isChecked():
+            self.MainWindow.xincl_ipt.setText("90")
+            center_of_mass = 1 - (1 / (1 + float(self.MainWindow.rm_ipt.text())))
         self.plot_starPositionAxis.clear()
         lcin = classes.lcin(self.MainWindow)
         phase = self.phase_spinbox.value()
@@ -2455,12 +2412,15 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
         process.wait()
         table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
-        x = [float(x[0].replace("D", "E")) for x in table]
+        x = [float(x[0].replace("D", "E")) + center_of_mass for x in table]
         y = [float(y[1].replace("D", "E")) for y in table]
         self.plot_starPositionAxis.plot(x, y, 'ko', markersize=0.2)
         self.plot_starPositionAxis.plot([0], [0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
         self.plot_starPositionAxis.set_xlabel("x")
         self.plot_starPositionAxis.set_ylabel("y")
+        if self.roche_chk.isChecked():
+            methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starPositionAxis)
+            self.MainWindow.xincl_ipt.setText(tempIncl)
         self.plot_toolbar.update()
         self.plot_canvas.draw()
 
