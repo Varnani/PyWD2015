@@ -1234,9 +1234,85 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         # TODO add conjunction times here
         conjunctionWidget = QtGui.QWidget()
         layout = QtGui.QVBoxLayout(conjunctionWidget)
-        layout.addWidget(QtGui.QTreeWidget())
+        conjunctionWidget.phases_treewidget = QtGui.QTreeWidget()
+        layout.addWidget(conjunctionWidget.phases_treewidget)
+        conjunctionWidget.calculate_btn = QtGui.QPushButton()
+        conjunctionWidget.calculate_btn.setText("Calculate")
+        conjunctionWidget.calculate_btn.clicked.connect(self.updateConjunctionWidget)
+        layout.addWidget(conjunctionWidget.calculate_btn)
+        conjunctionWidget.phases_treewidget.setHeaderHidden(True)
         conjunctionWidget.setLayout(layout)
+        conjunctionWidget.phases_treewidget.header().setResizeMode(3)
+        conjunctionWidget.phases_treewidget.headerItem().setText(0, "")
+        conjunctionWidget.phases_treewidget.headerItem().setText(1, "")
         return conjunctionWidget
+
+    def updateConjunctionWidget(self):
+        phase_of_primary_eclipse, \
+               phase_of_first_quadrature, \
+               phase_of_secondary_eclipse, \
+               phase_of_second_quadrature, \
+               phase_of_periastron, \
+               phase_of_apastron = self.computeConjunctionPhases()
+        self.ConjunctionWidget.phases_treewidget.clear()
+        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
+        item.setText(0, "Phase of Primary Eclipse")
+        item.setText(1, str(phase_of_primary_eclipse))
+        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
+        item.setText(0, "Phase of First Quadrature")
+        item.setText(1, str(phase_of_first_quadrature))
+        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
+        item.setText(0, "Phase of Secondary Eclipse")
+        item.setText(1, str(phase_of_secondary_eclipse))
+        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
+        item.setText(0, "Phase of Second Quadrature")
+        item.setText(1, str(phase_of_second_quadrature))
+        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
+        item.setText(0, "Phase of Periastron")
+        item.setText(1, str(phase_of_periastron))
+        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
+        item.setText(0, "Phase of Apastron")
+        item.setText(1, str(phase_of_apastron))
+
+    def computeConjunctionPhases(self):
+        w = float(self.MainWindow.perr0_ipt.text())
+        e = float(self.MainWindow.e_ipt.text())
+        phase_shift = float(self.MainWindow.pshift_ipt.text())
+
+        # Calculations below are adopted from JKTEBOP code;
+        #  - The equation for phase difference comes from Hilditch (2001) page 238 equation 5.66,
+        #  - originally credited to the monograph by Kopal (1959).
+
+        e_fac = numpy.sqrt(1.0 - e**2)
+        term1 = 2.0 * numpy.arctan((e * numpy.cos(w)) / e_fac)
+        term2 = 2.0 * e * numpy.cos(w) * e_fac / (1.0 - (e * numpy.sin(w)) ** 2)
+        phase_diff = (numpy.pi + term1 + term2) / (2.0 * numpy.pi)
+
+        # Calculations below are adopted from;
+        # Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
+
+        true_anomaly = (numpy.pi / 2.0) - w
+        eccentric_anomaly = 2.0 * numpy.arctan(numpy.sqrt((1.0 - e) / (1.0 + e)) * numpy.tan(true_anomaly / 2.0))
+        mean_anomaly = eccentric_anomaly - e * numpy.sin(eccentric_anomaly)
+        conjunction = ((mean_anomaly + w) / (2.0 * numpy.pi)) - 0.25 + phase_shift  # superior conjunction phase
+        periastron_passage = 1.0 - mean_anomaly / (2.0 * numpy.pi)
+        periastron_phase = conjunction + periastron_passage  # phase of periastron
+        while periastron_phase > 1.0:
+            periastron_phase = periastron_phase - int(periastron_phase)
+
+        phase_of_primary_eclipse = phase_shift
+        phase_of_first_quadrature = phase_shift + phase_diff / 2.0
+        phase_of_secondary_eclipse = phase_shift + phase_diff
+        phase_of_second_quadrature = phase_shift + (phase_diff / 2.0) + 0.5
+        phase_of_periastron = periastron_phase
+        phase_of_apastron = periastron_phase + 0.5
+
+        return phase_of_primary_eclipse, \
+               phase_of_first_quadrature, \
+               phase_of_secondary_eclipse, \
+               phase_of_second_quadrature, \
+               phase_of_periastron, \
+               phase_of_apastron
 
     def getXYfromFile(self, filepath):
         curve = classes.Curve(filepath)
