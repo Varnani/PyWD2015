@@ -960,7 +960,7 @@ def getAllTablesFromOutput(path, target, secondTarget, offset=3):
     return data
 
 
-def computeRochePotentials(MainWindow, phase, plotAxis):
+def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     # This snippet is only for e = 0 and f = 1, for now
     # For in-depth discussion about calculating Roche potentials, refer to:
     # Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
@@ -1021,14 +1021,42 @@ def computeRochePotentials(MainWindow, phase, plotAxis):
             (separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
             X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
     center_of_mass = 1 - (1 / (1 + float(MainWindow.rm_ipt.text())))
-    if qIsInverse:
-        plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
-        plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
+    if getPotentials is False:
+        if qIsInverse:
+            plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
+            plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
+        else:
+            plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
+            plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
+        plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
+                                   markersize=10, color="#ff3a3a")
+    if getPotentials is True:
+        return inner_potential, outer_potential
+
+
+def computeFillOutFactor(MainWindow):
+    e = float(MainWindow.e_ipt.text())
+    f1 = float(MainWindow.f1_ipt.text())
+    f2 = float(MainWindow.f2_ipt.text())
+    if e != 0.0 or f1 != 1.0 or f2 != 1.0 or str(MainWindow.mode_combobox.currentText()) not in ("Mode 0", "Mode 1", "Mode 3"):
+        return "N/A"
     else:
-        plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
-        plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
-    plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
-                               markersize=10, color="#ff3a3a")
+        q = float(MainWindow.rm_ipt.text())
+        inner_potential, outer_potential = computeRochePotentials(MainWindow, 0.25, None, getPotentials=True)
+        inner_potential = inner_potential[0]
+        outer_potential = outer_potential[0]
+        primary_potential = float(MainWindow.phsv_ipt.text())
+        primary_fillout_BM = None
+        secondary_fillout_BM = None
+
+        # Bradstreet 1993 - BinaryMaker
+        # for primary component
+        if primary_potential > inner_potential:
+            primary_fillout_BM = (inner_potential / primary_potential) - 1.0
+        if primary_potential <= inner_potential:
+            primary_fillout_BM = (inner_potential - primary_potential) / (inner_potential - outer_potential)
+
+        return "{:0.5f}".format(primary_fillout_BM)
 
 
 if __name__ == "__main__":

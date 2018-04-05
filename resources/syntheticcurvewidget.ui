@@ -147,6 +147,37 @@
          </property>
         </widget>
        </item>
+       <item row="11" column="0" colspan="2">
+        <widget class="QLabel" name="fillout_label">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Compute fillout factor as defined in BinaryMaker software;
+Bradstreet, D. H. 1993, IAU Commission on Close Binary Stars, 21, 151
+Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomical Society, 34, 75.02  </string>
+         </property>
+         <property name="text">
+          <string>Fillout = N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" colspan="2">
+        <widget class="Line" name="line_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item row="0" column="0">

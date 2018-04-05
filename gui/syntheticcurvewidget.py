@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'syntheticcurvewidget.ui'
 #
-# Created: Fri Mar  9 13:24:37 2018
+# Created: Thu Apr  5 14:11:18 2018
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -80,6 +80,21 @@ class Ui_SyntheticCurveWidget(object):
         self.roche_chk.setEnabled(True)
         self.roche_chk.setObjectName(_fromUtf8("roche_chk"))
         self.gridLayout.addWidget(self.roche_chk, 9, 0, 1, 2)
+        self.fillout_label = QtGui.QLabel(SyntheticCurveWidget)
+        self.fillout_label.setEnabled(True)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.fillout_label.sizePolicy().hasHeightForWidth())
+        self.fillout_label.setSizePolicy(sizePolicy)
+        self.fillout_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.fillout_label.setObjectName(_fromUtf8("fillout_label"))
+        self.gridLayout.addWidget(self.fillout_label, 11, 0, 1, 2)
+        self.line_4 = QtGui.QFrame(SyntheticCurveWidget)
+        self.line_4.setFrameShape(QtGui.QFrame.HLine)
+        self.line_4.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line_4.setObjectName(_fromUtf8("line_4"))
+        self.gridLayout.addWidget(self.line_4, 10, 0, 1, 2)
         self.gridLayout_2.addLayout(self.gridLayout, 0, 2, 1, 1)
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
@@ -137,6 +152,10 @@ class Ui_SyntheticCurveWidget(object):
         self.plot_btn.setText(_translate("SyntheticCurveWidget", "Plot", None))
         self.roche_chk.setToolTip(_translate("SyntheticCurveWidget", "Draw Roche equipotential surfaces onto star positions. This option is only valid when Phase = 0.25", None))
         self.roche_chk.setText(_translate("SyntheticCurveWidget", "Roche Pot.\'s", None))
+        self.fillout_label.setToolTip(_translate("SyntheticCurveWidget", "Compute fillout factor as defined in BinaryMaker software;\n"
+"Bradstreet, D. H. 1993, IAU Commission on Close Binary Stars, 21, 151\n"
+"Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomical Society, 34, 75.02  ", None))
+        self.fillout_label.setText(_translate("SyntheticCurveWidget", "Fillout = N/A", None))
         self.loaded_treewidget.headerItem().setText(0, _translate("SyntheticCurveWidget", "File Name", None))
         self.loaded_treewidget.headerItem().setText(1, _translate("SyntheticCurveWidget", "Type", None))
         self.loaded_treewidget.headerItem().setText(2, _translate("SyntheticCurveWidget", "Band", None))

@@ -20,47 +20,49 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0" rowspan="2">
-          <widget class="QLabel" name="label_8">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
-           </property>
+         <item row="0" column="11">
+          <widget class="QPushButton" name="viewlastdcin_btn">
            <property name="text">
-            <string>Number of iterations</string>
+            <string>dcin.active</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="5" rowspan="2">
+         <item row="0" column="10" rowspan="2">
           <widget class="Line" name="line_9">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
           </widget>
          </item>
-         <item row="1" column="4">
+         <item row="0" column="7" rowspan="2">
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="9">
           <widget class="QPushButton" name="exportresults_btn">
            <property name="text">
             <string>Export Results</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="4">
+         <item row="0" column="9">
           <widget class="QPushButton" name="updateinputs_btn">
            <property name="text">
             <string>Update Inputs</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="2" rowspan="2">
+         <item row="1" column="11">
+          <widget class="QPushButton" name="viewlaastdcout_btn">
+           <property name="text">
+            <string>dcout.active</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="6" rowspan="2">
           <widget class="QPushButton" name="rundc2015_btn">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -80,14 +82,33 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="6">
-          <widget class="QPushButton" name="viewlastdcin_btn">
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_8">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
-            <string>dcin.active</string>
+            <string>Number of iterations</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" rowspan="2">
+         <item row="1" column="1" colspan="2">
+          <widget class="QPushButton" name="conjunction_btn">
+           <property name="text">
+            <string>Compute Conjunction Phases</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
           <widget class="QSpinBox" name="iteration_spinbox">
            <property name="maximumSize">
             <size>
@@ -101,16 +122,9 @@
           </widget>
          </item>
          <item row="0" column="3" rowspan="2">
-          <widget class="Line" name="line_2">
+          <widget class="Line" name="line_12">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="6">
-          <widget class="QPushButton" name="viewlaastdcout_btn">
-           <property name="text">
-            <string>dcout.active</string>
            </property>
           </widget>
          </item>

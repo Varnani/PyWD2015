@@ -239,9 +239,11 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
             self.theme_combobox.addItem(str(style))
 
     def changeStyle(self):
+        font = self.font()
         styleFactory = QtGui.QStyleFactory()
         style = styleFactory.create(self.theme_combobox.currentText())
         self.app.setStyle(style)
+        self.app.setFont(font)
 
 
 class LCDCPickerWidget(QtGui.QDialog, lcdcpickerdialog.Ui_LCDCPickerDialog):
@@ -1023,6 +1025,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.MainWindow = None  # mainwindow sets itself here
         self.DcinView = OutputView()
         self.DcoutView = OutputView()
+        self.ConjunctionWidget = self.createConjunctionWidget()
         self.iterator = None
         self.parameterDict = {
             "1": "Spot 1 Latitude",
@@ -1215,6 +1218,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         # self.plotdcresults_btn.clicked.connect(self.PlotResultsWidget.show)
         self.plot_btn.clicked.connect(self.plotData)
         self.popmain_btn.clicked.connect(self.popPlotWindow)
+        self.conjunction_btn.clicked.connect(self.ConjunctionWidget.show)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -1224,6 +1228,15 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
         self.DcinView.close()
         self.DcoutView.close()
+        self.ConjunctionWidget.close()
+
+    def createConjunctionWidget(self):
+        # TODO add conjunction times here
+        conjunctionWidget = QtGui.QWidget()
+        layout = QtGui.QVBoxLayout(conjunctionWidget)
+        layout.addWidget(QtGui.QTreeWidget())
+        conjunctionWidget.setLayout(layout)
+        return conjunctionWidget
 
     def getXYfromFile(self, filepath):
         curve = classes.Curve(filepath)
@@ -1759,6 +1772,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             item.setText(2, component[5])
             star2ParentItem.addChild(item)
 
+        emptyItem = QtGui.QTreeWidgetItem(self.component_treewidget)
+        filloutItem = QtGui.QTreeWidgetItem(self.component_treewidget)
+
+        filloutItem.setText(0, "Fillout")
+        filloutItem.setText(1, methods.computeFillOutFactor(self.MainWindow))
+
         self.component_treewidget.expandAll()
 
     def updateCurveInfoTree(self, curveinfoTable):
@@ -1953,6 +1972,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
             return None
 
     def plotSelected(self):
+        self.fillout_label.setText("Fillout = " + methods.computeFillOutFactor(self.MainWindow))
         if self.selectedItem() is not None:
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
