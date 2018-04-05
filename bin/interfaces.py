@@ -1,12 +1,11 @@
 from PyQt4 import QtGui, QtCore, QtOpenGL
 import numpy
-from scipy.optimize import fsolve
 from matplotlib import pyplot, gridspec
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
-    dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, plotresultswidget, \
+    dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, \
     syntheticcurvewidget, starpositionswidget
 from functools import partial
 from bin import methods, classes
@@ -17,6 +16,7 @@ import ConfigParser
 import os
 import time
 import io
+
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
     def __init__(self):  # constructor
@@ -42,6 +42,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.lastProjectPath = None
         self.populateStyles()  # populate theme combobox
         self.connectSignals()  # connect events with method
+        self.hideConjunctionGroup()
 
     def connectSignals(self):
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
@@ -56,6 +57,10 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.fill_btn.clicked.connect(self.fillLcHJDMenu)
         self.lc_lightcurve_btn.clicked.connect(self.SyntheticCurveWidget.show)
         self.lc_coordinates_btn.clicked.connect(self.StarPositionWidget.show)
+        self.conj_btn.clicked.connect(self.showConjunctionGroup)
+        self.compute_btn.clicked.connect(self.updateConjunctionPhases)
+        self.inputtabwidget.currentChanged.connect(self.hideConjunctionGroup)
+        self.maintabwidget.currentChanged.connect(self.hideConjunctionGroup)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -64,6 +69,49 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.close()
         self.SyntheticCurveWidget.close()
         self.StarPositionWidget.close()
+
+    def showConjunctionGroup(self):
+        self.conjunction_groupbox.show()
+        self.setMaximumSize(1090, 345)
+        self.setMinimumSize(1090, 345)
+        self.whatsthis_btn.setGeometry(
+            1040,
+            self.whatsthis_btn.y(),
+            self.whatsthis_btn.width(),
+            self.whatsthis_btn.height())
+        self.conj_btn.clicked.disconnect()
+        self.conj_btn.clicked.connect(self.hideConjunctionGroup)
+
+    def hideConjunctionGroup(self):
+        self.conjunction_groupbox.hide()
+        self.setMaximumSize(850, 345)
+        self.setMinimumSize(850, 345)
+        self.whatsthis_btn.setGeometry(
+            800,
+            self.whatsthis_btn.y(),
+            self.whatsthis_btn.width(),
+            self.whatsthis_btn.height())
+        self.conj_btn.clicked.disconnect()
+        self.conj_btn.clicked.connect(self.showConjunctionGroup)
+
+    def updateConjunctionPhases(self):
+        phase_of_primary_eclipse, \
+        phase_of_first_quadrature, \
+        phase_of_secondary_eclipse, \
+        phase_of_second_quadrature, \
+        phase_of_periastron, \
+        phase_of_apastron = methods.computeConjunctionPhases(self)
+
+        self.primaryeclipse_label.setText(": " + "{:0.4f}".format(phase_of_primary_eclipse))
+        self.firstquadrature_label.setText(": " + "{:0.4f}".format(phase_of_first_quadrature))
+        self.secondaryeclipse_label.setText(": " + "{:0.4f}".format(phase_of_secondary_eclipse))
+        self.secondquadrature_label.setText(": " + "{:0.4f}".format(phase_of_second_quadrature))
+        if float(self.e_ipt.text()) == 0.0:
+            self.periastron_label.setText(": N/A")
+            self.apastron_label.setText(": N/A")
+        else:
+            self.periastron_label.setText(": " + "{:0.4f}".format(phase_of_periastron))
+            self.apastron_label.setText(": " + "{:0.4f}".format(phase_of_apastron))
 
     def setPaths(self, lcpath, dcpath):
         self.lcpath = lcpath
@@ -112,7 +160,9 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
 
         self.StarPositionWidget.plot_starPositionAxis.clear()
         self.StarPositionWidget.starRenderData = None
-        self.starsRendered = False
+        self.StarPositionWidget.starsRendered = False
+
+        self.updateConjunctionPhases()
 
     def begin(self):  # check for wd.conf
         wdconf = "wd.conf"
@@ -1025,7 +1075,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.MainWindow = None  # mainwindow sets itself here
         self.DcinView = OutputView()
         self.DcoutView = OutputView()
-        self.ConjunctionWidget = self.createConjunctionWidget()
         self.iterator = None
         self.parameterDict = {
             "1": "Spot 1 Latitude",
@@ -1215,10 +1264,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
         self.viewlastdcin_btn.clicked.connect(self.showDcin)
         self.viewlaastdcout_btn.clicked.connect(self.showDcout)
-        # self.plotdcresults_btn.clicked.connect(self.PlotResultsWidget.show)
         self.plot_btn.clicked.connect(self.plotData)
         self.popmain_btn.clicked.connect(self.popPlotWindow)
-        self.conjunction_btn.clicked.connect(self.ConjunctionWidget.show)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -1228,91 +1275,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
         self.DcinView.close()
         self.DcoutView.close()
-        self.ConjunctionWidget.close()
-
-    def createConjunctionWidget(self):
-        # TODO add conjunction times here
-        conjunctionWidget = QtGui.QWidget()
-        layout = QtGui.QVBoxLayout(conjunctionWidget)
-        conjunctionWidget.phases_treewidget = QtGui.QTreeWidget()
-        layout.addWidget(conjunctionWidget.phases_treewidget)
-        conjunctionWidget.calculate_btn = QtGui.QPushButton()
-        conjunctionWidget.calculate_btn.setText("Calculate")
-        conjunctionWidget.calculate_btn.clicked.connect(self.updateConjunctionWidget)
-        layout.addWidget(conjunctionWidget.calculate_btn)
-        conjunctionWidget.phases_treewidget.setHeaderHidden(True)
-        conjunctionWidget.setLayout(layout)
-        conjunctionWidget.phases_treewidget.header().setResizeMode(3)
-        conjunctionWidget.phases_treewidget.headerItem().setText(0, "")
-        conjunctionWidget.phases_treewidget.headerItem().setText(1, "")
-        return conjunctionWidget
-
-    def updateConjunctionWidget(self):
-        phase_of_primary_eclipse, \
-               phase_of_first_quadrature, \
-               phase_of_secondary_eclipse, \
-               phase_of_second_quadrature, \
-               phase_of_periastron, \
-               phase_of_apastron = self.computeConjunctionPhases()
-        self.ConjunctionWidget.phases_treewidget.clear()
-        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
-        item.setText(0, "Phase of Primary Eclipse")
-        item.setText(1, str(phase_of_primary_eclipse))
-        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
-        item.setText(0, "Phase of First Quadrature")
-        item.setText(1, str(phase_of_first_quadrature))
-        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
-        item.setText(0, "Phase of Secondary Eclipse")
-        item.setText(1, str(phase_of_secondary_eclipse))
-        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
-        item.setText(0, "Phase of Second Quadrature")
-        item.setText(1, str(phase_of_second_quadrature))
-        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
-        item.setText(0, "Phase of Periastron")
-        item.setText(1, str(phase_of_periastron))
-        item = QtGui.QTreeWidgetItem(self.ConjunctionWidget.phases_treewidget)
-        item.setText(0, "Phase of Apastron")
-        item.setText(1, str(phase_of_apastron))
-
-    def computeConjunctionPhases(self):
-        w = float(self.MainWindow.perr0_ipt.text())
-        e = float(self.MainWindow.e_ipt.text())
-        phase_shift = float(self.MainWindow.pshift_ipt.text())
-
-        # Calculations below are adopted from JKTEBOP code;
-        #  - The equation for phase difference comes from Hilditch (2001) page 238 equation 5.66,
-        #  - originally credited to the monograph by Kopal (1959).
-
-        e_fac = numpy.sqrt(1.0 - e**2)
-        term1 = 2.0 * numpy.arctan((e * numpy.cos(w)) / e_fac)
-        term2 = 2.0 * e * numpy.cos(w) * e_fac / (1.0 - (e * numpy.sin(w)) ** 2)
-        phase_diff = (numpy.pi + term1 + term2) / (2.0 * numpy.pi)
-
-        # Calculations below are adopted from;
-        # Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
-
-        true_anomaly = (numpy.pi / 2.0) - w
-        eccentric_anomaly = 2.0 * numpy.arctan(numpy.sqrt((1.0 - e) / (1.0 + e)) * numpy.tan(true_anomaly / 2.0))
-        mean_anomaly = eccentric_anomaly - e * numpy.sin(eccentric_anomaly)
-        conjunction = ((mean_anomaly + w) / (2.0 * numpy.pi)) - 0.25 + phase_shift  # superior conjunction phase
-        periastron_passage = 1.0 - mean_anomaly / (2.0 * numpy.pi)
-        periastron_phase = conjunction + periastron_passage  # phase of periastron
-        while periastron_phase > 1.0:
-            periastron_phase = periastron_phase - int(periastron_phase)
-
-        phase_of_primary_eclipse = phase_shift
-        phase_of_first_quadrature = phase_shift + phase_diff / 2.0
-        phase_of_secondary_eclipse = phase_shift + phase_diff
-        phase_of_second_quadrature = phase_shift + (phase_diff / 2.0) + 0.5
-        phase_of_periastron = periastron_phase
-        phase_of_apastron = periastron_phase + 0.5
-
-        return phase_of_primary_eclipse, \
-               phase_of_first_quadrature, \
-               phase_of_secondary_eclipse, \
-               phase_of_second_quadrature, \
-               phase_of_periastron, \
-               phase_of_apastron
 
     def getXYfromFile(self, filepath):
         curve = classes.Curve(filepath)

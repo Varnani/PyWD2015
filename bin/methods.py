@@ -963,7 +963,7 @@ def getAllTablesFromOutput(path, target, secondTarget, offset=3):
 def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     # This snippet is only for e = 0 and f = 1, for now
     # For in-depth discussion about calculating Roche potentials, refer to:
-    # Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
+    #  - Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
 
     w = float(MainWindow.perr0_ipt.text())
     # e = float(self.MainWindow.e_ipt.text())
@@ -984,7 +984,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     f_E = lambda E: E - e * numpy.sin(E) - M
     E = fsolve(f_E, M)
     separation_at_phase = 1.0 - e * numpy.cos(E)
-    print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
+
     q = float(MainWindow.rm_ipt.text())
     qIsInverse = False
     if q > 1.0:
@@ -998,7 +998,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     inner_potential = (1 / inner_critical_x) + (q * (
     (1 / numpy.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
                           ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
-    print "Inner critical potential: {0}".format(inner_potential)
+
     mu = (1.0 / 3.0) * q / (1.0 + q)
     outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** (
     3.0 / 3.0)
@@ -1007,7 +1007,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     (1.0 / numpy.absolute(separation_at_phase - outer_critical_x)) - (
     outer_critical_x / (separation_at_phase ** 2)))) + (
                           ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
-    print "Outer critical potential: {0}".format(outer_potential)
+
     f_outer_critical = lambda x: 1.0 / (numpy.sqrt(x ** 2)) + q * (1.0 / (numpy.sqrt(
         separation_at_phase ** 2 - 2.0 * x * separation_at_phase + x ** 2)) - x / separation_at_phase ** 2) + f ** 2 * (
     (q + 1.0) / 2.0) * (x ** 2) - outer_potential
@@ -1021,7 +1021,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
             (separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
             X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
     center_of_mass = 1 - (1 / (1 + float(MainWindow.rm_ipt.text())))
-    if getPotentials is False:
+    if plotAxis is not None:
         if qIsInverse:
             plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
             plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
@@ -1030,6 +1030,9 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
             plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
         plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
                                    markersize=10, color="#ff3a3a")
+        print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
+        print "Inner critical potential: {0}".format(inner_potential)
+        print "Outer critical potential: {0}".format(outer_potential)
     if getPotentials is True:
         return inner_potential, outer_potential
 
@@ -1041,13 +1044,11 @@ def computeFillOutFactor(MainWindow):
     if e != 0.0 or f1 != 1.0 or f2 != 1.0 or str(MainWindow.mode_combobox.currentText()) not in ("Mode 0", "Mode 1", "Mode 3"):
         return "N/A"
     else:
-        q = float(MainWindow.rm_ipt.text())
         inner_potential, outer_potential = computeRochePotentials(MainWindow, 0.25, None, getPotentials=True)
         inner_potential = inner_potential[0]
         outer_potential = outer_potential[0]
         primary_potential = float(MainWindow.phsv_ipt.text())
         primary_fillout_BM = None
-        secondary_fillout_BM = None
 
         # Bradstreet 1993 - BinaryMaker
         # for primary component
@@ -1057,6 +1058,49 @@ def computeFillOutFactor(MainWindow):
             primary_fillout_BM = (inner_potential - primary_potential) / (inner_potential - outer_potential)
 
         return "{:0.5f}".format(primary_fillout_BM)
+
+
+def computeConjunctionPhases(MainWindow):
+    w = float(MainWindow.perr0_ipt.text())
+    e = float(MainWindow.e_ipt.text())
+    phase_shift = float(MainWindow.pshift_ipt.text())
+
+    # Calculations below are adopted from JKTEBOP code;
+    #  - The equation for phase difference comes from Hilditch (2001) page 238 equation 5.66,
+    #  - originally credited to the monograph by Kopal (1959).
+
+    e_fac = numpy.sqrt(1.0 - e**2)
+    term1 = 2.0 * numpy.arctan((e * numpy.cos(w)) / e_fac)
+    term2 = 2.0 * e * numpy.cos(w) * e_fac / (1.0 - (e * numpy.sin(w)) ** 2)
+    phase_diff = (numpy.pi + term1 + term2) / (2.0 * numpy.pi)
+
+    # Calculations below are adopted from;
+    #  - Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
+
+    true_anomaly = (numpy.pi / 2.0) - w
+    eccentric_anomaly = 2.0 * numpy.arctan(numpy.sqrt((1.0 - e) / (1.0 + e)) * numpy.tan(true_anomaly / 2.0))
+    mean_anomaly = eccentric_anomaly - e * numpy.sin(eccentric_anomaly)
+    conjunction = ((mean_anomaly + w) / (2.0 * numpy.pi)) - 0.25 + phase_shift
+    periastron_passage = 1.0 - mean_anomaly / (2.0 * numpy.pi)
+    periastron_phase = conjunction + periastron_passage
+    while periastron_phase > 1.0:
+        periastron_phase = periastron_phase - int(periastron_phase)
+
+    phase_of_primary_eclipse = phase_shift
+    phase_of_first_quadrature = phase_shift + phase_diff / 2.0
+    phase_of_secondary_eclipse = phase_shift + phase_diff
+    phase_of_second_quadrature = phase_shift + (phase_diff / 2.0) + 0.5
+    phase_of_periastron = periastron_phase
+    phase_of_apastron = periastron_phase + 0.5
+    while phase_of_apastron > 1.0:
+        phase_of_apastron = phase_of_apastron - int(phase_of_apastron)
+
+    return phase_of_primary_eclipse, \
+           phase_of_first_quadrature, \
+           phase_of_secondary_eclipse, \
+           phase_of_second_quadrature, \
+           phase_of_periastron, \
+           phase_of_apastron
 
 
 if __name__ == "__main__":
