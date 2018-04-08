@@ -1086,10 +1086,10 @@ def computeConjunctionPhases(MainWindow):
     while periastron_phase > 1.0:
         periastron_phase = periastron_phase - int(periastron_phase)
 
-    phase_of_primary_eclipse = phase_shift
-    phase_of_first_quadrature = phase_shift + phase_diff / 2.0
-    phase_of_secondary_eclipse = phase_shift + phase_diff
-    phase_of_second_quadrature = phase_shift + (phase_diff / 2.0) + 0.5
+    phase_of_primary_eclipse = conjunction
+    phase_of_first_quadrature = conjunction + phase_diff / 2.0
+    phase_of_secondary_eclipse = conjunction + phase_diff
+    phase_of_second_quadrature = conjunction + (phase_diff / 2.0) + 0.5
     phase_of_periastron = periastron_phase
     phase_of_apastron = periastron_phase + 0.5
     while phase_of_apastron > 1.0:
