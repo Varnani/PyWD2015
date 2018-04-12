@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'syntheticcurvewidget.ui'
 #
-# Created: Thu Apr  5 14:11:18 2018
+# Created: Wed Apr 11 14:57:10 2018
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -38,7 +38,7 @@ class Ui_SyntheticCurveWidget(object):
         self.gridLayout.addWidget(self.label, 8, 0, 1, 1)
         self.phase_spinbox = QtGui.QDoubleSpinBox(SyntheticCurveWidget)
         self.phase_spinbox.setEnabled(True)
-        self.phase_spinbox.setDecimals(2)
+        self.phase_spinbox.setDecimals(4)
         self.phase_spinbox.setMaximum(1.0)
         self.phase_spinbox.setSingleStep(0.1)
         self.phase_spinbox.setProperty("value", 0.25)

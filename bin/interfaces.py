@@ -2346,8 +2346,11 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
 
     def rocheChanged(self):
         if self.roche_chk.isChecked():
+            periastron = methods.computeConjunctionPhases(self.MainWindow)[4]
+            if periastron == "N/A":
+                periastron = 0.25
             self.phase_spinbox.setDisabled(True)
-            self.phase_spinbox.setValue(float(0.25))
+            self.phase_spinbox.setValue(periastron)
         else:
             self.phase_spinbox.setDisabled(False)
 
@@ -2448,7 +2451,10 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
 
     def checkRoche(self):
         if self.roche_chk.isChecked():
-            self.phase_spinbox.setValue(0.25)
+            periastron = methods.computeConjunctionPhases(self.MainWindow)[4]
+            if periastron == "N/A":
+                periastron = 0.25
+            self.phase_spinbox.setValue(periastron)
             self.phase_spinbox.setDisabled(True)
         else:
             self.phase_spinbox.setDisabled(False)

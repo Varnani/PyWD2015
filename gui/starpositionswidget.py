@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'starpositionswidget.ui'
 #
-# Created: Wed Apr  4 11:14:19 2018
+# Created: Wed Apr 11 14:53:42 2018
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,7 +46,8 @@ class Ui_StarPositionWidget(object):
         self.gridLayout_2.addWidget(self.label_7, 0, 0, 1, 1)
         self.phase_spinbox = QtGui.QDoubleSpinBox(self.tab_2)
         self.phase_spinbox.setEnabled(True)
-        self.phase_spinbox.setDecimals(2)
+        self.phase_spinbox.setMinimumSize(QtCore.QSize(70, 0))
+        self.phase_spinbox.setDecimals(4)
         self.phase_spinbox.setMinimum(0.0)
         self.phase_spinbox.setMaximum(1.0)
         self.phase_spinbox.setSingleStep(0.01)

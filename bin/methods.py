@@ -966,8 +966,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     #  - Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
 
     w = float(MainWindow.perr0_ipt.text())
-    # e = float(self.MainWindow.e_ipt.text())
-    e = 0.0
+    e = float(MainWindow.e_ipt.text())
     phase_shift = float(MainWindow.pshift_ipt.text())
 
     true_anomaly = (numpy.pi / 2.0) - w
@@ -1020,14 +1019,16 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
         (1 / numpy.sqrt(
             (separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
             X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
-    center_of_mass = 1 - (1 / (1 + float(MainWindow.rm_ipt.text())))
+    center_of_mass = (separation_at_phase / (1 + (1/float(MainWindow.rm_ipt.text()))))
     if plotAxis is not None:
         if qIsInverse:
             plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
-            plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
+            if e == 0.0:
+                plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
         else:
             plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
-            plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
+            if e == 0.0:
+                plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
         plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
                                    markersize=10, color="#ff3a3a")
         print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
