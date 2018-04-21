@@ -43,6 +43,9 @@
          </item>
          <item row="1" column="9">
           <widget class="QPushButton" name="exportresults_btn">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Export Results</string>
            </property>
@@ -482,6 +485,9 @@
                  </item>
                  <item row="3" column="8" rowspan="2">
                   <widget class="QPushButton" name="addsubset_btn">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                      <horstretch>0</horstretch>
@@ -2350,7 +2356,6 @@ Line plotting will be used for LC synthetic points. DC outputs will be plotted w
            <height>300</height>
           </size>
          </property>
-         <zorder></zorder>
         </widget>
        </item>
       </layout>

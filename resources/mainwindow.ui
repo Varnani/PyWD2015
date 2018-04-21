@@ -2434,6 +2434,9 @@
       </property>
      </widget>
      <widget class="QPushButton" name="defaultseed_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>330</x>
@@ -2524,6 +2527,9 @@
       </property>
      </widget>
      <widget class="QPushButton" name="randomizeseed_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>240</x>
@@ -2851,6 +2857,9 @@ zero for zero output noise</string>
       </property>
      </widget>
      <widget class="QPushButton" name="lc_speclineprof_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>480</x>
@@ -2870,6 +2879,9 @@ zero for zero output noise</string>
       </property>
      </widget>
      <widget class="QPushButton" name="lc_stardimphase_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>480</x>
@@ -2904,10 +2916,13 @@ zero for zero output noise</string>
        <string>MPAGE = 5</string>
       </property>
       <property name="text">
-       <string>Sky Coordinates</string>
+       <string>Star Positions / Roche Lobes</string>
       </property>
      </widget>
      <widget class="QPushButton" name="lc_conjunction_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>480</x>
@@ -3215,6 +3230,9 @@ zero for zero output noise</string>
       </property>
      </widget>
      <widget class="QPushButton" name="dchistory_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>385</x>

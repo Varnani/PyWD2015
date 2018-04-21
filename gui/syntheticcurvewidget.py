@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'syntheticcurvewidget.ui'
 #
-# Created: Wed Apr 11 14:57:10 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -61,6 +60,7 @@ class Ui_SyntheticCurveWidget(object):
         self.time_combobox.addItem(_fromUtf8(""))
         self.gridLayout.addWidget(self.time_combobox, 3, 0, 1, 2)
         self.pop_btn = QtGui.QPushButton(SyntheticCurveWidget)
+        self.pop_btn.setEnabled(False)
         self.pop_btn.setObjectName(_fromUtf8("pop_btn"))
         self.gridLayout.addWidget(self.pop_btn, 1, 0, 1, 2)
         self.plot_btn = QtGui.QPushButton(SyntheticCurveWidget)

@@ -2182,36 +2182,32 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     self.plot_residualAxis.plot(x_obs, y_residuals, linestyle="", marker="o", markersize=4, color="#4286f4")
                 self.plot_residualAxis.set_ylabel("Residuals")
                     
-            if self.drawstars_chk.isChecked() or self.roche_chk.isChecked():
-                center_of_mass = 1 - (1 / (1 + float(self.MainWindow.rm_ipt.text())))
+            if self.drawstars_chk.isChecked():
                 self.plot_observationAxis.set_position(self.triple_grid[0, :-1].get_position(self.plot_figure))
                 self.plot_residualAxis.set_position(self.triple_grid[1, :-1].get_position(self.plot_figure))
                 self.plot_starposAxis.set_visible(True)
-                if self.drawstars_chk.isChecked():
-                    if self.roche_chk.isChecked():
-                        stored_inclination = str(self.MainWindow.xincl_ipt.text())
-                        self.MainWindow.xincl_ipt.setText("90")
-                    lcin = classes.lcin(self.MainWindow)
-                    phase = self.phase_spinbox.value()
-                    lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
-                                 phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000], jdphs="2")
-                    with open(self.MainWindow.lcinpath, "w") as f:
-                        f.write(lcin.output)
-                    process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
-                    process.wait()
-                    table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
-                    x = [float(x[0].replace("D", "E")) + center_of_mass for x in table]
-                    y = [float(y[1].replace("D", "E")) for y in table]
-                    self.plot_starposAxis.plot(x, y, 'ko', markersize=0.2, label="Surface Grids")
-                    self.plot_starposAxis.plot([center_of_mass], [0], linestyle="", marker="+", markersize=5, color="#ff3a3a")
-                    if self.roche_chk.isChecked():
-                        self.MainWindow.xincl_ipt.setText(stored_inclination)
-                if self.roche_chk.isChecked():
-                    methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starposAxis)
+                lcin = classes.lcin(self.MainWindow)
+                phase = self.phase_spinbox.value()
+                lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                             phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000], jdphs="2")
+                with open(self.MainWindow.lcinpath, "w") as f:
+                    f.write(lcin.output)
+                process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+                process.wait()
+                table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+                x = [float(x[0].replace("D", "E")) for x in table]
+                y = [float(y[1].replace("D", "E")) for y in table]
+                self.plot_starposAxis.plot(x, y, 'ko', markersize=0.2, label="Surface Grids")
+                self.plot_starposAxis.plot([0], [0], linestyle="", marker="+", markersize=5, color="#ff3a3a")
+            if self.roche_chk.isChecked():
+                self.plot_observationAxis.set_position(self.triple_grid[0, :-1].get_position(self.plot_figure))
+                self.plot_residualAxis.set_position(self.triple_grid[1, :-1].get_position(self.plot_figure))
+                self.plot_starposAxis.set_visible(True)
+                methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starposAxis)
                 self.plot_starposAxis.set_xlim(-1, 2)
                 self.plot_starposAxis.set_ylim(-1, 1)
-                self.plot_starposAxis.set_xlabel('x')
-                self.plot_starposAxis.set_ylabel('y')
+            self.plot_starposAxis.set_xlabel('x')
+            self.plot_starposAxis.set_ylabel('y')
             self.plot_toolbar.update()
             yticks_resd = self.plot_residualAxis.yaxis.get_major_ticks()
             yticks_resd[-1].label1.set_visible(False)
@@ -2347,12 +2343,13 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
     def rocheChanged(self):
         if self.roche_chk.isChecked():
             periastron = methods.computeConjunctionPhases(self.MainWindow)[4]
-            if periastron == "N/A":
-                periastron = 0.25
             self.phase_spinbox.setDisabled(True)
             self.phase_spinbox.setValue(periastron)
+            self.drawstars_chk.setDisabled(True)
+            self.drawstars_chk.setChecked(False)
         else:
             self.phase_spinbox.setDisabled(False)
+            self.drawstars_chk.setDisabled(False)
 
 
 class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidget):
@@ -2414,16 +2411,17 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
                 painter.end()
 
         def showImage(self, image):
-            start = time.time()
             self.imageToRender = image
             self.repaint()
-            print "frametime", time.time() - start
 
     def playRender(self):
         for image in self.starRenderData:
             start = time.time()
             self.renderArea.showImage(image)
-            time.sleep(self.frameTime - (time.time() - start))
+            wait = time.time() - start
+            if wait < 0.0:
+                wait = 0.0
+            time.sleep(self.frameTime - wait)
 
     def closeEvent(self, QCloseEvent):
         try:
@@ -2452,39 +2450,32 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
     def checkRoche(self):
         if self.roche_chk.isChecked():
             periastron = methods.computeConjunctionPhases(self.MainWindow)[4]
-            if periastron == "N/A":
-                periastron = 0.25
             self.phase_spinbox.setValue(periastron)
             self.phase_spinbox.setDisabled(True)
         else:
             self.phase_spinbox.setDisabled(False)
 
     def plotSingle(self):
-        tempIncl = self.MainWindow.xincl_ipt.text()
-        center_of_mass = 0
-        if self.roche_chk.isChecked():
-            self.MainWindow.xincl_ipt.setText("90")
-            center_of_mass = 1 - (1 / (1 + float(self.MainWindow.rm_ipt.text())))
         self.plot_starPositionAxis.clear()
-        lcin = classes.lcin(self.MainWindow)
-        phase = self.phase_spinbox.value()
-        lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
-                                  phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000],
-                           jdphs="2")
-        with open(self.MainWindow.lcinpath, "w") as f:
-            f.write(lcin.output)
-        process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
-        process.wait()
-        table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
-        x = [float(x[0].replace("D", "E")) + center_of_mass for x in table]
-        y = [float(y[1].replace("D", "E")) for y in table]
-        self.plot_starPositionAxis.plot(x, y, 'ko', markersize=0.2)
+        if self.roche_chk.isChecked():
+            methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starPositionAxis)
+        else:
+            lcin = classes.lcin(self.MainWindow)
+            phase = self.phase_spinbox.value()
+            lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                                      phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000],
+                               jdphs="2")
+            with open(self.MainWindow.lcinpath, "w") as f:
+                f.write(lcin.output)
+            process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+            process.wait()
+            table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+            x = [float(x[0].replace("D", "E")) for x in table]
+            y = [float(y[1].replace("D", "E")) for y in table]
+            self.plot_starPositionAxis.plot(x, y, 'ko', markersize=0.2)
         self.plot_starPositionAxis.plot([0], [0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
         self.plot_starPositionAxis.set_xlabel("x")
         self.plot_starPositionAxis.set_ylabel("y")
-        if self.roche_chk.isChecked():
-            methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starPositionAxis)
-            self.MainWindow.xincl_ipt.setText(tempIncl)
         self.plot_toolbar.update()
         self.plot_canvas.draw()
 

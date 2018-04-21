@@ -961,7 +961,7 @@ def getAllTablesFromOutput(path, target, secondTarget, offset=3):
 
 
 def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
-    # This snippet is only for e = 0 and f = 1, for now
+    # This snippet is only for f1, f2 = 1 for now
     # For in-depth discussion about calculating Roche potentials, refer to:
     #  - Eclipsing Binary Stars: Modeling and Analysis (Kallrath & Milone, 2009, Springer)
 
@@ -987,7 +987,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     q = float(MainWindow.rm_ipt.text())
     qIsInverse = False
     if q > 1.0:
-        q = 1 / q
+        q = 1.0 / q
         qIsInverse = True
     f = 1.0
     f_critical = lambda x: (-1 / x ** 2) - \
@@ -999,13 +999,13 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
                           ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
 
     mu = (1.0 / 3.0) * q / (1.0 + q)
-    outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** (
-    3.0 / 3.0)
+    outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** \
+                                (3.0 / 3.0)
     outer_critical_x = fsolve(f_critical, outer_critical_estimation)
     outer_potential = (1.0 / outer_critical_x) + (q * (
-    (1.0 / numpy.absolute(separation_at_phase - outer_critical_x)) - (
-    outer_critical_x / (separation_at_phase ** 2)))) + (
-                          ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
+        (1.0 / numpy.absolute(separation_at_phase - outer_critical_x)) - (
+        outer_critical_x / (separation_at_phase ** 2)))) + (
+                            ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
 
     f_outer_critical = lambda x: 1.0 / (numpy.sqrt(x ** 2)) + q * (1.0 / (numpy.sqrt(
         separation_at_phase ** 2 - 2.0 * x * separation_at_phase + x ** 2)) - x / separation_at_phase ** 2) + f ** 2 * (
@@ -1019,21 +1019,44 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
         (1 / numpy.sqrt(
             (separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
             X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
-    center_of_mass = (separation_at_phase / (1 + (1/float(MainWindow.rm_ipt.text()))))
+
+    if qIsInverse:
+        q = 1 / q
+    center_of_mass = (separation_at_phase / (1 + (1 / q)))
+
+    x_axis_primary = numpy.linspace(left_limit, inner_critical_x, 2000)
+    z_axis_primary = numpy.linspace(-1, 2, 2000)
+    (X_primary, Z_primary) = numpy.meshgrid(x_axis_primary, z_axis_primary)
+    x_axis_secondary = numpy.linspace(inner_critical_x, right_limit  + 0.2, 2000)
+    z_axis_secondary = numpy.linspace(-1, 2, 2000)
+    (X_secondary, Z_secondary) = numpy.meshgrid(x_axis_secondary, z_axis_secondary)
+    all_pots_primary = ((1 / numpy.sqrt(X_primary ** 2 + Z_primary ** 2)) + (q * (
+        (1 / numpy.sqrt(
+            (separation_at_phase ** 2) - (2 * X_primary * separation_at_phase) +
+            (numpy.sqrt(X_primary ** 2 + Z_primary ** 2) ** 2))) - (
+            X_primary / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X_primary ** 2)))
+    all_pots_secondary = ((1 / numpy.sqrt(X_secondary ** 2 + Z_secondary ** 2)) + (q * (
+        (1 / numpy.sqrt(
+            (separation_at_phase ** 2) - (2 * X_secondary * separation_at_phase) +
+            (numpy.sqrt(X_secondary ** 2 + Z_secondary ** 2) ** 2))) - (
+            X_secondary / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X_secondary ** 2)))
+
     if plotAxis is not None:
         if qIsInverse:
-            plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, inner_potential, colors="red")
-            if e == 0.0:
-                plotAxis.contour(-1.0 * X + 1.0, Z, all_pots, outer_potential, colors="blue")
-        else:
-            plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
-            if e == 0.0:
-                plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
+            X = -1.0 * X + 1.0
+        plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
+        if e == 0.0:
+            plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
+        plotAxis.contourf(X_primary, Z_primary, all_pots_primary, [float(MainWindow.phsv_ipt.text()),
+                                                   float(MainWindow.phsv_ipt.text()) * 1000], cmap='Dark2', vmin=0, vmax=1)
+        plotAxis.contourf(X_secondary, Z_secondary, all_pots_secondary, [float(MainWindow.pcsv_ipt.text()),
+                                                   float(MainWindow.pcsv_ipt.text()) * 1000], cmap='Dark2', vmin=0, vmax=1)
         plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
                                    markersize=10, color="#ff3a3a")
         print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
         print "Inner critical potential: {0}".format(inner_potential)
         print "Outer critical potential: {0}".format(outer_potential)
+        print outer_critical_x
     if getPotentials is True:
         return inner_potential, outer_potential
 
@@ -1095,6 +1118,9 @@ def computeConjunctionPhases(MainWindow):
     phase_of_apastron = periastron_phase + 0.5
     while phase_of_apastron > 1.0:
         phase_of_apastron = phase_of_apastron - int(phase_of_apastron)
+    if e == 0.0:
+        phase_of_periastron = 0.25
+        phase_of_apastron = 0.25
 
     return phase_of_primary_eclipse, \
            phase_of_first_quadrature, \
