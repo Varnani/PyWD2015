@@ -193,12 +193,12 @@
          <rect>
           <x>240</x>
           <y>110</y>
-          <width>141</width>
+          <width>131</width>
           <height>31</height>
          </rect>
         </property>
         <property name="toolTip">
-         <string>Set whether time or phase is the independent variable</string>
+         <string>Set whether time or phase is the independent variable in input observations.</string>
         </property>
         <property name="statusTip">
          <string>JDPHS</string>
@@ -237,7 +237,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Input - Observation, spot, calculation and general configuration</string>
+         <string>Input - Observation, spots, and general configuration</string>
         </property>
        </widget>
        <widget class="Line" name="line_12">
@@ -326,63 +326,6 @@
          <string>Save Project</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="icor2_chk">
-        <property name="geometry">
-         <rect>
-          <x>240</x>
-          <y>220</y>
-          <width>261</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Enable proximity and eclipse corrections for RV's of star 2.</string>
-        </property>
-        <property name="statusTip">
-         <string>ICOR2</string>
-        </property>
-        <property name="text">
-         <string>Proximity RV correction for star 2</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="icor1_chk">
-        <property name="geometry">
-         <rect>
-          <x>240</x>
-          <y>190</y>
-          <width>261</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Enable proximity and eclipse corrections for RV's of star 1.</string>
-        </property>
-        <property name="statusTip">
-         <string>ICOR1</string>
-        </property>
-        <property name="text">
-         <string>Proximity RV correction for star 1</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="ifcgs_chk">
-        <property name="geometry">
-         <rect>
-          <x>240</x>
-          <y>160</y>
-          <width>91</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If absolute solution with flux unit erg s&lt;span style=&quot; vertical-align:super;&quot;&gt;−1&lt;/span&gt; cm&lt;span style=&quot; vertical-align:super;&quot;&gt;−3&lt;/span&gt; is desired, check this box. Uncheck this box for a conventional solution in arbitrarily scaled flux.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="statusTip">
-         <string>IFCGS</string>
-        </property>
-        <property name="text">
-         <string>Use CGS</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_8">
         <property name="geometry">
          <rect>
@@ -423,6 +366,102 @@
         </property>
         <property name="text">
          <string>Save as...</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="maglite_combobox">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string>Flux</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Magnitude</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QLabel" name="label_77">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>160</y>
+          <width>131</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Input unit in observations and calculations. This is mainly required for DC but most plot windows need this information or they will not function correctly. </string>
+        </property>
+        <property name="statusTip">
+         <string>MAGLITE</string>
+        </property>
+        <property name="text">
+         <string>Input Unit</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="ifcgs_chk">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>200</y>
+          <width>121</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If absolute solution with flux unit erg s&lt;span style=&quot; vertical-align:super;&quot;&gt;−1&lt;/span&gt; cm&lt;span style=&quot; vertical-align:super;&quot;&gt;−3&lt;/span&gt; is desired, check this box. Uncheck this box for a conventional solution in arbitrarily scaled flux.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="statusTip">
+         <string>IFCGS</string>
+        </property>
+        <property name="text">
+         <string>Use CGS</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="icor2_chk">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>220</y>
+          <width>111</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Enable proximity and eclipse corrections for RV's of star 2.</string>
+        </property>
+        <property name="statusTip">
+         <string>ICOR2</string>
+        </property>
+        <property name="text">
+         <string>RV Corr. 2</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="icor1_chk">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>200</y>
+          <width>111</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Enable proximity and eclipse corrections for RV's of star 1.</string>
+        </property>
+        <property name="statusTip">
+         <string>ICOR1</string>
+        </property>
+        <property name="text">
+         <string>RV Corr. 1</string>
         </property>
        </widget>
       </widget>
@@ -3080,26 +3119,6 @@ zero for zero output noise</string>
        <string>Band #</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="maglite_combobox">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>90</y>
-        <width>121</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>Flux</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Magnitude</string>
-       </property>
-      </item>
-     </widget>
      <widget class="QLabel" name="label_40">
       <property name="geometry">
        <rect>
@@ -3136,7 +3155,7 @@ zero for zero output noise</string>
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>130</y>
+        <y>90</y>
         <width>110</width>
         <height>31</height>
        </rect>
@@ -3155,7 +3174,7 @@ zero for zero output noise</string>
       <property name="geometry">
        <rect>
         <x>230</x>
-        <y>130</y>
+        <y>90</y>
         <width>121</width>
         <height>30</height>
        </rect>
@@ -3170,25 +3189,6 @@ zero for zero output noise</string>
         <string>Asymmetrical</string>
        </property>
       </item>
-     </widget>
-     <widget class="QLabel" name="label_41">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>90</y>
-        <width>111</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Input unit</string>
-      </property>
-      <property name="statusTip">
-       <string>MAGLITE</string>
-      </property>
-      <property name="text">
-       <string>Input Unit</string>
-      </property>
      </widget>
      <widget class="QSpinBox" name="linkext_spinbox">
       <property name="geometry">
@@ -3652,9 +3652,6 @@ zero for zero output noise</string>
   <tabstop>systemname_ipt</tabstop>
   <tabstop>mode_combobox</tabstop>
   <tabstop>jdphs_combobox</tabstop>
-  <tabstop>ifcgs_chk</tabstop>
-  <tabstop>icor1_chk</tabstop>
-  <tabstop>icor2_chk</tabstop>
   <tabstop>jdstart_ipt</tabstop>
   <tabstop>jdstop_ipt</tabstop>
   <tabstop>jdincrement_ipt</tabstop>
@@ -3687,7 +3684,6 @@ zero for zero output noise</string>
   <tabstop>lcnoise_combobox</tabstop>
   <tabstop>spotconfigure_btn</tabstop>
   <tabstop>dc_rundc_btn</tabstop>
-  <tabstop>maglite_combobox</tabstop>
   <tabstop>isym_combobox</tabstop>
   <tabstop>linkext_spinbox</tabstop>
   <tabstop>desextinc_ipt</tabstop>

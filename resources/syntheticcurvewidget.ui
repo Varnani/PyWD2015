@@ -285,6 +285,16 @@ Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomica
            <string>Calibration</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>Factor</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Zero</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>

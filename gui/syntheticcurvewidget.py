@@ -169,4 +169,6 @@ class Ui_SyntheticCurveWidget(object):
         self.loaded_treewidget.headerItem().setText(10, _translate("SyntheticCurveWidget", "Opacity", None))
         self.loaded_treewidget.headerItem().setText(11, _translate("SyntheticCurveWidget", "Extinction", None))
         self.loaded_treewidget.headerItem().setText(12, _translate("SyntheticCurveWidget", "Calibration", None))
+        self.loaded_treewidget.headerItem().setText(13, _translate("SyntheticCurveWidget", "Factor", None))
+        self.loaded_treewidget.headerItem().setText(14, _translate("SyntheticCurveWidget", "Zero", None))
 

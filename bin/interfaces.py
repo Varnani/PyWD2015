@@ -480,9 +480,11 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
             curve = classes.Curve(item.toolTip(0))
             x = [float(x) for x in curve.timeList]
             y = [float(y) for y in curve.observationList]
-            pyplot.scatter(x, y)
+            pyplot.plot(x, y, linestyle="", marker="o", markersize=4, color="#4286f4")
             pyplot.title(item.text(0))
             pyplot.get_current_fig_manager().set_window_title("Matplotlib - " + item.text(0))
+            if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude" and str(item.text(1)) == "Light Curve":
+                pyplot.gca().invert_yaxis()
             pyplot.show()
 
     def updateCurveWidget(self):
@@ -1364,7 +1366,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     line3 = [min(curve.timeList), max(curve.timeList), float(self.MainWindow.p0_ipt.text()) / 100,
                              0, 1, 0.001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
                 else:
-                    line3 = [self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                    line3 = [float(self.MainWindow.jd0_ipt.text()), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
                              0, 1, 0.001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
                 model = classes.lcin(self.MainWindow)
                 mpage = 1
@@ -1806,8 +1808,14 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         for component in second:
             item = QtGui.QTreeWidgetItem(star2ParentItem)
             item.setText(0, component[1].title())
-            item.setText(1, component[2])
-            item.setText(2, component[5])
+            # fix for wd's mode 5
+            pointRadii = component[2]
+            stderrIndex = 5
+            if component[1] == "point" and str(self.MainWindow.mode_combobox.currentText()) == "Mode 5":
+                pointRadii = pointRadii.rstrip("*")
+                stderrIndex = 4
+            item.setText(1, pointRadii)
+            item.setText(2, component[stderrIndex])
             star2ParentItem.addChild(item)
 
         emptyItem = QtGui.QTreeWidgetItem(self.component_treewidget)
@@ -2064,8 +2072,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 syntheticCurve.y2 = item.text(9)
                 syntheticCurve.el3a = item.text(5)
                 syntheticCurve.opsf = item.text(10)
-                syntheticCurve.zero = "8"
-                syntheticCurve.factor = "1"
+                syntheticCurve.zero = item.text(14)
+                syntheticCurve.factor = item.text(13)
                 syntheticCurve.wla = "0.55"
                 syntheticCurve.aextinc = item.text(11)
                 syntheticCurve.calib = item.text(12)
@@ -2073,8 +2081,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
                 curve = self.MainWindow.LoadObservationWidget.Curves()[index]
                 syntheticCurve = curve.getSynthetic()
-                syntheticCurve.zero = "8"
-                syntheticCurve.factor = "1"
+                syntheticCurve.zero = item.text(14)
+                syntheticCurve.factor = item.text(13)
             if self.plotobs_chk.isChecked():
                 if str(item.text(0)) != "[Synthetic]":
                     index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
@@ -2144,6 +2152,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     y2_index = 7
                 if syntheticCurve.type == "lc":
                     y_index = 4
+                    if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude":
+                        y_index = 7
                 if self.time_combobox.currentText() == "HJD":
                     x_index = 0
                 else:
@@ -2160,6 +2170,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 # plot data
                 if syntheticCurve.type == "lc":
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
+                    if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude":
+                        self.plot_observationAxis.invert_yaxis()
                 if syntheticCurve.type == "vc":
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
                     self.plot_observationAxis.plot(x_model, y2_model, color="#f48942")
@@ -2173,7 +2185,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                         y2_residuals = []
                         for o, c in izip(y2_obs, interpolated_y2_model):
                             y2_residuals.append(o - c)
-                        self.plot_residualAxis.plot(x_obs, y2_residuals, linestyle="", marker="o", markersize=4,
+                        self.plot_residualAxis.plot(x2_obs, y2_residuals, linestyle="", marker="o", markersize=4,
                                                     color="#f73131")
                     interpolated_y_model = numpy.interp(x_obs, x_model, y_model)
                     y_residuals = []
@@ -2270,6 +2282,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         item.setText(10, "-")
         item.setText(11, "-")
         item.setText(12, "-")
+        item.setText(13, "-")
+        item.setText(14, "-")
         item = QtGui.QTreeWidgetItem(self.loaded_treewidget)
         item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         item.setText(0, "[Synthetic]")
@@ -2290,6 +2304,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         item.setText(10, "0")
         item.setText(11, "0")
         item.setText(12, "0")
+        item.setText(13, "0")
+        item.setText(14, "0")
 
     def populateSyntheticCurveWidget(self):
         for curve in self.MainWindow.LoadObservationWidget.Curves():
@@ -2309,6 +2325,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 item.setText(10, "-")
                 item.setText(11, "-")
                 item.setText(12, "-")
+                item.setText(13, "-")
+                item.setText(14, "-")
             if curve.type == "lc":
                 curveProps = CurvePropertiesDialog()
                 item.setText(0, os.path.basename(curve.FilePath))
@@ -2328,6 +2346,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 item.setText(10, curve.opsf)
                 item.setText(11, curve.aextinc)
                 item.setText(12, curve.calib)
+                item.setText(13, "1")
+                item.setText(14, "8")
         self.loaded_treewidget.header().setResizeMode(3)
 
     def selectBand(self, button, item):

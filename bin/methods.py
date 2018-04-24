@@ -1043,7 +1043,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
 
     if plotAxis is not None:
         if qIsInverse:
-            X = -1.0 * X + 1.0
+            X = -1.0 * X + separation_at_phase
         plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
         if e == 0.0:
             plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
@@ -1056,7 +1056,6 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
         print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
         print "Inner critical potential: {0}".format(inner_potential)
         print "Outer critical potential: {0}".format(outer_potential)
-        print outer_critical_x
     if getPotentials is True:
         return inner_potential, outer_potential
 
