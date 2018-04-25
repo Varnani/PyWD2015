@@ -1997,6 +1997,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         # self.plot_figure.tight_layout()
         self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
         self.plot_canvas.draw()
+        self.plotIsInverted = False
         # add synthetic curves
         self.appendSynthetics()
         self.loaded_treewidget.setEditTriggers(self.loaded_treewidget.NoEditTriggers)
@@ -2083,6 +2084,9 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 syntheticCurve = curve.getSynthetic()
                 syntheticCurve.zero = item.text(14)
                 syntheticCurve.factor = item.text(13)
+                if syntheticCurve.type == "vc":
+                    syntheticCurve.zero = "8"
+                    syntheticCurve.factor = "1"
             if self.plotobs_chk.isChecked():
                 if str(item.text(0)) != "[Synthetic]":
                     index = self.loaded_treewidget.invisibleRootItem().indexOfChild(item)
@@ -2171,7 +2175,13 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 if syntheticCurve.type == "lc":
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
                     if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude":
-                        self.plot_observationAxis.invert_yaxis()
+                        if self.plotIsInverted is False:
+                            self.plot_observationAxis.invert_yaxis()
+                            self.plotIsInverted = True
+                    else:
+                        if self.plotIsInverted is True:
+                            self.plot_observationAxis.invert_yaxis()
+                            self.plotIsInverted = False
                 if syntheticCurve.type == "vc":
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
                     self.plot_observationAxis.plot(x_model, y2_model, color="#f48942")

@@ -83,6 +83,8 @@ class CurveProperties:
             curve.aextinc = "0"
             curve.xunit = "0"
             curve.calib = "0"
+            curve.zero = "8"
+            curve.factor = "1"
         curve.synthetic = True
         curve.zero = "0"
         curve.factor = "0"
