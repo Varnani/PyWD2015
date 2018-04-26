@@ -8,7 +8,6 @@ from bin import interfaces
 # TODO add tooltips, statustips and whatsthis on every parameter
 # TODO add program input control (mode, ifcgs, maglite/xcalib etc.)
 # TODO add dc subset support
-# TODO finish implementing saveProject()/loadProject()
 # TODO add in/out file archiving
 # TODO make windows compatible
 

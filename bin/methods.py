@@ -1007,6 +1007,9 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
         outer_critical_x / (separation_at_phase ** 2)))) + (
                             ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
 
+    if getPotentials is True:
+        return inner_potential, outer_potential
+
     f_outer_critical = lambda x: 1.0 / (numpy.sqrt(x ** 2)) + q * (1.0 / (numpy.sqrt(
         separation_at_phase ** 2 - 2.0 * x * separation_at_phase + x ** 2)) - x / separation_at_phase ** 2) + f ** 2 * (
     (q + 1.0) / 2.0) * (x ** 2) - outer_potential
@@ -1056,8 +1059,6 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
         print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
         print "Inner critical potential: {0}".format(inner_potential)
         print "Outer critical potential: {0}".format(outer_potential)
-    if getPotentials is True:
-        return inner_potential, outer_potential
 
 
 def computeFillOutFactor(MainWindow):

@@ -40,9 +40,17 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.lcinpath = None
         self.lcoutpath = None
         self.lastProjectPath = None
+        self.mode1Dictionary = {
+            self.phsv_ipt: self.pcsv_ipt,
+            self.tavh_ipt: self.tavc_ipt,
+            self.gr1_spinbox: self.gr2_spinbox,
+            self.alb1_spinbox: self.alb2_spinbox,
+        }
+        #
         self.populateStyles()  # populate theme combobox
         self.connectSignals()  # connect events with method
         self.hideConjunctionGroup()
+        self.applyConstraints()
 
     def connectSignals(self):
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
@@ -61,6 +69,16 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.compute_btn.clicked.connect(self.updateConjunctionPhases)
         self.inputtabwidget.currentChanged.connect(self.hideConjunctionGroup)
         self.maintabwidget.currentChanged.connect(self.hideConjunctionGroup)
+        self.mode_combobox.currentIndexChanged.connect(self.applyConstraints)
+        self.phsv_ipt.textChanged.connect(self.updateInputPairs)
+        self.tavh_ipt.textChanged.connect(self.updateInputPairs)
+        self.gr1_spinbox.valueChanged.connect(self.updateInputPairs)
+        self.alb1_spinbox.valueChanged.connect(self.updateInputPairs)
+        self.ipb_chk.stateChanged.connect(self.checkIPB)
+        self.ld1_chk.stateChanged.connect(self.checkLD1LD2)
+        self.ld2_chk.stateChanged.connect(self.checkLD1LD2)
+        self.e_ipt.textChanged.connect(self.updatePotentials)
+        self.rm_ipt.textChanged.connect(self.updatePotentials)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -69,6 +87,166 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.close()
         self.SyntheticCurveWidget.close()
         self.StarPositionWidget.close()
+
+    def updateInputPairs(self):
+        sender = self.sender()
+        if str(self.mode_combobox.currentText()) == "Mode 1":
+            if str(type(sender)) == "<class 'PyQt4.QtGui.QLineEdit'>":
+                self.mode1Dictionary[sender].setText(sender.text())
+            else:
+                self.mode1Dictionary[sender].setValue(sender.value())
+
+        if str(self.mode_combobox.currentText()) == "Mode 3":
+            if str(sender.objectName()) == "phsv_ipt":
+                self.pcsv_ipt.setText(self.phsv_ipt.text())
+
+    def applyConstraints(self):
+        self.clearConstraints()
+        if str(self.mode_combobox.currentText()) == "Mode -1":
+            self.pcsv_ipt.setDisabled(True)
+            self.pcsv_ipt.setText(self.phsv_ipt.text())
+            self.DCWidget.pot2_chk.setDisabled(True)
+            self.DCWidget.pot2_chk.setChecked(False)
+
+        if str(self.mode_combobox.currentText()) == "Mode 0":
+            self.ipb_chk.setChecked(True)
+            self.ipb_chk.setDisabled(True)
+
+        if str(self.mode_combobox.currentText()) == "Mode 1":
+            # Curve independent params
+            self.pcsv_ipt.setText(self.phsv_ipt.text())
+            self.tavc_ipt.setText(self.tavh_ipt.text())
+            self.gr2_spinbox.setValue(self.gr1_spinbox.value())
+            self.alb2_spinbox.setValue(self.alb1_spinbox.value())
+
+            self.pcsv_ipt.setDisabled(True)
+            self.DCWidget.pot2_chk.setDisabled(True)
+            self.DCWidget.pot2_chk.setChecked(False)
+
+            self.tavc_ipt.setDisabled(True)
+            self.DCWidget.t2_chk.setDisabled(True)
+            self.DCWidget.t2_chk.setChecked(False)
+
+            self.gr2_spinbox.setDisabled(True)
+            self.DCWidget.g2_chk.setDisabled(True)
+            self.DCWidget.g2_chk.setChecked(False)
+
+            self.alb2_spinbox.setDisabled(True)
+            self.DCWidget.alb2_chk.setDisabled(True)
+            self.DCWidget.alb2_chk.setChecked(False)
+
+            # Curve dependent params
+            if self.ipb_chk.isChecked() is not True:
+                self.DCWidget.l2_chk.setDisabled(True)
+                self.DCWidget.l2_chk.setChecked(False)
+                if self.ld1_chk.isChecked() and self.ld2_chk.isChecked():
+                    for curve in self.LoadObservationWidget.lcPropertiesList:
+                        curve.x2 = curve.x1
+                        curve.y2 = curve.y1
+            self.DCWidget.x2_chk.setDisabled(True)
+            self.DCWidget.x2_chk.setChecked(False)
+
+        if str(self.mode_combobox.currentText()) == "Mode 3":
+            self.pcsv_ipt.setText(self.phsv_ipt.text())
+            self.pcsv_ipt.setDisabled(True)
+            self.DCWidget.pot2_chk.setDisabled(True)
+            self.DCWidget.pot2_chk.setChecked(False)
+
+        if str(self.mode_combobox.currentText()) == "Mode 4":
+            self.updatePotentials()
+            self.phsv_ipt.setDisabled(True)
+            self.DCWidget.pot1_chk.setDisabled(True)
+            self.DCWidget.pot1_chk.setChecked(False)
+
+        if str(self.mode_combobox.currentText()) == "Mode 5":
+            self.updatePotentials()
+            self.pcsv_ipt.setDisabled(True)
+            self.DCWidget.pot2_chk.setDisabled(True)
+            self.DCWidget.pot2_chk.setChecked(False)
+
+        if str(self.mode_combobox.currentText()) == "Mode 6":
+            self.updatePotentials()
+            self.phsv_ipt.setDisabled(True)
+            self.pcsv_ipt.setDisabled(True)
+            self.DCWidget.pot1_chk.setDisabled(True)
+            self.DCWidget.pot2_chk.setDisabled(True)
+            self.DCWidget.pot1_chk.setChecked(False)
+            self.DCWidget.pot2_chk.setChecked(False)
+
+        self.checkLD1LD2()
+
+    def clearConstraints(self):
+        self.phsv_ipt.setDisabled(False)
+        self.pcsv_ipt.setDisabled(False)
+        self.DCWidget.pot1_chk.setDisabled(False)
+        self.DCWidget.pot2_chk.setDisabled(False)
+
+        self.tavc_ipt.setDisabled(False)
+        self.DCWidget.t2_chk.setDisabled(False)
+
+        self.gr2_spinbox.setDisabled(False)
+        self.DCWidget.g2_chk.setDisabled(False)
+
+        self.alb2_spinbox.setDisabled(False)
+        self.DCWidget.alb2_chk.setDisabled(False)
+
+        self.DCWidget.x1_chk.setDisabled(False)
+        self.DCWidget.x2_chk.setDisabled(False)
+        self.DCWidget.l2_chk.setDisabled(False)
+
+        self.ipb_chk.setDisabled(False)
+
+        self.checkIPB()
+
+    def checkLD1LD2(self):
+        self.DCWidget.x1_chk.setDisabled(False)
+        self.DCWidget.x2_chk.setDisabled(False)
+
+        if self.ld1_chk.isChecked() is not True:
+            self.DCWidget.x1_chk.setDisabled(True)
+            self.DCWidget.x1_chk.setChecked(False)
+
+        if self.ld2_chk.isChecked() is not True:
+            self.DCWidget.x2_chk.setDisabled(True)
+            self.DCWidget.x2_chk.setChecked(False)
+
+        if str(self.mode_combobox.currentText()) == "Mode 1":
+            if self.ld1_chk.isChecked() and self.ld2_chk.isChecked():
+                for curve in self.LoadObservationWidget.lcPropertiesList:
+                    curve.x2 = curve.x1
+                    curve.y2 = curve.y1
+                self.DCWidget.x2_chk.setDisabled(True)
+
+    def checkIPB(self):
+        if self.ipb_chk.isChecked():
+            self.DCWidget.l2_chk.setDisabled(False)
+        else:
+            self.DCWidget.l2_chk.setDisabled(True)
+            self.DCWidget.l2_chk.setChecked(False)
+
+    def updatePotentials(self):
+        # TODO clean up
+        def _getPotentials():
+            inner_potential = "N/A"
+            try:
+                float(self.e_ipt.text())
+                float(self.rm_ipt.text())
+                inner_potential, outer_potential = methods.computeRochePotentials(
+                    self,
+                    methods.computeConjunctionPhases(self)[4],
+                    None,
+                    getPotentials=True)
+                inner_potential = float(inner_potential)
+            except:
+                pass
+            return inner_potential
+        if str(self.mode_combobox.currentText()) == "Mode 4":
+            self.phsv_ipt.setText(str(_getPotentials()))
+        if str(self.mode_combobox.currentText()) == "Mode 5":
+            self.pcsv_ipt.setText(str(_getPotentials()))
+        if str(self.mode_combobox.currentText()) == "Mode 6":
+            self.phsv_ipt.setText(str(_getPotentials()))
+            self.pcsv_ipt.setText(str(_getPotentials()))
 
     def showConjunctionGroup(self):
         self.conjunction_groupbox.show()
@@ -377,7 +555,7 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
         filePath = (dialog.selectedFiles())[0]
         if filePath != "" and returnCode != 0:
             try:
-                curvedialog = CurvePropertiesDialog.createCurveDialog(type)
+                curvedialog = CurvePropertiesDialog.createCurveDialog(type, self.MainWindow)
                 curvedialog.populateFromFile(filePath)
                 if curvedialog.hasError:
                     pass
@@ -436,13 +614,13 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
         if item is not None:
             curvedialog = None
             if item.text(1) == "Velocity Curve (#1)":
-                curvedialog = CurvePropertiesDialog.createCurveDialog("vc")
+                curvedialog = CurvePropertiesDialog.createCurveDialog("vc", self.MainWindow)
                 curvedialog.populateFromObject(self.vcPropertiesList[0])
             if item.text(1) == "Velocity Curve (#2)":
-                curvedialog = CurvePropertiesDialog.createCurveDialog("vc")
+                curvedialog = CurvePropertiesDialog.createCurveDialog("vc", self.MainWindow)
                 curvedialog.populateFromObject(self.vcPropertiesList[1])
             if item.text(1) == "Light Curve":
-                curvedialog = CurvePropertiesDialog.createCurveDialog("lc")
+                curvedialog = CurvePropertiesDialog.createCurveDialog("lc", self.MainWindow)
                 curvedialog.populateFromObject(self.lcPropertiesList[self.getSelectedLightCurveIndex(item)])
             returnCode = curvedialog.exec_()
             if returnCode == 1:
@@ -518,13 +696,14 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
 
 
 class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropertiesDialog):
-    def __init__(self):
+    def __init__(self, MainWindow):
         super(CurvePropertiesDialog, self).__init__()
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
         self.type = ""
         self.synthetic = False
         self.hasError = False
+        self.MainWindow = MainWindow
         self.bandpassdict = {
             "Stromgren u": "1",
             "Stromgren v": "2",
@@ -625,6 +804,7 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         self.bandpassContextMenu = self.createBandpassContextMenu()
         self.datawidget.header().setResizeMode(3)
         self.connectSignals()
+        self.applyConstraints()
 
     def connectSignals(self):
         self.accept_btn.clicked.connect(partial(self.done, 1))
@@ -634,6 +814,28 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         # this gets fired when we right click
         self.bandpasscontextlist_btn.customContextMenuRequested.connect(self.openBandpassContextMenu)
         self.bandpasscontextlist_btn.clicked.connect(self.openBandpassContextMenu)
+
+    def applyConstraints(self):
+        if self.MainWindow is not None:
+            if self.MainWindow.ld1_chk.isChecked() is not True:
+                self.x1_ipt.setDisabled(True)
+                self.y1_ipt.setDisabled(True)
+            if self.MainWindow.ld2_chk.isChecked() is not True:
+                self.x2_ipt.setDisabled(True)
+                self.y2_ipt.setDisabled(True)
+            if self.MainWindow.ipb_chk.isChecked() is not True:
+                self.l2_ipt.setDisabled(True)
+            if str(self.MainWindow.mode_combobox.currentText()) == "Mode 1":
+                if self.MainWindow.ld1_chk.isChecked() and self.MainWindow.ld2_chk.isChecked():
+                    self.x2_ipt.setDisabled(True)
+                    self.y2_ipt.setDisabled(True)
+
+                    def _lockx2y2():
+                        self.x2_ipt.setText(self.x1_ipt.text())
+                        self.y2_ipt.setText(self.y1_ipt.text())
+
+                    self.x1_ipt.textChanged.connect(_lockx2y2)
+                    self.y1_ipt.textChanged.connect(_lockx2y2)
 
     def openBandpassContextMenu(self):
         band = self.bandpassContextMenu.exec_(QtGui.QCursor.pos())
@@ -943,8 +1145,8 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
             self.label_21.setText("FACTOR")
 
     @staticmethod
-    def createCurveDialog(type, synthetic=False):
-        curvedialog = CurvePropertiesDialog()
+    def createCurveDialog(type, MainWindow, synthetic=False):
+        curvedialog = CurvePropertiesDialog(MainWindow)
         curvedialog.type = type
         if type == "lc":
             curvedialog.label_53.setText("Load or edit a light curve")
@@ -1078,6 +1280,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.DcinView = OutputView()
         self.DcoutView = OutputView()
         self.iterator = None
+        self.axisInverted = False
         self.parameterDict = {
             "1": "Spot 1 Latitude",
             "2": "Spot 1 Longitude",
@@ -1300,6 +1503,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
     def plotData(self):
         # TODO this is becoming messy. clean up before doing anything else.
+        magnitude = False
         if str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
 
@@ -1338,6 +1542,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             ocTable = ocTable[nobsStart:nobsEnd]
             obsIndex = 1
             timeIndex = 0
+            computedIndex = 2
             xlabel = self.time_combobox.currentText()
             ylabel = self.MainWindow.maglite_combobox.currentText()
             if ylabel == "Flux":
@@ -1346,12 +1551,25 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 ylabel = "Radial Velocity (km s$^{-1}$)"
             if self.MainWindow.jdphs_combobox.currentText() == "Time":  # wd outputs are in HJD
                 obsIndex = 2
+                computedIndex = 3
             if self.time_combobox.currentText() == "Phase" and self.MainWindow.jdphs_combobox.currentText() == "Time":
                 timeIndex = 1
             x_axis = [float(x[timeIndex]) for x in ocTable]
             obs = [float(x[obsIndex]) for x in ocTable]
             resd = [float(x[-1]) for x in ocTable]
 
+            if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude" \
+                and self.data_combobox.currentIndex() + 1 > len(self.MainWindow.LoadObservationWidget.vcPropertiesList):
+                magnitude = True
+                index = self.data_combobox.currentIndex() - len(self.MainWindow.LoadObservationWidget.vcPropertiesList)
+                curve = classes.Curve(self.MainWindow.LoadObservationWidget.lcPropertiesList[index].FilePath)
+                obs_mag = curve.observationList
+                computed = [float(x[computedIndex]) for x in ocTable]
+                resd_mag = []
+                for o, c in izip(obs, computed):
+                    resd_mag.append(-2.5 * numpy.log10(o / c))
+                resd = resd_mag
+                obs = obs_mag
             lc_x = []
             lc_y = []
 
@@ -1384,6 +1602,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 # get data
                 lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
                 lc_y_index = 4
+                if magnitude:
+                    lc_y_index = 8
                 lc_x_index = 1
                 if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
                     lc_x_index = 0
@@ -1404,6 +1624,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 if self.MainWindow.jdphs_combobox.currentText() == "Time":
                     idx = 3
                 lc_y = [float(x[idx]) for x in ocTable]
+                if magnitude:
+                    lc_y_mag = [-2.5 * numpy.log10(x) for x in lc_y]
+                    lc_y = lc_y_mag
 
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
@@ -1422,6 +1645,16 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.plot_residualAxis.set_xlabel(xlabel)
             self.plot_residualAxis.set_ylabel("Residuals")
             self.plot_observationAxis.set_ylabel(ylabel)
+            if magnitude:
+                if self.axisInverted is False:
+                    self.plot_observationAxis.invert_yaxis()
+                    self.plot_residualAxis.invert_yaxis()
+                    self.axisInverted = True
+            else:
+                if self.axisInverted is True:
+                    self.plot_observationAxis.invert_yaxis()
+                    self.plot_residualAxis.invert_yaxis()
+                    self.axisInverted = False
             self.plot_canvas.draw()
             # store plot data
             self.obs_x = x_axis
@@ -1441,8 +1674,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             obs = pyplot.subplot(grid[0])
             resd = pyplot.subplot(grid[1], sharex=obs)
             pyplot.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
-            yticks = resd.yaxis.get_major_ticks()
-            yticks[-1].label1.set_visible(False)
             obs.xaxis.get_major_ticks()
             obs.plot(self.obs_x, self.obs_y, linestyle="", marker="o", markersize=4, color="#4286f4")
             resd.plot(self.resd_x, self.resd_y, linestyle="", marker="o", markersize=4, color="#4286f4")
@@ -1458,7 +1689,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             resd.set_xlabel(self.timelabel)
             obs.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
                                                   labelright=False, labelleft=True, labelsize=11)
+            if self.axisInverted:
+                print "test"
+                obs.invert_yaxis()
+                resd.invert_yaxis()
             pyplot.show()
+
 
     def showDcin(self):
         self.DcinView.setWindowTitle("PyWD - " + self.dcinpath)
@@ -1799,8 +2035,14 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         for component in first:
             item = QtGui.QTreeWidgetItem(star1ParentItem)
             item.setText(0, component[1].title())
-            item.setText(1, component[2])
-            item.setText(2, component[5])
+            # fix for wd's mode 6
+            pointRadii = component[2]
+            stderrIndex = 5
+            if component[1] == "point" and str(self.MainWindow.mode_combobox.currentText()) == "Mode 6":
+                pointRadii = pointRadii.rstrip("*")
+                stderrIndex = 4
+            item.setText(1, pointRadii)
+            item.setText(2, component[stderrIndex])
             star1ParentItem.addChild(item)
 
         star2ParentItem = QtGui.QTreeWidgetItem(self.component_treewidget)
@@ -1811,7 +2053,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             # fix for wd's mode 5
             pointRadii = component[2]
             stderrIndex = 5
-            if component[1] == "point" and str(self.MainWindow.mode_combobox.currentText()) == "Mode 5":
+            if component[1] == "point" and (str(self.MainWindow.mode_combobox.currentText()) == "Mode 5" \
+                    or str(self.MainWindow.mode_combobox.currentText()) == "Mode 6"):
                 pointRadii = pointRadii.rstrip("*")
                 stderrIndex = 4
             item.setText(1, pointRadii)
@@ -2046,7 +2289,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
             self.plot_observationAxis.set_ylabel(ylabel)
             self.plot_residualAxis.set_xlabel(xlabel)
             syntheticCurve = classes.CurveProperties(type, synthetic=True)
-            curveProps = CurvePropertiesDialog()
+            curveProps = CurvePropertiesDialog(self.MainWindow)
             if str(item.text(0)) == "[Synthetic]" and str(item.text(1)) == "Velocity Curve":
                 syntheticCurve.band = "7"
                 syntheticCurve.l1 = "1"
@@ -2177,10 +2420,12 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude":
                         if self.plotIsInverted is False:
                             self.plot_observationAxis.invert_yaxis()
+                            self.plot_residualAxis.invert_yaxis()
                             self.plotIsInverted = True
                     else:
                         if self.plotIsInverted is True:
                             self.plot_observationAxis.invert_yaxis()
+                            self.plot_residualAxis.invert_yaxis()
                             self.plotIsInverted = False
                 if syntheticCurve.type == "vc":
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
@@ -2241,7 +2486,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         if item.text(0) != "[Synthetic]":
             curve = self.MainWindow.LoadObservationWidget.Curves()[self.lastEditedIndex]
             if self.lastEditedColumn == 2:
-                curveProp = CurvePropertiesDialog()
+                curveProp = CurvePropertiesDialog(self.MainWindow)
                 button = self.loaded_treewidget.itemWidget(item, 2)
                 curve.band = curveProp.bandpassdict[str(button.text())]
                 item2 = self.MainWindow.LoadObservationWidget.curve_treewidget.invisibleRootItem().child(self.lastEditedIndex)
@@ -2298,7 +2543,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         item.setText(0, "[Synthetic]")
         item.setText(1, "Light Curve")
-        curveProps = CurvePropertiesDialog()
+        curveProps = CurvePropertiesDialog(self.MainWindow)
         button = QtGui.QPushButton(self)
         button.setText("Select a filter")
         button.setMaximumHeight(20)
@@ -2338,7 +2583,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 item.setText(13, "-")
                 item.setText(14, "-")
             if curve.type == "lc":
-                curveProps = CurvePropertiesDialog()
+                curveProps = CurvePropertiesDialog(self.MainWindow)
                 item.setText(0, os.path.basename(curve.FilePath))
                 item.setText(1, "Light Curve")
                 button = QtGui.QPushButton(self)
@@ -2361,7 +2606,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         self.loaded_treewidget.header().setResizeMode(3)
 
     def selectBand(self, button, item):
-        curve = CurvePropertiesDialog()
+        curve = CurvePropertiesDialog(self.MainWindow)
         menu = curve.bandpassContextMenu
         band = menu.exec_(QtGui.QCursor.pos())
         if band is not None:
