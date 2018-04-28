@@ -225,28 +225,28 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
             self.DCWidget.l2_chk.setChecked(False)
 
     def updatePotentials(self):
-        # TODO clean up
-        def _getPotentials():
-            inner_potential = "N/A"
-            try:
-                float(self.e_ipt.text())
-                float(self.rm_ipt.text())
-                inner_potential, outer_potential = methods.computeRochePotentials(
-                    self,
-                    methods.computeConjunctionPhases(self)[4],
-                    None,
-                    getPotentials=True)
-                inner_potential = float(inner_potential)
-            except:
-                pass
-            return inner_potential
+        inner_potential = "N/A"
+        hadError = False
+        try:
+            float(self.e_ipt.text())
+            float(self.rm_ipt.text())
+        except ValueError:
+            hadError = True
+        if hadError is not True and float(str(self.rm_ipt.text())) != 0.0 and float(str(self.e_ipt.text())) < 1.0:
+            inner_potential, outer_potential = methods.computeRochePotentials(
+                self,
+                methods.computeConjunctionPhases(self)[4],
+                None,
+                getPotentials=True)
+            inner_potential = str(float(inner_potential))
+
         if str(self.mode_combobox.currentText()) == "Mode 4":
-            self.phsv_ipt.setText(str(_getPotentials()))
+            self.phsv_ipt.setText(inner_potential)
         if str(self.mode_combobox.currentText()) == "Mode 5":
-            self.pcsv_ipt.setText(str(_getPotentials()))
+            self.pcsv_ipt.setText(inner_potential)
         if str(self.mode_combobox.currentText()) == "Mode 6":
-            self.phsv_ipt.setText(str(_getPotentials()))
-            self.pcsv_ipt.setText(str(_getPotentials()))
+            self.phsv_ipt.setText(inner_potential)
+            self.pcsv_ipt.setText(inner_potential)
 
     def showConjunctionGroup(self):
         self.conjunction_groupbox.show()
@@ -448,6 +448,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
                     methods.loadProject(self, parser)
                     self.clearWidgets()
                     self.LoadObservationWidget.updateCurveWidget()
+                    self.updatePotentials()
                     self.lastProjectPath = filePath
                     msg.setText("Project file \"" + fi.fileName() + "\" loaded.")
                     msg.setWindowTitle("PyWD - Project Loaded")
@@ -1500,11 +1501,149 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         except:
             self.data_combobox.setCurrentIndex(0)
             self.autoupdate_chk.setChecked(False)
+        if self.MainWindow.LoadObservationWidget.vcPropertiesList[0] != 0 and self.MainWindow.LoadObservationWidget.vcPropertiesList[1] != 0:
+            self.data_combobox.addItem("Vr1 + Vr2")
 
     def plotData(self):
         # TODO this is becoming messy. clean up before doing anything else.
         magnitude = False
-        if str(self.data_combobox.currentText()) != "":
+        if str(self.data_combobox.currentText()) == "Vr1 + Vr2":
+            self.plot_observationAxis.clear()
+            self.plot_residualAxis.clear()
+
+            ocTable = methods.getTableFromOutput(self.dcoutpath, "Unweighted Observational Equations")
+            curvestatTable = methods.getTableFromOutput(
+                self.dcoutpath,
+                "Standard Deviations for Computation of Curve-dependent Weights"
+            )
+            columnLimit = 20
+            baseColumns = 4
+            if self.MainWindow.jdphs_combobox.currentText() == "Time":
+                columnLimit = 23
+                baseColumns = 5
+            currentColumns = len(methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")) + baseColumns
+            if currentColumns > columnLimit:
+                currentIndex = 0
+                tempList = []
+                step = 2
+                if currentColumns > columnLimit * 2:
+                    step = 3
+                if currentColumns > columnLimit * 3:
+                    step = 4
+                while currentIndex < len(ocTable):
+                    tempList.append(ocTable[currentIndex] + ocTable[currentIndex + 1])
+                    currentIndex = currentIndex + step
+                ocTable = tempList
+            obsIndex = 1
+            if self.MainWindow.jdphs_combobox.currentText() == "Time":  # wd outputs are in HJD
+                obsIndex = 2
+            timeIndex = 0
+            if self.time_combobox.currentText() == "Phase" and self.MainWindow.jdphs_combobox.currentText() == "Time":
+                timeIndex = 1
+            vr1_nobsStart = None
+            vr1_nobsEnd = -1
+            vr2_nobsStart = None
+            vr2_nobsEnd = None
+            vr1_table = None
+            vr2_table = None
+            if self.MainWindow.LoadObservationWidget.vcPropertiesList[0] != 0:
+                vr1_nobsStart = 0
+                vr1_nobsEnd = vr1_nobsStart + int(curvestatTable[0][1])
+                vr1_table = ocTable[vr1_nobsStart:vr1_nobsEnd]
+            if self.MainWindow.LoadObservationWidget.vcPropertiesList[1] != 0:
+                vr2_nobsStart = vr1_nobsEnd
+                vr2_nobsEnd = vr2_nobsStart + int(curvestatTable[1][1])
+                vr2_table = ocTable[vr2_nobsStart:vr2_nobsEnd]
+
+            if vr1_table is not None or vr2_table is not None:
+                obs_vr1 = None
+                obs_vr2 = None
+                resd_vr1 = None
+                resd_vr2 = None
+                x_axis_vr1 = None
+                x_axis_vr2 = None
+                if vr1_table is not None:
+                    obs_vr1 = [float(x[obsIndex]) * float(self.MainWindow.vunit_ipt.text()) for x in vr1_table]
+                    resd_vr1 = [float(x[-1]) for x in vr1_table]
+                    x_axis_vr1 = [float(x[timeIndex]) for x in vr1_table]
+                if vr2_table is not None:
+                    obs_vr2 = [float(x[obsIndex]) * float(self.MainWindow.vunit_ipt.text()) for x in vr2_table]
+                    resd_vr2 = [float(x[-1]) for x in vr2_table]
+                    x_axis_vr2 = [float(x[timeIndex]) for x in vr2_table]
+                if self.uselc_chk.isChecked():
+                    # get model
+                    curveProp = self.MainWindow.LoadObservationWidget.Curves()[0].getSynthetic()
+                    curveProp.zero = "8"
+                    curveProp.factor = "1"
+                    curve = classes.Curve(curveProp.FilePath)
+                    line3 = []
+                    if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
+                        line3 = [min(curve.timeList), max(curve.timeList), float(self.MainWindow.p0_ipt.text()) / 100,
+                                 0, 1, 0.001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
+                    else:
+                        line3 = [float(self.MainWindow.jd0_ipt.text()), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
+                                 0, 1, 0.001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
+                    model = classes.lcin(self.MainWindow)
+                    mpage = 1
+                    if curveProp.type == "vc":
+                        mpage = 2
+                    jdphs = "2"
+                    if self.time_combobox.currentText() == "HJD" and self.MainWindow.jdphs_combobox.currentText() == "Time":
+                        jdphs = "1"
+                    model.syntheticCurve(curveProp, mpage, line3=line3, jdphs=jdphs)
+                    with open(self.MainWindow.lcinpath, "w") as f:
+                        f.write(model.output)
+                    # exec model
+                    process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+                    process.wait()
+                    # get data
+                    lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
+                    lc_x_index = 1
+                    if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
+                        lc_x_index = 0
+                    lc_x = None
+                    lc_y_vr1 = None
+                    lc_y_vr2 = None
+                    lc_x = [float(x[lc_x_index].replace("D", "E")) for x in lcoutTable]
+                    if vr1_table is not None:
+                        lc_y_vr1 = [float(y[6].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for y in
+                                    lcoutTable]
+                        self.plot_observationAxis.plot(lc_x, lc_y_vr1, color="orange")
+                    if vr2_table is not None:
+                        lc_y_vr2 = [float(y[7].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for y in
+                                    lcoutTable]
+                        self.plot_observationAxis.plot(lc_x, lc_y_vr2, color="#edd83b")
+                else:
+                    idx = 2
+                    if self.MainWindow.jdphs_combobox.currentText() == "Time":
+                        idx = 3
+                    if vr1_table is not None:
+                        lc_x_vr1 = x_axis_vr1
+                        lc_y_vr1 = [float(x[idx]) * float(self.MainWindow.vunit_ipt.text()) for x in vr1_table]
+                        self.plot_observationAxis.plot(lc_x_vr1, lc_y_vr1, linestyle="", marker="o", markersize=4,
+                                                       color="orange")
+                    if vr2_table is not None:
+                        lc_x_vr2 = x_axis_vr2
+                        lc_y_vr2 = [float(x[idx]) * float(self.MainWindow.vunit_ipt.text()) for x in vr2_table]
+                        self.plot_observationAxis.plot(lc_x_vr2, lc_y_vr2, linestyle="", marker="o", markersize=4,
+                                                       color="#edd83b")
+                if vr1_table is not None:
+                    self.plot_observationAxis.plot(x_axis_vr1, obs_vr1, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    self.plot_residualAxis.plot(x_axis_vr1, resd_vr1, linestyle="", marker="o", markersize=4, color="#4286f4")
+                if vr2_table is not None:
+                    self.plot_observationAxis.plot(x_axis_vr2, obs_vr2, linestyle="", marker="o", markersize=4, color="red")
+                    self.plot_residualAxis.plot(x_axis_vr2, resd_vr2, linestyle="", marker="o", markersize=4, color="red")
+            self.plot_residualAxis.axhline(c="r")
+            self.plot_observationAxis.set_ylabel("Radial Velocity (km s$^{-1}$)")
+            self.plot_residualAxis.set_ylabel("Residuals")
+            if str(self.MainWindow.jdphs_combobox.currentText()) == "Time" and str(self.time_combobox.currentText()) == "HJD":
+                self.plot_residualAxis.set_xlabel("HJD")
+            else:
+                self.plot_residualAxis.set_xlabel("Phase")
+            self.plot_toolbar.update()
+            self.plot_canvas.draw()
+
+        elif str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
 
             ocTable = methods.getTableFromOutput(self.dcoutpath, "Unweighted Observational Equations")
@@ -1563,7 +1702,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 magnitude = True
                 index = self.data_combobox.currentIndex() - len(self.MainWindow.LoadObservationWidget.vcPropertiesList)
                 curve = classes.Curve(self.MainWindow.LoadObservationWidget.lcPropertiesList[index].FilePath)
-                obs_mag = curve.observationList
+                obs_mag = [float(x) for x in curve.observationList]
                 computed = [float(x[computedIndex]) for x in ocTable]
                 resd_mag = []
                 for o, c in izip(obs, computed):
@@ -1608,7 +1747,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
                     lc_x_index = 0
                 if curveProp.type == "vc":
-                    lc_y_index = 6 + self.data_combobox.currentIndex()
+                    lc_y_index = 6 + curveProp.star - 1
 
                 lc_x = [float(x[lc_x_index].replace("D", "E")) for x in lcoutTable]
                 lc_y = [float(y[lc_y_index].replace("D", "E")) for y in lcoutTable]
@@ -1638,23 +1777,21 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color="#4286f4")
             self.plot_residualAxis.axhline(c="r")
             self.plot_toolbar.update()
-            # yticks = self.plot_residualAxis.yaxis.get_major_ticks()
-            # yticks[-1].label1.set_visible(False)
             self.plot_observationAxis.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
                                                   labelright=False, labelleft=True, labelsize=11)
             self.plot_residualAxis.set_xlabel(xlabel)
             self.plot_residualAxis.set_ylabel("Residuals")
             self.plot_observationAxis.set_ylabel(ylabel)
             if magnitude:
-                if self.axisInverted is False:
+                if self.plot_observationAxis.yaxis_inverted() == False:
                     self.plot_observationAxis.invert_yaxis()
+                if self.plot_residualAxis.yaxis_inverted() == False:
                     self.plot_residualAxis.invert_yaxis()
-                    self.axisInverted = True
             else:
-                if self.axisInverted is True:
+                if self.plot_observationAxis.yaxis_inverted() == True:
                     self.plot_observationAxis.invert_yaxis()
+                if self.plot_residualAxis.yaxis_inverted() == True:
                     self.plot_residualAxis.invert_yaxis()
-                    self.axisInverted = False
             self.plot_canvas.draw()
             # store plot data
             self.obs_x = x_axis
@@ -1689,8 +1826,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             resd.set_xlabel(self.timelabel)
             obs.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
                                                   labelright=False, labelleft=True, labelsize=11)
-            if self.axisInverted:
-                print "test"
+
+            if self.plot_observationAxis.yaxis_inverted() == True:
                 obs.invert_yaxis()
                 resd.invert_yaxis()
             pyplot.show()
@@ -2373,6 +2510,16 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                         self.plot_observationAxis.plot(x2_obs, y2_obs, linestyle="", marker="o", markersize=4,
                                                        color="#f73131")
                     curveProps = self.MainWindow.LoadObservationWidget.Curves()[index]
+                    if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude" and curveProps.type == "lc":
+                        if self.plot_observationAxis.yaxis_inverted() == False:
+                            self.plot_observationAxis.invert_yaxis()
+                        if self.plot_residualAxis.yaxis_inverted() == False:
+                            self.plot_residualAxis.invert_yaxis()
+                    else:
+                        if self.plot_observationAxis.yaxis_inverted() == True:
+                            self.plot_observationAxis.invert_yaxis()
+                        if self.plot_residualAxis.yaxis_inverted() == True:
+                            self.plot_residualAxis.invert_yaxis()
 
             if self.plotmodel_chk.isChecked():
                 lcin = classes.lcin(self.MainWindow)
@@ -2400,7 +2547,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 if syntheticCurve.type == "lc":
                     y_index = 4
                     if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude":
-                        y_index = 7
+                        y_index = 8
                 if self.time_combobox.currentText() == "HJD":
                     x_index = 0
                 else:
@@ -2417,16 +2564,6 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 # plot data
                 if syntheticCurve.type == "lc":
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
-                    if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude":
-                        if self.plotIsInverted is False:
-                            self.plot_observationAxis.invert_yaxis()
-                            self.plot_residualAxis.invert_yaxis()
-                            self.plotIsInverted = True
-                    else:
-                        if self.plotIsInverted is True:
-                            self.plot_observationAxis.invert_yaxis()
-                            self.plot_residualAxis.invert_yaxis()
-                            self.plotIsInverted = False
                 if syntheticCurve.type == "vc":
                     self.plot_observationAxis.plot(x_model, y_model, color="red")
                     self.plot_observationAxis.plot(x_model, y2_model, color="#f48942")
@@ -2448,6 +2585,16 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                         y_residuals.append(o - c)
                     self.plot_residualAxis.plot(x_obs, y_residuals, linestyle="", marker="o", markersize=4, color="#4286f4")
                 self.plot_residualAxis.set_ylabel("Residuals")
+                if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude" and syntheticCurve.type == "lc":
+                    if self.plot_observationAxis.yaxis_inverted() == False:
+                        self.plot_observationAxis.invert_yaxis()
+                    if self.plot_residualAxis.yaxis_inverted() == False:
+                        self.plot_residualAxis.invert_yaxis()
+                else:
+                    if self.plot_observationAxis.yaxis_inverted() == True:
+                        self.plot_observationAxis.invert_yaxis()
+                    if self.plot_residualAxis.yaxis_inverted() == True:
+                        self.plot_residualAxis.invert_yaxis()
                     
             if self.drawstars_chk.isChecked():
                 self.plot_observationAxis.set_position(self.triple_grid[0, :-1].get_position(self.plot_figure))
@@ -2473,6 +2620,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starposAxis)
                 self.plot_starposAxis.set_xlim(-1, 2)
                 self.plot_starposAxis.set_ylim(-1, 1)
+
             self.plot_starposAxis.set_xlabel('x')
             self.plot_starposAxis.set_ylabel('y')
             self.plot_toolbar.update()
