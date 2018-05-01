@@ -185,17 +185,17 @@ class WDInput:
             if f_ipt == float(0):
                 return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
             if width - 6 - precision >= 0:
-                output = "{:> {width}.{precision}g}".format(f_ipt, width=width, precision=precision)
+                output = "{:{width}.{precision}g}".format(f_ipt, width=width, precision=precision)
             else:
-                output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
+                output = "{:{width}.{precision}f}".format(f_ipt, width=width, precision=precision)
         if f_ipt >= float(1) or f_ipt < float(0):
-            output = "{:> {width}.{precision}f}".format(f_ipt, width=width, precision=precision)
+            output = "{:{width}.{precision}f}".format(f_ipt, width=width, precision=precision)
         output = output.rstrip("0")
         if output[-1] == ".":
             output = output + "0"
         output = " " * (width - len(output)) + output
         if len(output) > width:
-            raise IndexError("This input can't be formatted into dcin.active file: " + ipt +
+            raise IndexError("This input can't be formatted into current output file: " + ipt +
                              "\nMaximum character lenght: " + str(width) +
                              "\nMaximum decimal precision: " + str(precision) +
                              "\nTried to write: " + output +
