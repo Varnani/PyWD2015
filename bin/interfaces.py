@@ -1510,6 +1510,10 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         if str(self.data_combobox.currentText()) == "Vr1 + Vr2":
             self.plot_observationAxis.clear()
             self.plot_residualAxis.clear()
+            if self.plot_observationAxis.yaxis_inverted() == True:
+                self.plot_observationAxis.invert_yaxis()
+            if self.plot_residualAxis.yaxis_inverted() == True:
+                self.plot_residualAxis.invert_yaxis()
 
             ocTable = methods.getTableFromOutput(self.dcoutpath, "Unweighted Observational Equations")
             curvestatTable = methods.getTableFromOutput(
