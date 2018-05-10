@@ -2858,6 +2858,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.start_btn.clicked.connect(self.playRender)
         self.plot_btn.clicked.connect(self.plotSingle)
         self.roche_chk.stateChanged.connect(self.checkRoche)
+        self.saveall_btn.clicked.connect(self.saveAll)
 
     def checkSingle(self):
         if self.single_chk.isChecked():
@@ -2882,7 +2883,12 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.plot_starPositionAxis.clear()
         if self.roche_chk.isChecked():
             methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starPositionAxis)
+            inner, outer = methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), None, getPotentials=True)
+            self.inner_crit_label.setText(str(inner[0]))
+            self.outer_crit_label.setText(str(outer[0]))
         else:
+            self.inner_crit_label.setText("N/A")
+            self.outer_crit_label.setText("N/A")
             lcin = classes.lcin(self.MainWindow)
             phase = self.phase_spinbox.value()
             lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
@@ -2902,14 +2908,15 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.plot_toolbar.update()
         self.plot_canvas.draw()
 
-    def renderFrame(self, x, y):
+    def renderFrame(self, x, y, phase):
         pyplot.cla()
         pyplot.axis("equal")
         pyplot.xlabel("x")
         pyplot.ylabel("y")
         pyplot.xlim(self.min_spinbox.value(), self.max_spinbox.value())
         pyplot.ylim(self.min_spinbox.value(), self.max_spinbox.value())
-        pyplot.plot(x, y, 'ko', markersize=0.2)
+        pyplot.plot(x, y, 'ko', markersize=0.2, label="{:4.3f}".format(phase))
+        pyplot.legend(loc="upper right")
         pyplot.plot([0], [0], linestyle="", marker="+", markersize=10, color="#ff3a3a")
         image = io.BytesIO()
         dpiDict = {
@@ -2923,6 +2930,27 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         qimage = QtGui.QImage()
         qimage.loadFromData(qbyte)
         return qimage
+
+    def saveAll(self):
+        if self.starsRendered is True:
+            dialog = QtGui.QFileDialog()
+            dialog.setFileMode(2)
+            dialog.exec_()
+            path = str(dialog.selectedFiles()[0])
+            i = 0
+            saveOk = True
+            for qimage in self.starRenderData:
+                status = qimage.save(os.path.join(path, "{:0>4d}".format(i) + ".png"), "png", 100)
+                i = i + 1
+                if status is False:
+                    saveOk = False
+                    break
+            msg = QtGui.QMessageBox()
+            if saveOk is True:
+                msg.setText("Frames are saved into " + path)
+            else:
+                msg.setText("An error has occured.")
+            msg.exec_()
 
     def renderStars(self):
         if self.single_chk.isChecked():
@@ -2940,7 +2968,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
             table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
             x = [float(x[0].replace("D", "E")) for x in table]
             y = [float(y[1].replace("D", "E")) for y in table]
-            self.renderArea.showImage(self.renderFrame(x, y))
+            self.renderArea.showImage(self.renderFrame(x, y, float(str(self.render_phaseSpinbox.text()))))
         else:
             lcin = classes.lcin(self.MainWindow)
             lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
@@ -2997,14 +3025,16 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         plotnumber = len(data)
         percentage = (1.0 / plotnumber) * 100
         currentPercentage = 0.0
+        i = 0
         for line in data:
             lx = [float(x[0].replace("D", "E")) for x in line]
             ly = [float(x[1].replace("D", "E")) for x in line]
-            frame = self.renderFrame(lx, ly)
+            frame = self.renderFrame(lx, ly, i * self.phaseIncrement)
             renderedFrames.append(frame)
             currentPercentage = percentage + currentPercentage
             self.progressBar.setValue(currentPercentage)
             self.progressBar.repaint()
+            i = i + 1
         self.starRenderData = renderedFrames
         self.starsRendered = True
         self.enableUi()
