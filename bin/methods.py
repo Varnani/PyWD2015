@@ -897,12 +897,13 @@ def loadProject(MainWindow, parser):
     loadEclipseParameters(MainWindow, parser)
 
 
-def getTableFromOutput(path, target, offset=3):
+def getTableFromOutput(path, target, offset=3, splitmap=None):
     """
     extract a table from a dc/lc output file.
     :param path: output file path
     :param target: target string to find
     :param offset: offset of data from target
+    :param splitmap: a list that contains cursor positions to slice table manually
     :return: a list of lists containing outputs
     for results:
      [
@@ -934,7 +935,20 @@ def getTableFromOutput(path, target, offset=3):
                     if line == "\n":
                         break
                     else:
-                        table.append(line.split())
+                        if splitmap is not None:
+                            if splitmap[0] != 0:
+                                splitmap.insert(0, 0)
+                            tempLine = []
+                            i = 0
+                            while i < len(splitmap) - 1:
+                                value = line[splitmap[i]:splitmap[i+1]]
+                                value = value.rstrip(" ")
+                                value = value.strip(" ")
+                                tempLine.append(value)
+                                i = i + 1
+                            table.append(tempLine)
+                        else:
+                            table.append(line.split())
     return table
 
 
@@ -1128,6 +1142,33 @@ def computeConjunctionPhases(MainWindow):
            phase_of_second_quadrature, \
            phase_of_periastron, \
            phase_of_apastron
+
+# 5 4 19 18 19 18
+def getOutputFromDC(path, splitmap):
+    table = []
+    flag = False
+    start = 0
+    with open(path, "r") as dcout:
+        for line in dcout:
+            if "Input-Output in F Format" in line:
+                flag = True
+            if flag is True:
+                if start < 3:
+                    start = start + 1
+                else:
+                    if line == "\n":
+                        break
+                    else:
+                        if splitmap is not None:
+                            if splitmap[0] != 0:
+                                splitmap.insert(0, 0)
+                            tempLine = []
+                            i = 0
+                            while i < len(splitmap) - 1:
+                                tempLine.append(line[splitmap[i]:splitmap[i+1]])
+                                i = i + 1
+                            table.append(tempLine)
+    return table
 
 
 if __name__ == "__main__":

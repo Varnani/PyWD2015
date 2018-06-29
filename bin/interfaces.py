@@ -2040,46 +2040,51 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             valueparams = (17, 18, 21, 22)
 
             for result in self.lastBaseSet:
-                if len(result) >= 6:
-                    index = int(result[0])
-                    if result[1] != "0":
-                        curveindex = int(result[1]) - 1
-                        if result[0] == "56":
-                            self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l1 = result[4]
-                        if result[0] == "57":
-                            self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l2 = result[4]
-                        if result[0] == "58":
-                            self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x1 = result[4]
-                        if result[0] == "59":
-                            self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x2 = result[4]
-                        if result[0] == "60":
-                            self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].el3a = result[4]
-                    else:
-                        if index in (spota + spotb):
-                            star1spots = self.MainWindow.SpotConfigureWidget.star1ElementList
-                            star2spots = self.MainWindow.SpotConfigureWidget.star2ElementList
-                            radioindex = ""
-                            if index in spota:
-                                radioindex = 1
-                            if index in spotb:
-                                radioindex = 2
-                            for spot in star1spots:
-                                if spot[radioindex].isChecked():
-                                    spot[spotparamdict[index]].setText(result[4])
-                            for spot in star2spots:
-                                if spot[radioindex].isChecked():
-                                    spot[spotparamdict[index]].setText(result[4])
+                allChars = ""
+                for val in result:
+                    allChars = allChars + val
+
+                if "*" not in allChars:
+                    if len(result) >= 6:
+                        index = int(result[0])
+                        if result[1] != "0":
+                            curveindex = int(result[1]) - 1
+                            if result[0] == "56":
+                                self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l1 = result[4]
+                            if result[0] == "57":
+                                self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].l2 = result[4]
+                            if result[0] == "58":
+                                self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x1 = result[4]
+                            if result[0] == "59":
+                                self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].x2 = result[4]
+                            if result[0] == "60":
+                                self.MainWindow.LoadObservationWidget.lcPropertiesList[curveindex].el3a = result[4]
                         else:
-                            if index in (19, 20):
-                                paramdict[index].setText(str(float(result[4]) * 10000.0))
+                            if index in (spota + spotb):
+                                star1spots = self.MainWindow.SpotConfigureWidget.star1ElementList
+                                star2spots = self.MainWindow.SpotConfigureWidget.star2ElementList
+                                radioindex = ""
+                                if index in spota:
+                                    radioindex = 1
+                                if index in spotb:
+                                    radioindex = 2
+                                for spot in star1spots:
+                                    if spot[radioindex].isChecked():
+                                        spot[spotparamdict[index]].setText(result[4])
+                                for spot in star2spots:
+                                    if spot[radioindex].isChecked():
+                                        spot[spotparamdict[index]].setText(result[4])
                             else:
-                                if index is 15:
-                                    paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vunit_ipt.text())))
+                                if index in (19, 20):
+                                    paramdict[index].setText(str(float(result[4]) * 10000.0))
                                 else:
-                                    if index in valueparams:  # input is spinbox
-                                        paramdict[index].setValue(float(result[4]))
-                                    else:  # just slap output into input
-                                        paramdict[index].setText(result[4])
+                                    if index is 15:
+                                        paramdict[index].setText(str(float(result[4]) * float(self.MainWindow.vunit_ipt.text())))
+                                    else:
+                                        if index in valueparams:  # input is spinbox
+                                            paramdict[index].setValue(float(result[4]))
+                                        else:  # just slap output into input
+                                            paramdict[index].setText(result[4])
             self.MainWindow.SyntheticCurveWidget.loaded_treewidget.model().dataChanged.disconnect(
                 self.MainWindow.SyntheticCurveWidget.updateObservations
             )
@@ -2095,22 +2100,13 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
         def _populateItem(itm, rslt):
             frmt = "{:11.8f}"  # TODO add this as a user setting
-            if len(rslt) < 4:
-                itm.setText(0, self.parameterDict[rslt[0]])
-                itm.setText(1, rslt[2].rstrip("*"))
-                itm.setText(2, "***")
-                itm.setText(3, "***")
-                itm.setText(4, "***")
-                itm.setBackground(2, QtGui.QBrush(QtGui.QColor("red")))
-                itm.setBackground(3, QtGui.QBrush(QtGui.QColor("red")))
-                itm.setBackground(4, QtGui.QBrush(QtGui.QColor("red")))
-                return itm
-            else:
-                id = int(rslt[0])
-                input = rslt[2]
-                corr = rslt[3]
-                output = rslt[4]
-                stderr = rslt[5]
+            id = int(rslt[0])
+            input = rslt[2]
+            corr = rslt[3]
+            output = rslt[4]
+            stderr = rslt[5]
+
+            if "*" not in input + corr + output + stderr:
                 if id in (19, 20):  # T's are in K/10000 format
                     input = str(float(input) * 10000.0)
                     corr = str(float(corr) * 10000.0)
@@ -2133,15 +2129,33 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 stderr = str(frmt.format(float(stderr)).rstrip("0"))
                 if stderr[-1] == ".":
                     stderr = stderr + "0"
-                itm.setText(0, self.parameterDict[rslt[0]])
-                itm.setText(1, input)
-                itm.setText(2, corr)
-                itm.setText(3, output)
-                itm.setText(4, stderr)
+
                 if numpy.absolute(float(stderr)) > numpy.absolute(float(corr)) or \
                         (numpy.absolute(float(stderr)) == 0.0 and numpy.absolute(float(corr)) == 0.0):
                     itm.setBackground(3, QtGui.QBrush(QtGui.QColor("green")))
-                return itm
+
+            else:
+                if "*" in input:
+                    input = "***"
+                    itm.setBackground(1, QtGui.QBrush(QtGui.QColor("red")))
+                if "*" in corr:
+                    corr = "***"
+                    itm.setBackground(2, QtGui.QBrush(QtGui.QColor("red")))
+                if "*" in output:
+                    output = "***"
+                    itm.setBackground(3, QtGui.QBrush(QtGui.QColor("red")))
+                if "*" in stderr:
+                    stderr = "***"
+                    itm.setBackground(4, QtGui.QBrush(QtGui.QColor("red")))
+
+            itm.setText(0, self.parameterDict[rslt[0]])
+            itm.setText(1, input)
+            itm.setText(2, corr)
+            itm.setText(3, output)
+            itm.setText(4, stderr)
+
+            return itm
+
         self.result_treewidget.clear()
         root = self.result_treewidget.invisibleRootItem()
         curvelist = self.MainWindow.LoadObservationWidget.lcPropertiesList
@@ -2182,12 +2196,14 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             for line in table:
                 item = QtGui.QTreeWidgetItem(parentItem)
                 item.setText(0, line[1].title())
-                if len(table) < 6:
-                    item.setText(1, line[2].rstrip("*"))
-                    item.setText(2, line[-1])
-                else:
-                    item.setText(1, line[2])
-                    item.setText(2, line[6])
+                item.setText(1, line[2])
+                item.setText(2, line[5])
+
+                if "*" in line[2]:
+                    item.setBackground(1, QtGui.QBrush(QtGui.QColor("red")))
+                if "*" in line[5]:
+                    item.setBackground(2, QtGui.QBrush(QtGui.QColor("red")))
+
                 parentItem.addChild(item)
 
         self.component_treewidget.clear()
@@ -2274,18 +2290,25 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             # self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
             # self.iterator.deleteLater()  # dispose iterator
             self.iterator = None
-            self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")
+            self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format", splitmap=[5, 9, 28, 46, 65, 83])
             residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1)[0]
-            firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0)
-            secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0)
+            firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66])
+            secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66])
             self.updateResultTree(self.lastBaseSet)
             self.updateComponentTree(firstComponentTable, secondComponentTable)
             self.updateResidualTree(residualTable)
             self.updateCurveInfoTree(methods.getTableFromOutput(self.dcoutpath,
-                "Standard Deviations for Computation of Curve-dependent Weights")
-            )
+                "Standard Deviations for Computation of Curve-dependent Weights"))
             self.enableUi()
-            sanity = self.checkSanity()
+
+            # check for output sanity
+            sanity = True
+            for result in self.lastBaseSet:
+                for cell in result:
+                    if cell == "NaN" or cell == "nan" or "*" in cell:
+                        sanity = False
+                        break
+
             if sanity is True:
                 self.populatePlotCombobox()
                 if self.autoupdate_chk.isChecked():
@@ -2294,7 +2317,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             else:
                 niter = int(self.lastiteration)
                 self.lastiteration = 0
-                raise ValueError("Iteration #{0} resulted in NaN for one "
+                raise ValueError("Iteration #{0} resulted in NaN or *** for one "
                                  "or multiple solutions.".format(niter + 1))
         except IOError as ex:
             msg = QtGui.QMessageBox(self)
@@ -2314,15 +2337,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             msg.setText("Unknown exception has ben caught: " + str(sys.exc_info()))
             msg.exec_()
             self.enableUi()
-
-    def checkSanity(self):
-        sanity = True
-        for result in self.lastBaseSet:
-            for cell in result:
-                if cell == "NaN" or cell == "nan":
-                    sanity = False
-                    break
-        return sanity
 
     def continueIterating(self):
         self.lastiteration = self.lastiteration + 1
