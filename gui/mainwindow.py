@@ -97,7 +97,7 @@ class Ui_MainWindow(object):
         self.line_5.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_5.setObjectName(_fromUtf8("line_5"))
         self.eclipsewidget_btn = QtGui.QPushButton(self.tab_7)
-        self.eclipsewidget_btn.setEnabled(False)
+        self.eclipsewidget_btn.setEnabled(True)
         self.eclipsewidget_btn.setGeometry(QtCore.QRect(520, 125, 210, 50))
         font = QtGui.QFont()
         font.setPointSize(13)

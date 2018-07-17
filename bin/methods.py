@@ -1,10 +1,11 @@
 import ConfigParser
 import StringIO
+from itertools import izip
 from functools import partial
 from PyQt4 import QtGui
 from bin import classes
 import numpy
-from scipy.optimize import  fsolve
+from scipy.optimize import fsolve
 
 
 __configver__ = "0.1.0"
@@ -1143,32 +1144,56 @@ def computeConjunctionPhases(MainWindow):
            phase_of_periastron, \
            phase_of_apastron
 
-# 5 4 19 18 19 18
-def getOutputFromDC(path, splitmap):
-    table = []
-    flag = False
-    start = 0
-    with open(path, "r") as dcout:
-        for line in dcout:
-            if "Input-Output in F Format" in line:
-                flag = True
-            if flag is True:
-                if start < 3:
-                    start = start + 1
-                else:
-                    if line == "\n":
-                        break
-                    else:
-                        if splitmap is not None:
-                            if splitmap[0] != 0:
-                                splitmap.insert(0, 0)
-                            tempLine = []
-                            i = 0
-                            while i < len(splitmap) - 1:
-                                tempLine.append(line[splitmap[i]:splitmap[i+1]])
-                                i = i + 1
-                            table.append(tempLine)
-    return table
+
+def aliasObservations(x, y, start, end):
+    """
+    :param x: a list containing phases
+    :param y: a list containing observations
+    :param start: start phase
+    :param end: end phase
+    :return: aliased observation with the same input format
+    """
+    if start > end:
+        raise ValueError("Start phase can't be larger than stop phase.")
+
+    x = [float(i) for i in x]
+    y = [float(i) for i in y]
+
+    distance = int(start - min(x))
+    if (distance == 0 and min(x) > start) or (distance < 0 < min(x)):
+        distance = distance - 1
+
+    x = [phase + distance for phase in x]
+
+    while max(x) < end:
+        _y = y[:]
+        y = y + _y
+        _x = [phase + 1 for phase in x]
+        x = x + _x
+
+    # while min(x) > start:
+    #     _y = y[:]
+    #     y = y + _y
+    #     _x = [phase - 1 for phase in x]
+    #     x = _x
+    #
+    # print x
+    #
+    # while max(x) < end:
+    #     _y = y[:]
+    #     y = y + _y
+    #     _x = [phase + 1 for phase in x]
+    #     x = x + _x
+
+    _x = []
+    _y = []
+
+    for phase, value in izip(x, y):
+        if start <= phase <= end:
+            _x.append(phase)
+            _y.append(value)
+
+    return _x, _y
 
 
 if __name__ == "__main__":

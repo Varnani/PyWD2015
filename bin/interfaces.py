@@ -1503,6 +1503,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.autoupdate_chk.setChecked(False)
         if self.MainWindow.LoadObservationWidget.vcPropertiesList[0] != 0 and self.MainWindow.LoadObservationWidget.vcPropertiesList[1] != 0:
             self.data_combobox.addItem("Vr1 + Vr2")
+        if self.MainWindow.EclipseWidget.iftime_chk.isChecked() and os.path.isfile(str(self.MainWindow.EclipseWidget.filepath_label.text())):
+            self.data_combobox.addItem("O - C")
 
     def plotData(self):
         # TODO this is becoming messy. clean up before doing anything else.
@@ -1646,6 +1648,42 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 self.plot_residualAxis.set_xlabel("Phase")
             self.plot_toolbar.update()
             self.plot_canvas.draw()
+        elif str(self.data_combobox.currentText()) == "O - C":
+            ocTable = methods.getTableFromOutput(self.dcoutpath, "Unweighted Observational Equations")
+            curvestatTable = methods.getTableFromOutput(
+                self.dcoutpath,
+                "Standard Deviations for Computation of Curve-dependent Weights"
+            )
+            columnLimit = 20
+            baseColumns = 4
+            if self.MainWindow.jdphs_combobox.currentText() == "Time":
+                columnLimit = 23
+                baseColumns = 5
+            currentColumns = len(methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format")) + baseColumns
+            if currentColumns > columnLimit:
+                currentIndex = 0
+                tempList = []
+                step = 2
+                if currentColumns > columnLimit * 2:
+                    step = 3
+                if currentColumns > columnLimit * 3:
+                    step = 4
+                while currentIndex < len(ocTable):
+                    tempList.append(ocTable[currentIndex] + ocTable[currentIndex + 1])
+                    currentIndex = currentIndex + step
+                ocTable = tempList
+            if os.path.isfile(str(self.MainWindow.EclipseWidget.filepath_label.text())):
+                curve = classes.Curve(str(self.MainWindow.EclipseWidget.filepath_label.text()))
+                if curve.hasError is False:
+                    lenght = len(curve.timeList)
+                    ocTable = ocTable[-1 * lenght:]
+                    x = [float(x[0]) for x in ocTable]
+                    y = [float(y[-1]) for y in ocTable]
+                    self.plot_observationAxis.clear()
+                    self.plot_residualAxis.clear()
+                    self.plot_observationAxis.plot(x, y, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    self.plot_toolbar.update()
+                    self.plot_canvas.draw()
 
         elif str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
@@ -2520,6 +2558,18 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                                 x2_2.append(obs2)
                             x2_obs = x2_2
 
+                    if self.alias_chk.isChecked() and \
+                            (self.MainWindow.jdphs_combobox.currentText() == "Phase" or
+                             (self.time_combobox.currentText() == "Phase" and
+                              self.MainWindow.jdphs_combobox.currentText() == "Time")):
+                        x_obs, y_obs = methods.aliasObservations(x_obs, y_obs,
+                                                                 float(str(self.MainWindow.phasestart_ipt.text())),
+                                                                 float(str(self.MainWindow.phasestop_ipt.text())))
+                        if curveProperties.type == "vc":
+                            x2_obs, y2_obs = methods.aliasObservations(x2_obs, y2_obs,
+                                                                     float(str(self.MainWindow.phasestart_ipt.text())),
+                                                                     float(str(self.MainWindow.phasestop_ipt.text())))
+
                     self.plot_observationAxis.plot(x_obs, y_obs, linestyle="", marker="o", markersize=4, color="#4286f4")
                     if curveProperties.type == "vc":
                         self.plot_observationAxis.plot(x2_obs, y2_obs, linestyle="", marker="o", markersize=4,
@@ -2636,9 +2686,9 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                 self.plot_starposAxis.set_xlim(-1, 2)
                 self.plot_starposAxis.set_ylim(-1, 1)
 
+            self.plot_toolbar.update()
             self.plot_starposAxis.set_xlabel('x')
             self.plot_starposAxis.set_ylabel('y')
-            self.plot_toolbar.update()
             yticks_resd = self.plot_residualAxis.yaxis.get_major_ticks()
             yticks_resd[-1].label1.set_visible(False)
             self.plot_residualAxis.axhline(0, color="red")
