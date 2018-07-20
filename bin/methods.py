@@ -1165,30 +1165,21 @@ def aliasObservations(x, y, start, end):
 
     x = [phase + distance for phase in x]
 
-    while max(x) < end:
-        _y = y[:]
-        y = y + _y
-        _x = [phase + 1 for phase in x]
-        x = x + _x
+    new_x = x[:]
+    new_y = y[:]
 
-    # while min(x) > start:
-    #     _y = y[:]
-    #     y = y + _y
-    #     _x = [phase - 1 for phase in x]
-    #     x = _x
-    #
-    # print x
-    #
-    # while max(x) < end:
-    #     _y = y[:]
-    #     y = y + _y
-    #     _x = [phase + 1 for phase in x]
-    #     x = x + _x
+    i = 1
+    while max(new_x) < end:
+        x_temp = [phase + i for phase in x]
+        new_x = new_x + x_temp
+        new_y = new_y + y[:]
+        i = i + 1
+        print new_x[-1]
 
     _x = []
     _y = []
 
-    for phase, value in izip(x, y):
+    for phase, value in izip(new_x, new_y):
         if start <= phase <= end:
             _x.append(phase)
             _y.append(value)
