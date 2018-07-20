@@ -1174,7 +1174,6 @@ def aliasObservations(x, y, start, end):
         new_x = new_x + x_temp
         new_y = new_y + y[:]
         i = i + 1
-        print new_x[-1]
 
     _x = []
     _y = []
