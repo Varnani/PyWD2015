@@ -402,9 +402,11 @@ class dcin(WDInput):
             )
             marqmul = ("0" * (2 - len(str(MainWindow.DCWidget.marqmul_spinbox.value())))) + str(
                 MainWindow.DCWidget.marqmul_spinbox.value())
+            niter = str(int(MainWindow.DCWidget.niter_spinbox.value()))
+            niter = (" " * (3 - len(niter))) + niter
             line4 = " " + block1 + " " + block2 + " " + block3 + " " + block4 + " " + block5 + \
                     " " + block6 + " " + block7 + " " + block8 + " " + block9 + " " + block10 + \
-                    " " + block11 + " " + block12 + " 01 1.000d-" + marqmul + \
+                    " " + block11 + " " + block12 + niter + " 1.000d-" + marqmul + \
                     self.formatInput(MainWindow.DCWidget.vlr_spinbox.value(), 6, 3, "F") + "\n"
             spot1 = "  0  0"
             spot2 = "  0  0"
@@ -595,6 +597,11 @@ class dcin(WDInput):
                 lcparamsList = []
                 lcextraparamsList = []
                 for lcprop in MainWindow.LoadObservationWidget.lcPropertiesList:
+                    if MainWindow.ipb_chk.isChecked() is False and float(lcprop.l2) == 0.0:
+                        self.addWarning(os.path.basename(lcprop.FilePath) + " has L2 set to 0, but DC returns some "
+                                                                            "fields as NaN when T2 and L2 is coupled. "
+                                                                            "L2 will be set to 1.")
+                        lcprop.l2 = "1"
                     iband = (" " * (3 - len(lcprop.band))) + lcprop.band
                     lcparams = iband + self.formatInput(lcprop.l1, 13, 6, "F") + \
                                self.formatInput(lcprop.l2, 13, 6, "F") + \
@@ -760,8 +767,8 @@ class lcin(WDInput):
         MPAGE = 1
         running self.output with LC will result in a synthetic light curve
         :param curve: a SyntheticCurveProperties object
-        :param line3: an optinal list with start and end points of data
         :param mpage: mpage parameter
+        :param line3: an optinal list with start and end points of data
         it should be in this format:
         [jdstart, jdstop, jdincrement, phasestart, phasestop, phaseincrement, phasenorm, phobs, lsp, tobs]
         :return: this fills self.output with ready-to-write data.

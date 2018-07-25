@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, \
-    syntheticcurvewidget, starpositionswidget
+    syntheticcurvewidget, starpositionswidget, dimensionwidget
 from functools import partial
 from bin import methods, classes
 from itertools import izip
@@ -35,6 +35,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.StarPositionWidget = StarPositionWidget()
         self.StarPositionWidget.MainWindow = self
         self.SyntheticCurveWidget.MainWindow = self
+        self.DimensionWidget = DimensionWidget()
+        self.DimensionWidget.MainWindow = self
         # variables
         self.lcpath = None
         self.lcinpath = None
@@ -51,6 +53,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.connectSignals()  # connect events with method
         self.hideConjunctionGroup()
         self.applyConstraints()
+        self.checkJdphs()
 
     def connectSignals(self):
         self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
@@ -79,6 +82,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.ld2_chk.stateChanged.connect(self.checkLD1LD2)
         self.e_ipt.textChanged.connect(self.updatePotentials)
         self.rm_ipt.textChanged.connect(self.updatePotentials)
+        self.jdphs_combobox.currentIndexChanged.connect(self.checkJdphs)
+        self.lc_stardimphase_btn.clicked.connect(self.DimensionWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -87,6 +92,21 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.close()
         self.SyntheticCurveWidget.close()
         self.StarPositionWidget.close()
+        self.DimensionWidget.close()
+
+    def checkJdphs(self):
+        jdphs = str(self.jdphs_combobox.currentText())
+        self.pshift_ipt.setDisabled(False)
+        self.DCWidget.pshift_chk.setDisabled(False)
+        self.DCWidget.jd0_chk.setDisabled(False)
+        if jdphs == "Time":
+            self.pshift_ipt.setDisabled(True)
+            self.pshift_ipt.setText("0")
+            self.DCWidget.pshift_chk.setDisabled(True)
+            self.DCWidget.pshift_chk.setChecked(False)
+        elif jdphs == "Phase":
+            self.DCWidget.jd0_chk.setDisabled(True)
+            self.DCWidget.jd0_chk.setChecked(False)
 
     def updateInputPairs(self):
         sender = self.sender()
@@ -302,12 +322,12 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
     def clearWidgets(self):
         # TODO add proper cleaning here (plots, trees, widgets which depend on current project)
         self.DCWidget.data_combobox.clear()
-        self.DCWidget.plot_observationAxis.clear()
-        self.DCWidget.plot_residualAxis.clear()
+        self.DCWidget.plot_observationAxis.cla()
+        self.DCWidget.plot_residualAxis.cla()
 
-        self.SyntheticCurveWidget.plot_observationAxis.clear()
-        self.SyntheticCurveWidget.plot_residualAxis.clear()
-        self.SyntheticCurveWidget.plot_starposAxis.clear()
+        self.SyntheticCurveWidget.plot_observationAxis.cla()
+        self.SyntheticCurveWidget.plot_residualAxis.cla()
+        self.SyntheticCurveWidget.plot_starposAxis.cla()
 
         self.DCWidget.obs_x = []
         self.DCWidget.obs_y = []
@@ -336,11 +356,29 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.lastSubSets = None
         self.DCWidget.curvestat_treewidget.clear()
 
-        self.StarPositionWidget.plot_starPositionAxis.clear()
+        self.StarPositionWidget.plot_starPositionAxis.cla()
         self.StarPositionWidget.starRenderData = None
         self.StarPositionWidget.starsRendered = False
 
         self.updateConjunctionPhases()
+
+        self.DimensionWidget.s1_plotAxis.cla()
+        self.DimensionWidget.s2_plotAxis.cla()
+
+        self.DimensionWidget.s1_pole = None
+        self.DimensionWidget.s1_point = None
+        self.DimensionWidget.s1_side = None
+        self.DimensionWidget.s1_back = None
+        self.DimensionWidget.s2_pole = None
+        self.DimensionWidget.s2_point = None
+        self.DimensionWidget.s2_side = None
+        self.DimensionWidget.s2_back = None
+        self.DimensionWidget.x = None
+
+        self.DimensionWidget.s1_plot_canvas.draw()
+        self.DimensionWidget.s1_plot_toolbar.update()
+        self.DimensionWidget.s2_plot_canvas.draw()
+        self.DimensionWidget.s2_plot_toolbar.update()
 
     def begin(self):  # check for wd.conf
         wdconf = "wd.conf"
@@ -381,7 +419,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
                 if self.jdphs_combobox.currentText() == "Time":
                     self.jdstart_ipt.setText(start)
                     self.jdstop_ipt.setText(stop)
-                    self.jdincrement_ipt.setText(str(float(self.p0_ipt.text()) / 100.0))
+                    self.jdincrement_ipt.setText(str(float(self.p0_ipt.text()) / 1000.0))
                 if self.jdphs_combobox.currentText() == "Phase":
                     self.phasestart_ipt.setText(start)
                     self.phasestop_ipt.setText(stop)
@@ -1510,8 +1548,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         # TODO this is becoming messy. clean up before doing anything else.
         magnitude = False
         if str(self.data_combobox.currentText()) == "Vr1 + Vr2":
-            self.plot_observationAxis.clear()
-            self.plot_residualAxis.clear()
+            self.plot_observationAxis.cla()
+            self.plot_residualAxis.cla()
             if self.plot_observationAxis.yaxis_inverted() == True:
                 self.plot_observationAxis.invert_yaxis()
             if self.plot_residualAxis.yaxis_inverted() == True:
@@ -1614,11 +1652,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     if vr1_table is not None:
                         lc_y_vr1 = [float(y[6].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for y in
                                     lcoutTable]
-                        self.plot_observationAxis.plot(lc_x, lc_y_vr1, color="orange")
+                        self.plot_observationAxis.plot(lc_x, lc_y_vr1, color="#4286f4")
                     if vr2_table is not None:
                         lc_y_vr2 = [float(y[7].replace("D", "E")) * float(self.MainWindow.vunit_ipt.text()) for y in
                                     lcoutTable]
-                        self.plot_observationAxis.plot(lc_x, lc_y_vr2, color="#edd83b")
+                        self.plot_observationAxis.plot(lc_x, lc_y_vr2, color="red")
                 else:
                     idx = 2
                     if self.MainWindow.jdphs_combobox.currentText() == "Time":
@@ -1627,12 +1665,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                         lc_x_vr1 = x_axis_vr1
                         lc_y_vr1 = [float(x[idx]) * float(self.MainWindow.vunit_ipt.text()) for x in vr1_table]
                         self.plot_observationAxis.plot(lc_x_vr1, lc_y_vr1, linestyle="", marker="o", markersize=4,
-                                                       color="orange")
+                                                       color="#4286f4")
                     if vr2_table is not None:
                         lc_x_vr2 = x_axis_vr2
                         lc_y_vr2 = [float(x[idx]) * float(self.MainWindow.vunit_ipt.text()) for x in vr2_table]
                         self.plot_observationAxis.plot(lc_x_vr2, lc_y_vr2, linestyle="", marker="o", markersize=4,
-                                                       color="#edd83b")
+                                                       color="red")
                 if vr1_table is not None:
                     self.plot_observationAxis.plot(x_axis_vr1, obs_vr1, linestyle="", marker="o", markersize=4, color="#4286f4")
                     self.plot_residualAxis.plot(x_axis_vr1, resd_vr1, linestyle="", marker="o", markersize=4, color="#4286f4")
@@ -1679,11 +1717,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     ocTable = ocTable[-1 * lenght:]
                     x = [float(x[0]) for x in ocTable]
                     y = [float(y[-1]) for y in ocTable]
-                    self.plot_observationAxis.clear()
-                    self.plot_residualAxis.clear()
+                    self.plot_observationAxis.cla()
+                    self.plot_residualAxis.cla()
                     self.plot_observationAxis.plot(x, y, linestyle="", marker="o", markersize=4, color="#4286f4")
-                    self.plot_toolbar.update()
                     self.plot_canvas.draw()
+                    self.plot_toolbar.update()
 
         elif str(self.data_combobox.currentText()) != "":
             index = self.data_combobox.currentIndex()
@@ -1762,7 +1800,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 curve = classes.Curve(curveProp.FilePath)
                 line3 = []
                 if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
-                    line3 = [min(curve.timeList), max(curve.timeList), float(self.MainWindow.p0_ipt.text()) / 100,
+                    line3 = [min(curve.timeList), max(curve.timeList), float(self.MainWindow.p0_ipt.text()) / 1000,
                              0, 1, 0.001, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000]
                 else:
                     line3 = [float(self.MainWindow.jd0_ipt.text()), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
@@ -1809,14 +1847,18 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     lc_y_mag = [-2.5 * numpy.log10(x) for x in lc_y]
                     lc_y = lc_y_mag
 
-            self.plot_observationAxis.clear()
-            self.plot_residualAxis.clear()
-            self.plot_observationAxis.plot(x_axis, obs, linestyle="", marker="o", markersize=4, color="#4286f4")
+            self.plot_observationAxis.cla()
+            self.plot_residualAxis.cla()
+            clr = "#4286f4"
+            curveProp = self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].getSynthetic()
+            if curveProp.type == "vc" and curveProp.star == 2:
+                clr = "red"
+            self.plot_observationAxis.plot(x_axis, obs, linestyle="", marker="o", markersize=4, color=clr)
             if self.uselc_chk.isChecked():
                 self.plot_observationAxis.plot(lc_x, lc_y, color="red")
             else:
                 self.plot_observationAxis.plot(lc_x, lc_y, linestyle="", marker="o", markersize=4, color="red")
-            self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color="#4286f4")
+            self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color=clr)
             self.plot_residualAxis.axhline(c="r")
             self.plot_toolbar.update()
             self.plot_observationAxis.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
@@ -1834,6 +1876,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     self.plot_observationAxis.invert_yaxis()
                 if self.plot_residualAxis.yaxis_inverted() == True:
                     self.plot_residualAxis.invert_yaxis()
+            self.plot_observationAxis.ticklabel_format(useOffset=False)
             self.plot_canvas.draw()
             # store plot data
             self.obs_x = x_axis
@@ -2328,10 +2371,10 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             # self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
             # self.iterator.deleteLater()  # dispose iterator
             self.iterator = None
-            self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format", splitmap=[5, 9, 28, 46, 65, 83])
-            residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1)[0]
-            firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66])
-            secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66])
+            self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format", splitmap=[5, 9, 28, 46, 65, 83], occurence=int(self.niter_spinbox.value()))
+            residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1, occurence=int(self.niter_spinbox.value()))[0]
+            firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
+            secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
             self.updateResultTree(self.lastBaseSet)
             self.updateComponentTree(firstComponentTable, secondComponentTable)
             self.updateResidualTree(residualTable)
@@ -2454,9 +2497,9 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
     def plotSelected(self):
         self.fillout_label.setText("Fillout = " + methods.computeFillOutFactor(self.MainWindow))
         if self.selectedItem() is not None:
-            self.plot_observationAxis.clear()
-            self.plot_residualAxis.clear()
-            self.plot_starposAxis.clear()
+            self.plot_observationAxis.cla()
+            self.plot_residualAxis.cla()
+            self.plot_starposAxis.cla()
             self.plot_observationAxis.set_position(self.dual_grid[0].get_position(self.plot_figure))
             self.plot_residualAxis.set_position(self.dual_grid[1].get_position(self.plot_figure))
             self.plot_starposAxis.set_visible(False)
@@ -2945,7 +2988,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
             self.phase_spinbox.setDisabled(False)
 
     def plotSingle(self):
-        self.plot_starPositionAxis.clear()
+        self.plot_starPositionAxis.cla()
         if self.roche_chk.isChecked():
             methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starPositionAxis)
             inner, outer = methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), None, getPotentials=True)
@@ -3104,6 +3147,133 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.starsRendered = True
         self.enableUi()
         self.render_btn.setDisabled(False)
+
+
+class DimensionWidget(QtGui.QWidget, dimensionwidget.Ui_DimensionWidget):
+    def __init__(self):
+        super(DimensionWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.MainWindow = None
+        # set up plot widget for star 1
+        self.s1_plot_figure = Figure()
+        self.s1_plot_canvas = FigureCanvas(self.s1_plot_figure)
+        self.s1_plot_toolbar = NavigationToolbar(self.s1_plot_canvas, self.s1_plot_widget)
+        s1_plot_layout = QtGui.QVBoxLayout()
+        s1_plot_layout.addWidget(self.s1_plot_toolbar)
+        s1_plot_layout.addWidget(self.s1_plot_canvas)
+        self.s1_plot_widget.setLayout(s1_plot_layout)
+        self.s1_plotAxis = self.s1_plot_figure.add_subplot(111)
+        # set up plot widget for star 2
+        self.s2_plot_figure = Figure()
+        self.s2_plot_canvas = FigureCanvas(self.s2_plot_figure)
+        self.s2_plot_toolbar = NavigationToolbar(self.s2_plot_canvas, self.s2_plot_widget)
+        s2_plot_layout = QtGui.QVBoxLayout()
+        s2_plot_layout.addWidget(self.s2_plot_toolbar)
+        s2_plot_layout.addWidget(self.s2_plot_canvas)
+        self.s2_plot_widget.setLayout(s2_plot_layout)
+        self.s2_plotAxis = self.s2_plot_figure.add_subplot(111)
+        self.s1_plotAxis.set_xlabel("Phase")
+        self.s1_plotAxis.set_ylabel("Fractional Radius")
+        self.s2_plotAxis.set_xlabel("Phase")
+        self.s2_plotAxis.set_ylabel("Fractional Radius")
+        self.s1_plot_figure.tight_layout()
+        self.s2_plot_figure.tight_layout()
+        # variables to plot
+        self.s1_pole = None
+        self.s1_point = None
+        self.s1_side = None
+        self.s1_back = None
+        self.s2_pole = None
+        self.s2_point = None
+        self.s2_side = None
+        self.s2_back = None
+        self.x = None
+        # signal connection
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.plot_btn.clicked.connect(self.computeComponents)
+        self.s1_pole_chk.stateChanged.connect(self.plotComponents)
+        self.s1_point_chk.stateChanged.connect(self.plotComponents)
+        self.s1_side_chk.stateChanged.connect(self.plotComponents)
+        self.s1_back_chk.stateChanged.connect(self.plotComponents)
+        self.s2_pole_chk.stateChanged.connect(self.plotComponents)
+        self.s2_point_chk.stateChanged.connect(self.plotComponents)
+        self.s2_side_chk.stateChanged.connect(self.plotComponents)
+        self.s2_back_chk.stateChanged.connect(self.plotComponents)
+
+    def plotComponents(self):
+        self.s1_plotAxis.cla()
+        self.s2_plotAxis.cla()
+
+        if self.s1_pole_chk.isChecked() and self.s1_pole is not None:
+            self.s1_plotAxis.plot(self.x, self.s1_pole, color="blue")
+        if self.s1_point_chk.isChecked() and self.s1_point is not None:
+            self.s1_plotAxis.plot(self.x, self.s1_point, color="black")
+        if self.s1_side_chk.isChecked() and self.s1_side is not None:
+            self.s1_plotAxis.plot(self.x, self.s1_side, color="red")
+        if self.s1_back_chk.isChecked() and self.s1_back is not None:
+            self.s1_plotAxis.plot(self.x, self.s1_back, color="green")
+
+        if self.s2_pole_chk.isChecked() and self.s2_pole is not None:
+            self.s2_plotAxis.plot(self.x, self.s2_pole, color="blue")
+        if self.s2_point_chk.isChecked() and self.s2_point is not None:
+            self.s2_plotAxis.plot(self.x, self.s2_point, color="black")
+        if self.s2_side_chk.isChecked() and self.s2_side is not None:
+            self.s2_plotAxis.plot(self.x, self.s2_side, color="red")
+        if self.s2_back_chk.isChecked() and self.s2_back is not None:
+            self.s2_plotAxis.plot(self.x, self.s2_back, color="green")
+
+        self.s1_plotAxis.set_xlabel("Phase")
+        self.s1_plotAxis.set_ylabel("Fractional Radius")
+
+        self.s2_plotAxis.set_xlabel("Phase")
+        self.s2_plotAxis.set_ylabel("Fractional Radius")
+
+        self.s1_plotAxis.ticklabel_format(useOffset=False)
+        self.s1_plot_canvas.draw()
+        self.s1_plot_toolbar.update()
+
+        self.s2_plotAxis.ticklabel_format(useOffset=False)
+        self.s2_plot_canvas.draw()
+        self.s2_plot_toolbar.update()
+        self.s1_plot_figure.tight_layout()
+        self.s2_plot_figure.tight_layout()
+
+    def computeComponents(self):
+        lcin = classes.lcin(self.MainWindow)
+        lcin.starPositions()
+        lcin.output = "4" + lcin.output[1:]
+        with open(self.MainWindow.lcinpath, "w") as f:
+            f.write(lcin.output)
+        print self.MainWindow.lcinpath
+        process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+        process.wait()
+        table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "      JD             Phase", offset=1)
+
+        self.s1_pole = []
+        self.s1_point = []
+        self.s1_side = []
+        self.s1_back = []
+        self.s2_pole = []
+        self.s2_point = []
+        self.s2_side = []
+        self.s2_back = []
+        self.x = []
+
+        for line in table:
+            self.s1_pole.append(float(line[2]))
+            self.s1_point.append(float(line[3]))
+            self.s1_side.append(float(line[4]))
+            self.s1_back.append(float(line[5]))
+            self.s2_pole.append(float(line[6]))
+            self.s2_point.append(float(line[7]))
+            self.s2_side.append(float(line[8]))
+            self.s2_back.append(float(line[9]))
+            self.x.append(float(line[1]))
+
+        self.plotComponents()
 
 
 if __name__ == "__main__":

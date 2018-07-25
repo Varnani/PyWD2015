@@ -18,7 +18,75 @@
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="0" column="2">
       <layout class="QGridLayout" name="gridLayout">
-       <item row="12" column="0" colspan="2">
+       <item row="8" column="0" colspan="3">
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="3">
+        <widget class="QCheckBox" name="alias_chk">
+         <property name="toolTip">
+          <string>Alias with phase start and phase end. Does nothing if working with HJD.</string>
+         </property>
+         <property name="text">
+          <string>Alias with Phase</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="3">
+        <widget class="QPushButton" name="plot_btn">
+         <property name="toolTip">
+          <string>Plot selected item</string>
+         </property>
+         <property name="text">
+          <string>Plot</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="3">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0" colspan="3">
+        <widget class="Line" name="line_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3">
+        <widget class="QComboBox" name="time_combobox">
+         <property name="toolTip">
+          <string>Select x axis unit</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Phase</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>HJD</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="9" column="0" colspan="3">
+        <widget class="QCheckBox" name="drawstars_chk">
+         <property name="toolTip">
+          <string>Draw star positions in a subplot</string>
+         </property>
+         <property name="text">
+          <string>Star Positions</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0" colspan="3">
         <widget class="QLabel" name="fillout_label">
          <property name="enabled">
           <bool>true</bool>
@@ -42,117 +110,7 @@ Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomica
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="2">
-        <widget class="Line" name="line_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QComboBox" name="time_combobox">
-         <property name="toolTip">
-          <string>Select x axis unit</string>
-         </property>
-         <item>
-          <property name="text">
-           <string>Phase</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>HJD</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="10" column="0" colspan="2">
-        <widget class="QCheckBox" name="roche_chk">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="toolTip">
-          <string>Draw Roche equipotential surfaces onto star positions. This option is only valid when Phase = 0.25</string>
-         </property>
-         <property name="text">
-          <string>Roche Pot.'s</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QPushButton" name="pop_btn">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="toolTip">
-          <string>Pop plot window</string>
-         </property>
-         <property name="text">
-          <string>Pop</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QPushButton" name="plot_btn">
-         <property name="toolTip">
-          <string>Plot selected item</string>
-         </property>
-         <property name="text">
-          <string>Plot</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QCheckBox" name="plotobs_chk">
-         <property name="toolTip">
-          <string>Include observation in plot</string>
-         </property>
-         <property name="text">
-          <string>Observation</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label">
-         <property name="toolTip">
-          <string>Phase of star positions</string>
-         </property>
-         <property name="text">
-          <string>Phase</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0" colspan="2">
-        <widget class="Line" name="line_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QCheckBox" name="plotmodel_chk">
-         <property name="toolTip">
-          <string>Compute and plot synthetic curve</string>
-         </property>
-         <property name="text">
-          <string>Model</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
+       <item row="10" column="2">
         <widget class="QDoubleSpinBox" name="phase_spinbox">
          <property name="enabled">
           <bool>true</bool>
@@ -171,23 +129,75 @@ Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomica
          </property>
         </widget>
        </item>
-       <item row="8" column="0" colspan="2">
-        <widget class="QCheckBox" name="drawstars_chk">
+       <item row="5" column="0" colspan="3">
+        <widget class="QCheckBox" name="plotobs_chk">
          <property name="toolTip">
-          <string>Draw star positions in a subplot</string>
+          <string>Include observation in plot</string>
          </property>
          <property name="text">
-          <string>Star Positions</string>
+          <string>Observation</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="2">
-        <widget class="QCheckBox" name="alias_chk">
+       <item row="6" column="0" colspan="3">
+        <widget class="QCheckBox" name="plotmodel_chk">
          <property name="toolTip">
-          <string>Alias with phase start and phase end. Does nothing if working with HJD.</string>
+          <string>Compute and plot synthetic curve</string>
          </property>
          <property name="text">
-          <string>Alias with Phase</string>
+          <string>Model</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="3">
+        <widget class="QCheckBox" name="roche_chk">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Draw Roche equipotential surfaces onto star positions. This option is only valid when Phase = 0.25</string>
+         </property>
+         <property name="text">
+          <string>Roche Pot.'s</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" colspan="2">
+        <widget class="QLabel" name="label">
+         <property name="toolTip">
+          <string>Phase of star positions</string>
+         </property>
+         <property name="text">
+          <string>Phase</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3">
+        <widget class="QPushButton" name="pop_btn">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>Pop plot window</string>
+         </property>
+         <property name="text">
+          <string>Pop</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="3">
+        <widget class="QPushButton" name="pushButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Export</string>
          </property>
         </widget>
        </item>

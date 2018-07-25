@@ -898,9 +898,10 @@ def loadProject(MainWindow, parser):
     loadEclipseParameters(MainWindow, parser)
 
 
-def getTableFromOutput(path, target, offset=3, splitmap=None):
+def getTableFromOutput(path, target, offset=3, splitmap=None, occurence=1):
     """
     extract a table from a dc/lc output file.
+    :param occurence: which occurence?
     :param path: output file path
     :param target: target string to find
     :param offset: offset of data from target
@@ -925,10 +926,13 @@ def getTableFromOutput(path, target, offset=3, splitmap=None):
     table = []
     flag = False
     start = 0
+    occured = 0
     with open(path, "r") as dcout:
         for line in dcout:
             if target in line:
-                flag = True
+                occured = occured + 1
+                if occured == occurence:
+                    flag = True
             if flag is True:
                 if start < offset:
                     start = start + 1

@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Wed Jul 25 13:45:27 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -681,7 +682,7 @@ class Ui_MainWindow(object):
         self.lc_speclineprof_btn.setGeometry(QtCore.QRect(480, 110, 230, 30))
         self.lc_speclineprof_btn.setObjectName(_fromUtf8("lc_speclineprof_btn"))
         self.lc_stardimphase_btn = QtGui.QPushButton(self.tab_9)
-        self.lc_stardimphase_btn.setEnabled(False)
+        self.lc_stardimphase_btn.setEnabled(True)
         self.lc_stardimphase_btn.setGeometry(QtCore.QRect(480, 160, 230, 30))
         self.lc_stardimphase_btn.setObjectName(_fromUtf8("lc_stardimphase_btn"))
         self.lc_coordinates_btn = QtGui.QPushButton(self.tab_9)

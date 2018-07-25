@@ -20,28 +20,42 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="11">
-          <widget class="QPushButton" name="viewlastdcin_btn">
+         <item row="1" column="8">
+          <widget class="QPushButton" name="viewlaastdcout_btn">
            <property name="text">
-            <string>dcin.active</string>
+            <string>dcout.active</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="10" rowspan="2">
-          <widget class="Line" name="line_9">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="7" rowspan="2">
+         <item row="0" column="4" rowspan="2">
           <widget class="Line" name="line_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
           </widget>
          </item>
-         <item row="1" column="9">
+         <item row="0" column="8">
+          <widget class="QPushButton" name="viewlastdcin_btn">
+           <property name="text">
+            <string>dcin.active</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5" colspan="2">
+          <widget class="QPushButton" name="updateinputs_btn">
+           <property name="text">
+            <string>Update Inputs</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="7" rowspan="2">
+          <widget class="Line" name="line_9">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="5" colspan="2">
           <widget class="QPushButton" name="exportresults_btn">
            <property name="enabled">
             <bool>false</bool>
@@ -51,21 +65,59 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="9">
-          <widget class="QPushButton" name="updateinputs_btn">
-           <property name="text">
-            <string>Update Inputs</string>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="iteration_spinbox">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="minimum">
+            <number>1</number>
            </property>
           </widget>
          </item>
-         <item row="1" column="11">
-          <widget class="QPushButton" name="viewlaastdcout_btn">
-           <property name="text">
-            <string>dcout.active</string>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="niter_spinbox">
+           <property name="minimum">
+            <number>1</number>
            </property>
           </widget>
          </item>
-         <item row="0" column="6" rowspan="2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="toolTip">
+            <string>Itertations performed py PyWD. After each iteration, results will be copied into inputs.</string>
+           </property>
+           <property name="text">
+            <string>External Iterations</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Iterations performed by Wilson - Devinney [NITER]</string>
+           </property>
+           <property name="text">
+            <string>Internal Iterations</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" rowspan="2" colspan="2">
           <widget class="QPushButton" name="rundc2015_btn">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -82,45 +134,6 @@
            </property>
            <property name="text">
             <string>Run DC</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3" rowspan="2">
-          <widget class="Line" name="line_12">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2" rowspan="2">
-          <widget class="QSpinBox" name="iteration_spinbox">
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" rowspan="2">
-          <widget class="QLabel" name="label_8">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Number of iterations</string>
            </property>
           </widget>
          </item>
