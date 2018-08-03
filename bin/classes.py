@@ -184,11 +184,8 @@ class WDInput:
         if float(1) > f_ipt > float(-1):
             if f_ipt == float(0):
                 return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
-            if width - 6 - precision >= 0:
-                output = "{:{width}.{precision}g}".format(f_ipt, width=width, precision=precision)
-            else:
-                output = "{:{width}.{precision}f}".format(f_ipt, width=width, precision=precision)
-        if f_ipt >= float(1) or f_ipt < float(0):
+            output = "{:{width}.{precision}g}".format(f_ipt, width=width, precision=precision)
+        elif f_ipt >= float(1) or f_ipt <= float(-1):
             output = "{:{width}.{precision}f}".format(f_ipt, width=width, precision=precision)
         output = output.rstrip("0")
         if output[-1] == ".":

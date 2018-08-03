@@ -2913,24 +2913,24 @@ zero for zero output noise</string>
      </widget>
      <widget class="QPushButton" name="lc_conjunction_btn">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
         <x>480</x>
         <y>260</y>
-        <width>230</width>
+        <width>105</width>
         <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Compute conjunction times or calculate O - C from input eclipse timings.</string>
+       <string>Compute conjunction times.</string>
       </property>
       <property name="statusTip">
        <string>MPAGE = 6</string>
       </property>
       <property name="text">
-       <string>Conjunction Times</string>
+       <string>Conjunction</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="lsp_spinbox">
@@ -3016,6 +3016,28 @@ zero for zero output noise</string>
       </property>
       <property name="text">
        <string>Fill...</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="lc_oc_btn">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>605</x>
+        <y>260</y>
+        <width>105</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Calculate O - C from input eclipse timings.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 6</string>
+      </property>
+      <property name="text">
+       <string>O - C</string>
       </property>
      </widget>
     </widget>

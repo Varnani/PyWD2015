@@ -847,6 +847,7 @@ def loadCurveParameters(MainWindow, parser):
 
 
 def loadEclipseParameters(MainWindow, parser):
+    MainWindow.EclipseWidget.clear_btn.click()
     MainWindow.EclipseWidget.filepath_label.setText(parser.get("Eclipse Timing", "filepath"))
     MainWindow.EclipseWidget.filepath_label.setToolTip(parser.get("Eclipse Timing", "filepath"))
     MainWindow.EclipseWidget.iftime_chk.setChecked(parser.getboolean("Eclipse Timing", "iftime"))
@@ -1155,10 +1156,12 @@ def aliasObservations(x, y, start, end):
     :param y: a list containing observations
     :param start: start phase
     :param end: end phase
-    :return: aliased observation with the same input format
+    :return: aliased phases and observations with the same input format
     """
     if start > end:
         raise ValueError("Start phase can't be larger than stop phase.")
+    if len(x) != len(y):
+        raise ValueError("x and y must be the same size.")
 
     x = [float(i) for i in x]
     y = [float(i) for i in y]
@@ -1188,6 +1191,80 @@ def aliasObservations(x, y, start, end):
             _y.append(value)
 
     return _x, _y
+
+
+def convertFromScientificToGeneric(number):
+
+    def _strip(nm):
+        nm = nm.strip("0")
+        if nm[0] == ".":
+            nm = "0" + nm
+
+            nm = nm.rstrip("0")
+        if nm[-1] == ".":
+            nm = nm + "0"
+
+        return nm
+
+    float(number)  # check if input is actually a number
+
+    if number[0] == ".":
+        number = 0 + number
+
+    if "e" in number:
+        exp = ""
+        num = ""
+        dotIndex = 0
+        wasNegative = False
+
+        if number[0] == "-":
+            number = number[1:]
+            wasNegative = True
+
+        for i, char in enumerate(number):
+            if char == ".":
+                dotIndex = i
+            if char == "e":
+                exp = int(number[i + 1:])
+                num = number[:i]
+                break
+
+        if exp == 0:
+            if wasNegative:
+                num = "-" + num
+            return _strip(num)
+
+        num = num.replace(".", "")
+
+        output = ""
+
+        if exp < 0:
+            dot = abs(exp) - dotIndex
+            if dot == 0:
+                if num[0] == "0":
+                    output = "0." + num
+                else:
+                    output = num
+            elif dot < 0:
+                dot = abs(dot)
+                output = num[:dot] + "." + num[dot:]
+            elif dot > 0:
+                output = "0." + ("0" * dot) + num
+        elif exp > 0:
+            dot = len(num) - exp - dotIndex
+            if dot == 0:
+                output = num
+            elif dot < 0:
+                output = num + ("0" * abs(dot)) + ".0"
+            elif dot > 0:
+                output = num[:dotIndex + exp] + "." + num[dotIndex + exp:]
+        if wasNegative:
+            output = "-" + output
+
+        return _strip(output)
+
+    else:
+        return number
 
 
 if __name__ == "__main__":

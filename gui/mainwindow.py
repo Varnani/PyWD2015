@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Wed Jul 25 13:45:27 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -689,8 +688,8 @@ class Ui_MainWindow(object):
         self.lc_coordinates_btn.setGeometry(QtCore.QRect(480, 210, 230, 30))
         self.lc_coordinates_btn.setObjectName(_fromUtf8("lc_coordinates_btn"))
         self.lc_conjunction_btn = QtGui.QPushButton(self.tab_9)
-        self.lc_conjunction_btn.setEnabled(False)
-        self.lc_conjunction_btn.setGeometry(QtCore.QRect(480, 260, 230, 30))
+        self.lc_conjunction_btn.setEnabled(True)
+        self.lc_conjunction_btn.setGeometry(QtCore.QRect(480, 260, 105, 30))
         self.lc_conjunction_btn.setObjectName(_fromUtf8("lc_conjunction_btn"))
         self.lsp_spinbox = QtGui.QSpinBox(self.tab_9)
         self.lsp_spinbox.setGeometry(QtCore.QRect(30, 260, 51, 25))
@@ -710,6 +709,10 @@ class Ui_MainWindow(object):
         self.fill_btn = QtGui.QPushButton(self.tab_9)
         self.fill_btn.setGeometry(QtCore.QRect(360, 160, 51, 74))
         self.fill_btn.setObjectName(_fromUtf8("fill_btn"))
+        self.lc_oc_btn = QtGui.QPushButton(self.tab_9)
+        self.lc_oc_btn.setEnabled(True)
+        self.lc_oc_btn.setGeometry(QtCore.QRect(605, 260, 105, 30))
+        self.lc_oc_btn.setObjectName(_fromUtf8("lc_oc_btn"))
         self.maintabwidget.addTab(self.tab_9, _fromUtf8(""))
         self.tab_11 = QtGui.QWidget()
         self.tab_11.setObjectName(_fromUtf8("tab_11"))
@@ -1246,9 +1249,9 @@ class Ui_MainWindow(object):
         self.lc_coordinates_btn.setToolTip(_translate("MainWindow", "Draw star positions as they appear in the sky.", None))
         self.lc_coordinates_btn.setStatusTip(_translate("MainWindow", "MPAGE = 5", None))
         self.lc_coordinates_btn.setText(_translate("MainWindow", "Star Positions / Roche Lobes", None))
-        self.lc_conjunction_btn.setToolTip(_translate("MainWindow", "Compute conjunction times or calculate O - C from input eclipse timings.", None))
+        self.lc_conjunction_btn.setToolTip(_translate("MainWindow", "Compute conjunction times.", None))
         self.lc_conjunction_btn.setStatusTip(_translate("MainWindow", "MPAGE = 6", None))
-        self.lc_conjunction_btn.setText(_translate("MainWindow", "Conjunction Times", None))
+        self.lc_conjunction_btn.setText(_translate("MainWindow", "Conjunction", None))
         self.lcnoise_combobox.setItemText(0, _translate("MainWindow", "None", None))
         self.lcnoise_combobox.setItemText(1, _translate("MainWindow", "Square Root", None))
         self.lcnoise_combobox.setItemText(2, _translate("MainWindow", "Linear", None))
@@ -1258,6 +1261,9 @@ class Ui_MainWindow(object):
         self.label_72.setText(_translate("MainWindow", "Noise", None))
         self.fill_btn.setToolTip(_translate("MainWindow", "Fill start/stop times from a loaded curve. Sections filled depends on whether time or phase is selected as independent variable. HJD Increment is filled as [Period/100].", None))
         self.fill_btn.setText(_translate("MainWindow", "Fill...", None))
+        self.lc_oc_btn.setToolTip(_translate("MainWindow", "Calculate O - C from input eclipse timings.", None))
+        self.lc_oc_btn.setStatusTip(_translate("MainWindow", "MPAGE = 6", None))
+        self.lc_oc_btn.setText(_translate("MainWindow", "O - C", None))
         self.maintabwidget.setTabText(self.maintabwidget.indexOf(self.tab_9), _translate("MainWindow", "LC2015", None))
         self.dc_rundc_btn.setToolTip(_translate("MainWindow", "Do differential corrections on input parameters", None))
         self.dc_rundc_btn.setText(_translate("MainWindow", "Differential Correction", None))

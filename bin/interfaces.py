@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, \
-    syntheticcurvewidget, starpositionswidget, dimensionwidget
+    syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget
 from functools import partial
 from bin import methods, classes
 from itertools import izip
@@ -37,6 +37,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.SyntheticCurveWidget.MainWindow = self
         self.DimensionWidget = DimensionWidget()
         self.DimensionWidget.MainWindow = self
+        self.ConjunctionWidget = ConjunctionWidget()
+        self.ConjunctionWidget.MainWindow = self
         # variables
         self.lcpath = None
         self.lcinpath = None
@@ -84,6 +86,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.rm_ipt.textChanged.connect(self.updatePotentials)
         self.jdphs_combobox.currentIndexChanged.connect(self.checkJdphs)
         self.lc_stardimphase_btn.clicked.connect(self.DimensionWidget.show)
+        self.lc_conjunction_btn.clicked.connect(self.ConjunctionWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -93,6 +96,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.SyntheticCurveWidget.close()
         self.StarPositionWidget.close()
         self.DimensionWidget.close()
+        self.ConjunctionWidget.close()
 
     def checkJdphs(self):
         jdphs = str(self.jdphs_combobox.currentText())
@@ -379,6 +383,9 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DimensionWidget.s1_plot_toolbar.update()
         self.DimensionWidget.s2_plot_canvas.draw()
         self.DimensionWidget.s2_plot_toolbar.update()
+
+        self.ConjunctionWidget.data_treewidget.clear()
+        self.ConjunctionWidget.data = None
 
     def begin(self):  # check for wd.conf
         wdconf = "wd.conf"
@@ -2126,6 +2133,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     allChars = allChars + val
 
                 if "*" not in allChars:
+                    result[4] = result[4].replace("D", "e")
+                    result[4] = methods.convertFromScientificToGeneric(result[4])
                     if len(result) >= 6:
                         index = int(result[0])
                         if result[1] != "0":
@@ -2177,15 +2186,19 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             )
 
     def updateResultTree(self, resultTable):
-        frmt = "{:11.8f}"
+
+        def _reformat(num):
+            if -1.0e-5 < float(num) < 1.0e-5:
+                return num
+            else:
+                return methods.convertFromScientificToGeneric(num)
 
         def _populateItem(itm, rslt):
-            frmt = "{:11.8f}"  # TODO add this as a user setting
             id = int(rslt[0])
-            input = rslt[2]
-            corr = rslt[3]
-            output = rslt[4]
-            stderr = rslt[5]
+            input = rslt[2].replace("D", "e")
+            corr = rslt[3].replace("D", "e")
+            output = rslt[4].replace("D", "e")
+            stderr = rslt[5].replace("D", "e")
 
             if "*" not in input + corr + output + stderr:
                 if id in (19, 20):  # T's are in K/10000 format
@@ -2198,18 +2211,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     corr = str(float(corr) * float(self.MainWindow.vunit_ipt.text()))
                     output = str(float(output) * float(self.MainWindow.vunit_ipt.text()))
                     stderr = str(float(stderr) * float(self.MainWindow.vunit_ipt.text()))
-                input = str(frmt.format(float(input)).rstrip("0"))
-                if input[-1] == ".":
-                    input = input + "0"
-                corr = str(frmt.format(float(corr)).rstrip("0"))
-                if corr[-1] == ".":
-                    corr = corr + "0"
-                output = str(frmt.format(float(output)).rstrip("0"))
-                if output[-1] == ".":
-                    output = output + "0"
-                stderr = str(frmt.format(float(stderr)).rstrip("0"))
-                if stderr[-1] == ".":
-                    stderr = stderr + "0"
+
+                input = _reformat(input)
+                corr = _reformat(corr)
+                output = _reformat(output)
+                stderr = _reformat(stderr)
 
                 if numpy.absolute(float(stderr)) > numpy.absolute(float(corr)) or \
                         (numpy.absolute(float(stderr)) == 0.0 and numpy.absolute(float(corr)) == 0.0):
@@ -2371,7 +2377,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             # self.disconnect(self.iterator, self.iterator.exception, self.iteratorException)
             # self.iterator.deleteLater()  # dispose iterator
             self.iterator = None
-            self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in F Format", splitmap=[5, 9, 28, 46, 65, 83], occurence=int(self.niter_spinbox.value()))
+            self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in D Format", splitmap=[5, 9, 28, 46, 65, 83], occurence=int(self.niter_spinbox.value()))
             residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1, occurence=int(self.niter_spinbox.value()))[0]
             firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
             secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
@@ -3243,11 +3249,10 @@ class DimensionWidget(QtGui.QWidget, dimensionwidget.Ui_DimensionWidget):
 
     def computeComponents(self):
         lcin = classes.lcin(self.MainWindow)
-        lcin.starPositions()
+        lcin.starPositions(jdphs="2")
         lcin.output = "4" + lcin.output[1:]
         with open(self.MainWindow.lcinpath, "w") as f:
             f.write(lcin.output)
-        print self.MainWindow.lcinpath
         process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
         process.wait()
         table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "      JD             Phase", offset=1)
@@ -3274,6 +3279,62 @@ class DimensionWidget(QtGui.QWidget, dimensionwidget.Ui_DimensionWidget):
             self.x.append(float(line[1]))
 
         self.plotComponents()
+
+
+class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
+    def __init__(self):
+        super(ConjunctionWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.MainWindow = None
+        self.data_treewidget.header().setResizeMode(3)
+        self.data = None
+        # signal connection
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.compute_btn.clicked.connect(self.computeConjunction)
+        self.export_btn.clicked.connect(self.exportData)
+
+    def computeConjunction(self):
+        self.data_treewidget.clear()
+        lcin = classes.lcin(self.MainWindow)
+        lcin.starPositions(jdphs="1")
+        ktstep = str(self.kstep_spinbox.value())
+        lcin.output = "6" + lcin.output[1:29] + " " + (" " * (5 - len(ktstep)) + ktstep) + lcin.output[29:]
+        with open(self.MainWindow.lcinpath, "w") as f:
+            f.write(lcin.output)
+        process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+        process.wait()
+        table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "    conj. time", 2)
+        for row in table:
+            item = QtGui.QTreeWidgetItem(self.data_treewidget)
+            item.setText(0, row[0])
+            item.setText(1, row[1])
+        self.data = table
+
+    def exportData(self):
+        if self.data is not None:
+            dialog = QtGui.QFileDialog(self)
+            dialog.setDefaultSuffix("txt")
+            dialog.setNameFilter("Plaintext File (*.txt)")
+            dialog.setAcceptMode(1)
+            returnCode = dialog.exec_()
+            filePath = str((dialog.selectedFiles())[0])
+            if filePath != "" and returnCode != 0:
+                msg = QtGui.QMessageBox()
+                fi = QtCore.QFileInfo(filePath)
+                try:
+                    with open(filePath, "w") as f:
+                        f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype\n")
+                        for row in self.data:
+                            f.write(row[0] + "    " + row[1]+ "\n")
+                    msg.setText("Data file \"" + fi.fileName() + "\" saved.")
+                    msg.setWindowTitle("PyWD - Data Saved")
+                    msg.exec_()
+                except:
+                    msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                    msg.exec_()
 
 
 if __name__ == "__main__":
