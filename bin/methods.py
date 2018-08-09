@@ -1194,6 +1194,13 @@ def aliasObservations(x, y, start, end):
 
 
 def convertFromScientificToGeneric(number):
+    """
+    Converts a scientific notated number to a generic one by shifting the dot.
+    Used to display numbers in main ui in a normal way.
+    Not really sure if we need this approach to display numbers normally. Maybe a more pythonic way exists.
+    :param number: number to convert
+    :return: converted number as string
+    """
 
     def _strip(nm):
         nm = nm.strip("0")
@@ -1265,6 +1272,63 @@ def convertFromScientificToGeneric(number):
 
     else:
         return number
+
+
+def convertJDtoUT(jd):
+    jd = float(jd) + 0.5
+
+    if jd < 2400000.0:
+        jd = jd + 2400000.0
+
+    fractional, integral = numpy.modf(jd)
+    integral = int(integral)
+
+    A = numpy.trunc((integral - 1867216.25) / 36524.25)
+
+    B = None
+
+    if integral > 2299160:
+        B = integral + 1 + A - numpy.trunc(A / 4.)
+    else:
+        B = integral
+
+    C = B + 1524
+    D = numpy.trunc((C - 122.1) / 365.25)
+    E = numpy.trunc(365.25 * D)
+    G = numpy.trunc((C - E) / 30.6001)
+
+    day = C - E + fractional - numpy.trunc(30.6001 * G)
+    day_fract, day = numpy.modf(day)
+
+    month = None
+    if G < 13.5:
+        month = G - 1
+    else:
+        month = G - 13
+
+    year = None
+    if month > 2.5:
+        year = D - 4716
+    else:
+        year = D - 4715
+
+
+
+    hour = day_fract * 24.0
+    fract_hour, hour = numpy.modf(hour)
+
+    minute = fract_hour * 60.0
+    fract_minute, minute = numpy.modf(minute)
+
+    second = fract_minute * 60.0
+
+    # if second - int(second) > 0.5:
+    #     second = second + 1.0
+    #     if second >= 60.0:
+    #         second = 0.0
+    #         minute = minute + 1.0
+
+    return int(year), int(month), int(day), int(hour), int(minute), second
 
 
 if __name__ == "__main__":

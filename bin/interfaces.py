@@ -386,6 +386,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
 
         self.ConjunctionWidget.data_treewidget.clear()
         self.ConjunctionWidget.data = None
+        self.ConjunctionWidget.ut_data = []
 
     def begin(self):  # check for wd.conf
         wdconf = "wd.conf"
@@ -3289,15 +3290,21 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
         self.MainWindow = None
         self.data_treewidget.header().setResizeMode(3)
         self.data = None
+        self.ut_data = []
         # signal connection
         self.connectSignals()
 
     def connectSignals(self):
         self.compute_btn.clicked.connect(self.computeConjunction)
         self.export_btn.clicked.connect(self.exportData)
+        self.dt_chk.stateChanged.connect(self.checkDt)
+
+    def checkDt(self):
+        self.radec_container.setEnabled(self.dt_chk.isChecked())
 
     def computeConjunction(self):
         self.data_treewidget.clear()
+        self.ut_data = []
         lcin = classes.lcin(self.MainWindow)
         lcin.starPositions(jdphs="1")
         ktstep = str(self.kstep_spinbox.value())
@@ -3307,10 +3314,17 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
         process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
         process.wait()
         table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "    conj. time", 2)
+        ut_table = []
         for row in table:
             item = QtGui.QTreeWidgetItem(self.data_treewidget)
             item.setText(0, row[0])
-            item.setText(1, row[1])
+            item.setText(1, (" " * 9) + row[1])
+            if self.ut_groupbox.isChecked():
+                year, month, day, hour, minute, second = methods.convertJDtoUT(row[0])
+                ut = "{2}/{1}/{0} - {3}:{4}:{5:4.2f}".format(year, month, day, hour, minute, second)
+                item.setText(2, ut)
+                ut_table.append(ut)
+        self.ut_data = ut_table
         self.data = table
 
     def exportData(self):
@@ -3326,9 +3340,14 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
                 fi = QtCore.QFileInfo(filePath)
                 try:
                     with open(filePath, "w") as f:
-                        f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype\n")
-                        for row in self.data:
-                            f.write(row[0] + "    " + row[1]+ "\n")
+                        if len(self.ut_data) > 0:
+                            f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype" + "    #UT" + "\n")
+                            for i, row in enumerate(self.data):
+                                f.write(row[0] + "    " + row[1] + "           " + self.ut_data[i] + "\n")
+                        else:
+                            f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype\n")
+                            for row in self.data:
+                                f.write(row[0] + "    " + row[1] + "\n")
                     msg.setText("Data file \"" + fi.fileName() + "\" saved.")
                     msg.setWindowTitle("PyWD - Data Saved")
                     msg.exec_()
@@ -3339,4 +3358,3 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
 
 if __name__ == "__main__":
     pass
-
