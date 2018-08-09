@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>680</width>
-    <height>430</height>
+    <height>450</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>680</width>
-    <height>430</height>
+    <height>450</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>680</width>
-    <height>430</height>
+    <height>450</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -64,13 +64,13 @@
      <x>20</x>
      <y>50</y>
      <width>641</width>
-     <height>111</height>
+     <height>141</height>
     </rect>
    </property>
    <property name="text">
-    <string>PyWD2015 is a GUI for LC and DC programs of Wilson - Devinney eclipsing binary modeling software. PyWD2015 needs these programs to function properly. Please provide their paths below.
+    <string>PyWD2015 is a GUI for LC and DC programs of Wilson - Devinney eclipsing binary modeling software. PyWD2015 needs these programs to function. Please provide their paths below.
 
-If you got this program from the GitHub release page, you probably have them in /PyWD2015/wd/ path with necessary files. If you don't, you can grab them from GitHub or compile the source codes from WD Homepage yourself.</string>
+If you got this program from the GitHub release page, you probably have them in /PyWD2015/wd/ path with necessary files. If you don't, you can grab them from GitHub or compile the source code from WD Homepage yourself.</string>
    </property>
    <property name="textFormat">
     <enum>Qt::PlainText</enum>
@@ -89,7 +89,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>560</x>
-     <y>220</y>
+     <y>230</y>
      <width>98</width>
      <height>31</height>
     </rect>
@@ -102,7 +102,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>220</y>
+     <y>230</y>
      <width>71</width>
      <height>31</height>
     </rect>
@@ -115,7 +115,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>220</y>
+     <y>230</y>
      <width>441</width>
      <height>31</height>
     </rect>
@@ -127,8 +127,8 @@ If you got this program from the GitHub release page, you probably have them in 
   <widget class="QLabel" name="label_65">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>310</y>
+     <x>140</x>
+     <y>320</y>
      <width>111</width>
      <height>31</height>
     </rect>
@@ -141,8 +141,8 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>270</y>
-     <width>230</width>
+     <y>280</y>
+     <width>261</width>
      <height>30</height>
     </rect>
    </property>
@@ -157,8 +157,8 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>310</y>
-     <width>230</width>
+     <y>320</y>
+     <width>261</width>
      <height>30</height>
     </rect>
    </property>
@@ -172,8 +172,8 @@ If you got this program from the GitHub release page, you probably have them in 
   <widget class="QLabel" name="label_66">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>270</y>
+     <x>140</x>
+     <y>280</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -186,7 +186,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>360</y>
+     <y>380</y>
      <width>200</width>
      <height>50</height>
     </rect>
@@ -199,7 +199,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>360</y>
+     <y>380</y>
      <width>200</width>
      <height>50</height>
     </rect>
@@ -212,7 +212,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>560</x>
-     <y>179</y>
+     <y>189</y>
      <width>98</width>
      <height>31</height>
     </rect>
@@ -225,7 +225,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>179</y>
+     <y>189</y>
      <width>71</width>
      <height>31</height>
     </rect>
@@ -238,7 +238,7 @@ If you got this program from the GitHub release page, you probably have them in 
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>180</y>
+     <y>190</y>
      <width>441</width>
      <height>31</height>
     </rect>

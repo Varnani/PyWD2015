@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'dcwidget.ui'
 #
-# Created: Wed Jul 25 16:54:29 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -110,6 +109,7 @@ class Ui_DCWidget(object):
         self.tab_5 = QtGui.QWidget()
         self.tab_5.setObjectName(_fromUtf8("tab_5"))
         self.horizontalLayout_3 = QtGui.QHBoxLayout(self.tab_5)
+        self.horizontalLayout_3.setMargin(0)
         self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
         self.tabWidget_3 = QtGui.QTabWidget(self.tab_5)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
@@ -121,6 +121,7 @@ class Ui_DCWidget(object):
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.tab_2)
+        self.horizontalLayout_2.setMargin(0)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.gridLayout_2 = QtGui.QGridLayout()
         self.gridLayout_2.setMargin(10)
@@ -491,6 +492,7 @@ class Ui_DCWidget(object):
         self.tab_6 = QtGui.QWidget()
         self.tab_6.setObjectName(_fromUtf8("tab_6"))
         self.horizontalLayout_5 = QtGui.QHBoxLayout(self.tab_6)
+        self.horizontalLayout_5.setMargin(0)
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
         self.gridLayout_3 = QtGui.QGridLayout()
         self.gridLayout_3.setMargin(10)
@@ -896,6 +898,7 @@ class Ui_DCWidget(object):
         self.tab_7 = QtGui.QWidget()
         self.tab_7.setObjectName(_fromUtf8("tab_7"))
         self.horizontalLayout_6 = QtGui.QHBoxLayout(self.tab_7)
+        self.horizontalLayout_6.setMargin(0)
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.gridLayout_4 = QtGui.QGridLayout()
         self.gridLayout_4.setMargin(5)
@@ -906,6 +909,8 @@ class Ui_DCWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.component_treewidget.sizePolicy().hasHeightForWidth())
         self.component_treewidget.setSizePolicy(sizePolicy)
+        self.component_treewidget.setMaximumSize(QtCore.QSize(250, 16777215))
+        self.component_treewidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.component_treewidget.setAlternatingRowColors(True)
         self.component_treewidget.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
         self.component_treewidget.setObjectName(_fromUtf8("component_treewidget"))
@@ -948,6 +953,7 @@ class Ui_DCWidget(object):
         self.tab_8 = QtGui.QWidget()
         self.tab_8.setObjectName(_fromUtf8("tab_8"))
         self.horizontalLayout_7 = QtGui.QHBoxLayout(self.tab_8)
+        self.horizontalLayout_7.setMargin(0)
         self.horizontalLayout_7.setObjectName(_fromUtf8("horizontalLayout_7"))
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setMargin(5)
@@ -1209,7 +1215,7 @@ class Ui_DCWidget(object):
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_6), _translate("DCWidget", "DEL\'s", None))
         self.component_treewidget.headerItem().setText(0, _translate("DCWidget", "Component", None))
         self.component_treewidget.headerItem().setText(1, _translate("DCWidget", "r (R/a)", None))
-        self.component_treewidget.headerItem().setText(2, _translate("DCWidget", "Standard Error", None))
+        self.component_treewidget.headerItem().setText(2, _translate("DCWidget", "Std. Err.", None))
         self.result_treewidget.headerItem().setText(0, _translate("DCWidget", "Parameter", None))
         self.result_treewidget.headerItem().setText(1, _translate("DCWidget", "Input", None))
         self.result_treewidget.headerItem().setText(2, _translate("DCWidget", "Adjustment", None))

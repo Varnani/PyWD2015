@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, \
-    syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget
+    syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget, ocwidget
 from functools import partial
 from bin import methods, classes
 from itertools import izip
@@ -39,6 +39,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DimensionWidget.MainWindow = self
         self.ConjunctionWidget = ConjunctionWidget()
         self.ConjunctionWidget.MainWindow = self
+        self.OCWidget = OCWidget()
+        self.OCWidget.MainWindow = self
         # variables
         self.lcpath = None
         self.lcinpath = None
@@ -87,6 +89,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.jdphs_combobox.currentIndexChanged.connect(self.checkJdphs)
         self.lc_stardimphase_btn.clicked.connect(self.DimensionWidget.show)
         self.lc_conjunction_btn.clicked.connect(self.ConjunctionWidget.show)
+        self.lc_oc_btn.clicked.connect(self.OCWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -97,6 +100,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.StarPositionWidget.close()
         self.DimensionWidget.close()
         self.ConjunctionWidget.close()
+        self.OCWidget.close()
 
     def checkJdphs(self):
         jdphs = str(self.jdphs_combobox.currentText())
@@ -3354,6 +3358,27 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
                 except:
                     msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
                     msg.exec_()
+
+
+class OCWidget(QtGui.QWidget, ocwidget.Ui_OCWidget):
+    def __init__(self):
+        super(OCWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.MainWindow = None
+        self.data_treewidget.header().setResizeMode(3)
+        # set up plots
+        self.plot_figure = Figure()
+        self.plot_canvas = FigureCanvas(self.plot_figure)
+        self.plot_toolbar = NavigationToolbar(self.plot_canvas, self.plot_widget)
+        plot_layout = QtGui.QVBoxLayout()
+        plot_layout.addWidget(self.plot_toolbar)
+        plot_layout.addWidget(self.plot_canvas)
+        self.plot_widget.setLayout(plot_layout)
+        self.plotAxis = self.plot_figure.add_subplot(111)
+        self.plotAxis.set_xlabel("Cycle")
+        self.plotAxis.set_ylabel("Day")
+        self.plot_figure.tight_layout()
 
 
 if __name__ == "__main__":

@@ -2012,6 +2012,15 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="maximumSize">
+                <size>
+                 <width>250</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAsNeeded</enum>
+               </property>
                <property name="alternatingRowColors">
                 <bool>true</bool>
                </property>
@@ -2030,7 +2039,7 @@
                </column>
                <column>
                 <property name="text">
-                 <string>Standard Error</string>
+                 <string>Std. Err.</string>
                 </property>
                </column>
               </widget>
