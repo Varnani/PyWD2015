@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>850</width>
     <height>500</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>750</width>
-    <height>350</height>
+    <width>850</width>
+    <height>500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -86,19 +86,31 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>0</height>
+        </size>
+       </property>
        <column>
         <property name="text">
-         <string>Cycle</string>
+         <string>HJD</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string>Linear</string>
+         <string>Lin. Res.</string>
+        </property>
+        <property name="toolTip">
+         <string>Linear residuals</string>
         </property>
        </column>
        <column>
         <property name="text">
          <string>with dP/dt</string>
+        </property>
+        <property name="toolTip">
+         <string>Linear residuals with dP/dt</string>
         </property>
        </column>
       </widget>

@@ -25,8 +25,8 @@ except AttributeError:
 class Ui_OCWidget(object):
     def setupUi(self, OCWidget):
         OCWidget.setObjectName(_fromUtf8("OCWidget"))
-        OCWidget.resize(800, 500)
-        OCWidget.setMinimumSize(QtCore.QSize(750, 350))
+        OCWidget.resize(850, 500)
+        OCWidget.setMinimumSize(QtCore.QSize(850, 500))
         self.horizontalLayout = QtGui.QHBoxLayout(OCWidget)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.gridLayout = QtGui.QGridLayout()
@@ -72,6 +72,7 @@ class Ui_OCWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.data_treewidget.sizePolicy().hasHeightForWidth())
         self.data_treewidget.setSizePolicy(sizePolicy)
+        self.data_treewidget.setMinimumSize(QtCore.QSize(300, 0))
         self.data_treewidget.setObjectName(_fromUtf8("data_treewidget"))
         self.gridLayout.addWidget(self.data_treewidget, 4, 0, 1, 2)
         self.compute_btn = QtGui.QPushButton(OCWidget)
@@ -104,9 +105,11 @@ class Ui_OCWidget(object):
         OCWidget.setWindowTitle(_translate("OCWidget", "Compute O - C", None))
         self.dpdt_chk.setText(_translate("OCWidget", "Residuals with dP/dt", None))
         self.linear_chk.setText(_translate("OCWidget", "Linear Residuals", None))
-        self.data_treewidget.headerItem().setText(0, _translate("OCWidget", "Cycle", None))
-        self.data_treewidget.headerItem().setText(1, _translate("OCWidget", "Linear", None))
+        self.data_treewidget.headerItem().setText(0, _translate("OCWidget", "HJD", None))
+        self.data_treewidget.headerItem().setText(1, _translate("OCWidget", "Lin. Res.", None))
+        self.data_treewidget.headerItem().setToolTip(1, _translate("OCWidget", "Linear residuals", None))
         self.data_treewidget.headerItem().setText(2, _translate("OCWidget", "with dP/dt", None))
+        self.data_treewidget.headerItem().setToolTip(2, _translate("OCWidget", "Linear residuals with dP/dt", None))
         self.compute_btn.setText(_translate("OCWidget", "Compute", None))
         self.export_btn.setText(_translate("OCWidget", "Export", None))
 

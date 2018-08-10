@@ -25,8 +25,8 @@ except AttributeError:
 class Ui_conjunctionwidget(object):
     def setupUi(self, conjunctionwidget):
         conjunctionwidget.setObjectName(_fromUtf8("conjunctionwidget"))
-        conjunctionwidget.resize(400, 700)
-        conjunctionwidget.setMinimumSize(QtCore.QSize(300, 500))
+        conjunctionwidget.resize(450, 700)
+        conjunctionwidget.setMinimumSize(QtCore.QSize(450, 500))
         conjunctionwidget.setMaximumSize(QtCore.QSize(600, 1000))
         self.verticalLayout_2 = QtGui.QVBoxLayout(conjunctionwidget)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
@@ -182,7 +182,7 @@ class Ui_conjunctionwidget(object):
         self.compute_btn.setText(_translate("conjunctionwidget", "Compute", None))
         self.data_treewidget.headerItem().setText(0, _translate("conjunctionwidget", "HJD", None))
         self.data_treewidget.headerItem().setText(1, _translate("conjunctionwidget", "Min Type", None))
-        self.data_treewidget.headerItem().setText(2, _translate("conjunctionwidget", "UT", None))
+        self.data_treewidget.headerItem().setText(2, _translate("conjunctionwidget", "Date (D/M/Y) - Time (H:M:S)", None))
         self.label.setToolTip(_translate("conjunctionwidget", "Space conjunction times by a whole orbit cycles per minima [KTSTEP]", None))
         self.label.setText(_translate("conjunctionwidget", "Cycle Step", None))
         self.ut_groupbox.setTitle(_translate("conjunctionwidget", "Compute UTC", None))

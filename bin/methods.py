@@ -1312,8 +1312,6 @@ def convertJDtoUT(jd):
     else:
         year = D - 4715
 
-
-
     hour = day_fract * 24.0
     fract_hour, hour = numpy.modf(hour)
 
@@ -1321,12 +1319,6 @@ def convertJDtoUT(jd):
     fract_minute, minute = numpy.modf(minute)
 
     second = fract_minute * 60.0
-
-    # if second - int(second) > 0.5:
-    #     second = second + 1.0
-    #     if second >= 60.0:
-    #         second = 0.0
-    #         minute = minute + 1.0
 
     return int(year), int(month), int(day), int(hour), int(minute), second
 

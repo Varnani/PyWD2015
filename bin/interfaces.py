@@ -392,6 +392,16 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.ConjunctionWidget.data = None
         self.ConjunctionWidget.ut_data = []
 
+        self.OCWidget.data_treewidget.clear()
+        self.OCWidget.hjd = None
+        self.OCWidget.linear = None
+        self.OCWidget.dpdt = None
+        self.OCWidget.plotAxis.clear()
+        self.OCWidget.plotAxis.set_xlabel("HJD")
+        self.OCWidget.plotAxis.set_ylabel("Day")
+        self.OCWidget.plot_canvas.draw()
+        self.OCWidget.plot_toolbar.update()
+
     def begin(self):  # check for wd.conf
         wdconf = "wd.conf"
         parser = ConfigParser.SafeConfigParser()
@@ -3345,7 +3355,8 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
                 try:
                     with open(filePath, "w") as f:
                         if len(self.ut_data) > 0:
-                            f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype" + "    #UT" + "\n")
+                            f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype" +
+                                    "    #Date (D/M/Y) - Time (UTC, H:M:S)" + "\n")
                             for i, row in enumerate(self.data):
                                 f.write(row[0] + "    " + row[1] + "           " + self.ut_data[i] + "\n")
                         else:
@@ -3376,9 +3387,105 @@ class OCWidget(QtGui.QWidget, ocwidget.Ui_OCWidget):
         plot_layout.addWidget(self.plot_canvas)
         self.plot_widget.setLayout(plot_layout)
         self.plotAxis = self.plot_figure.add_subplot(111)
-        self.plotAxis.set_xlabel("Cycle")
+        self.plotAxis.set_xlabel("HJD")
         self.plotAxis.set_ylabel("Day")
         self.plot_figure.tight_layout()
+        # variables
+        self.hjd = None
+        self.linear = None
+        self.dpdt = None
+        # signal connection
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.compute_btn.clicked.connect(self.computeOC)
+        self.linear_chk.stateChanged.connect(self.plotSelected)
+        self.dpdt_chk.stateChanged.connect(self.plotSelected)
+        self.export_btn.clicked.connect(self.exportData)
+
+    def computeOC(self):
+        if os.path.isfile(str(self.MainWindow.EclipseWidget.filepath_label.text())):
+            self.data_treewidget.clear()
+            lcin = classes.lcin(self.MainWindow)
+            lcin.starPositions(jdphs="1")
+            ktstep = "0"
+            lcin.output = "6" + lcin.output[1:29] + " " + (" " * (5 - len(ktstep)) + ktstep) + lcin.output[29:]
+            eclipseCurve = classes.Curve(str(self.MainWindow.EclipseWidget.filepath_label.text()))
+            eclipse = []
+            formatter = classes.WDInput()
+            for jd, min in izip(eclipseCurve.timeList, eclipseCurve.observationList):
+                eclipse.append(formatter.formatInput(jd, 14, 5, "F") + "     " + min)
+            lcin.output = lcin.output.split("\n")
+            lcin.output = lcin.output[:-1] + eclipse
+            lcin.output.append("-10000.")
+            lcin.output.append("9")
+            output = ""
+            for line in lcin.output:
+                output = output + line + "\n"
+            with open(self.MainWindow.lcinpath, "w") as f:
+                f.write(output)
+            process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+            process.wait()
+            table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "eclipse timing   type", 2)
+
+            self.hjd = []
+            self.linear = []
+            self.dpdt = []
+
+            for row in table:
+                item = QtGui.QTreeWidgetItem(self.data_treewidget)
+                item.setText(0, row[0])
+                self.hjd.append(float(row[0]))
+                item.setText(1, row[3])
+                self.linear.append(float(row[3]))
+                item.setText(2, row[5])
+                self.dpdt.append(float(row[5]))
+
+            self.plotSelected()
+
+        else:
+            msg = QtGui.QMessageBox()
+            msg.setWindowTitle("PyWD - Error")
+            msg.setText("Please provide eclipse timings in the main menu before "
+                        "attempting to calculate O - C residuals.")
+            msg.exec_()
+
+    def plotSelected(self):
+        self.plotAxis.clear()
+
+        if self.linear_chk.isChecked() and self.linear is not None:
+            self.plotAxis.plot(self.hjd, self.linear, linestyle="", marker="o", markersize=4, color="#4286f4")
+
+        if self.dpdt_chk.isChecked() and self.dpdt is not None:
+            self.plotAxis.plot(self.hjd, self.dpdt, linestyle="", marker="o", markersize=4, color="#f73131")
+
+        self.plotAxis.set_xlabel("HJD")
+        self.plotAxis.set_ylabel("Day")
+        self.plot_canvas.draw()
+        self.plot_toolbar.update()
+
+    def exportData(self):
+        if self.hjd is not None and self.linear is not None and self.dpdt is not None:
+            dialog = QtGui.QFileDialog(self)
+            dialog.setDefaultSuffix("txt")
+            dialog.setNameFilter("Plaintext File (*.txt)")
+            dialog.setAcceptMode(1)
+            returnCode = dialog.exec_()
+            filePath = str((dialog.selectedFiles())[0])
+            if filePath != "" and returnCode != 0:
+                msg = QtGui.QMessageBox()
+                fi = QtCore.QFileInfo(filePath)
+                try:
+                    with open(filePath, "w") as f:
+                        f.write("#HJD            #Lin. Res. #with dP/dt\n")
+                        for jd, ln, dt in izip(self.hjd, self.linear, self. dpdt):
+                            f.write("{0:<13f}{1: >11f}{2: >11f}\n".format(jd, ln, dt))
+                    msg.setText("Data file \"" + fi.fileName() + "\" saved.")
+                    msg.setWindowTitle("PyWD - Data Saved")
+                    msg.exec_()
+                except:
+                    msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                    msg.exec_()
 
 
 if __name__ == "__main__":
