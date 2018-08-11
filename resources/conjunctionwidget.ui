@@ -122,7 +122,7 @@
         <item>
          <widget class="QCheckBox" name="dt_chk">
           <property name="text">
-           <string>Include dT</string>
+           <string>Substract dt (Convert HJD to JD)</string>
           </property>
          </widget>
         </item>
@@ -148,7 +148,7 @@
            <item>
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="3" column="1">
-              <widget class="QSpinBox" name="dec_d_spinbox_2">
+              <widget class="QSpinBox" name="dec_d_spinbox">
                <property name="minimum">
                 <number>-90</number>
                </property>
@@ -197,21 +197,21 @@
               </widget>
              </item>
              <item row="1" column="2">
-              <widget class="QSpinBox" name="ra_m_spinbox_2">
+              <widget class="QSpinBox" name="ra_m_spinbox">
                <property name="maximum">
                 <number>59</number>
                </property>
               </widget>
              </item>
              <item row="1" column="3">
-              <widget class="QSpinBox" name="ra_s_spinbox_2">
+              <widget class="QSpinBox" name="ra_s_spinbox">
                <property name="maximum">
                 <number>59</number>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QSpinBox" name="ra_h_spinbox_2">
+              <widget class="QSpinBox" name="ra_h_spinbox">
                <property name="maximum">
                 <number>23</number>
                </property>
@@ -231,7 +231,7 @@
               </widget>
              </item>
              <item row="3" column="2">
-              <widget class="QSpinBox" name="dec_m_spinbox_2">
+              <widget class="QSpinBox" name="dec_m_spinbox">
                <property name="maximum">
                 <number>59</number>
                </property>
@@ -251,7 +251,7 @@
               </widget>
              </item>
              <item row="3" column="3">
-              <widget class="QSpinBox" name="dec_s_spinbox_2">
+              <widget class="QSpinBox" name="dec_s_spinbox">
                <property name="maximum">
                 <number>59</number>
                </property>

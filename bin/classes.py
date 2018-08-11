@@ -3,6 +3,7 @@ import subprocess
 import os
 import sys
 import time
+import numpy
 from PyQt4 import QtCore
 
 
@@ -1069,6 +1070,64 @@ class Stopwatch(QtCore.QThread):
 
     def run(self):
         time.sleep(self.wait)
+
+
+class ColorCalibrator:
+
+    def __init__(self, reference):
+        self.param_dict = {
+            "gray": [0, 0, 0, 0, 0, 0, 0, 0],  # not actually used
+            "gray_cool": [3.981, -0.4728, 0.2434, -0.0620, 0, 0, 0, 0],  # do not reference this
+            "gray_hot": [3.981, 0.0142, 16.3618, 81.8910, 161.5075, 0, 0, 0],  # do not reference this
+            "flower": [3.979145, -0.654499, 1.740690, -4.608815, 6.792600, -5.396910, 2.192970, -0.359496],
+            "drilling_landolt": [3.97758849, -0.63784759, 1.7966422, -4.37949535, 5.05075322, -2.60480351, 0.44186047, 0.02579832],
+            "popper": [3.97981681, -0.82365352, 2.10679135, -3.47184197, 2.48191975, -0.34341818, -0.4029675, 0.14262473],
+            "tokunaga_vk": [3.99391909, -3.15370242e-01, 2.33380328e-01, -1.27336537e-01, 3.76914126e-02, -6.01480225e-03, 4.91975597e-04, -1.62340638e-05],
+            "tokunaga_jh": [3.99250922, -2.44541306, 16.60593436, -26.76755927, -235.35579444, 1132.65031894, -1810.38727869, 991.27146106],
+            "tokunaga_hk": [4.04566110, -8.28316187, 7.97352126e+01, -4.30370358e+02, 7.87866519e+02, 2.05805024e+03, -1.00848335e+04, 1.07400393e+04]
+        }
+
+        self.a = None
+        self.b = None
+        self.c = None
+        self.d = None
+        self.e = None
+        self.f = None
+        self.g = None
+        self.h = None
+
+        self.set_coeffs(self.param_dict[reference])
+        self.reference = reference
+
+    def set_coeffs(self, coeff_list):
+
+        self.a = coeff_list[0]
+        self.b = coeff_list[1]
+        self.c = coeff_list[2]
+        self.d = coeff_list[3]
+        self.e = coeff_list[4]
+        self.f = coeff_list[5]
+        self.g = coeff_list[6]
+        self.h = coeff_list[7]
+
+    def calibrate(self, color, err):
+        def _compute_temp(clr):
+            return 10 ** (self.a + self.b * clr + self.c * clr ** 2 + self.d * clr ** 3 +
+                          self.e * clr ** 4 + self.f * clr ** 5 + self.g * clr ** 6 + self.h * clr ** 7)
+
+        if self.reference == "gray" and color < 0.0:
+            self.set_coeffs(self.param_dict["gray_hot"])
+
+        elif self.reference == "gray" and color >= 0.0:
+            self.set_coeffs(self.param_dict["gray_cool"])
+
+        temp = _compute_temp(color)
+        temp_upper = _compute_temp(color - err)
+        temp_lower = _compute_temp(color + err)
+
+        temp_err = ((temp - temp_lower) + (temp_upper - temp)) / 2.0
+
+        return int(numpy.round(temp)), int(numpy.round(temp_err))
 
 
 # class bidict(dict):

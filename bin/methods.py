@@ -1274,10 +1274,10 @@ def convertFromScientificToGeneric(number):
         return number
 
 
-def convertJDtoUT(jd):
+def convertJDtoUT(jd, dontAdd24=False):
     jd = float(jd) + 0.5
 
-    if jd < 2400000.0:
+    if dontAdd24 is False and jd < 2400000.0:
         jd = jd + 2400000.0
 
     fractional, integral = numpy.modf(jd)
@@ -1321,6 +1321,47 @@ def convertJDtoUT(jd):
     second = fract_minute * 60.0
 
     return int(year), int(month), int(day), int(hour), int(minute), second
+
+
+def convertHJDtoJD(hjd, ra_h, ra_m, ra_s, dec_d, dec_m, dec_s):
+    if dec_d < 0:
+        dec_m = dec_m * -1.0
+        dec_s = dec_s * -1.0
+
+    RA = ra_h + ra_m / 60.0 + ra_s / 3600.0
+    DEC = dec_d + dec_m / 60.0 + dec_s / 3600.0
+
+    JD_without_day_fraction = int(hjd) + 0.5
+
+    T = (JD_without_day_fraction + 0.5 - 2415020.0) / 36525.0
+    epsilon = (((23.0 * 3600.0 + 27.0 * 60.0 + 8.26 - 46.845 * T - 0.0059
+                 * T ** 2 + 0.00181 * T ** 3) / 3600.0) * numpy.pi) / 180.0
+    p = (1.396041 + 0.000308 * (T + 0.5)) * (T - 0.499998)
+    L = (279.696678 + 36000.76892 * (T) + 0.000303 * (T ** 2) - p)
+    G = (358.475833 + 35999.04975 * (T) - 0.00015 * (T ** 2))
+
+    X = 0.99986 * numpy.cos(L * numpy.pi / 180.0) - 0.025127 * numpy.cos(((G - L) * numpy.pi) / 180.0) + 0.008374 * numpy.cos(
+        (G + L) * numpy.pi / 180.0) + 0.000105 * numpy.cos((2.0 * G + L) * numpy.pi / 180.0) + 0.000063 * T * numpy.cos(
+        (G - L) * numpy.pi / 180.0) + 0.000035 * numpy.cos((2.0 * G - L) * numpy.pi / 180.0)
+
+    Y = 0.917308 * numpy.sin(L * numpy.pi / 180.0) - 0.023053 * numpy.sin(((G - L) * numpy.pi) / 180.0) + 0.007683 * numpy.sin(
+        (G + L) * numpy.pi / 180.0) + 0.000097 * numpy.sin((2.0 * G + L) * numpy.pi / 180.0) - 0.000057 * T * numpy.sin(
+        (G - L) * numpy.pi / 180.0) - 0.000032 * numpy.sin((2.0 * G - L) * numpy.pi / 180.0)
+
+    dt = -0.0057755 * ((numpy.cos(DEC * numpy.pi / 180.0) * numpy.cos(RA * 15 * numpy.pi / 180.0)) * X + (
+            numpy.tan(epsilon * numpy.pi / 180.0) * numpy.sin(DEC * numpy.pi / 180.0) + numpy.cos(DEC * numpy.pi / 180.0) * numpy.sin(
+            RA * 15 * numpy.pi / 180.0)) * Y)
+
+    jd = hjd - dt
+
+    return jd
+
+
+def computeOmegaPotential(q, fractradius, f, d):
+    omega = (1.0 / fractradius) + (q * ((1.0 / numpy.absolute(d - fractradius)) -
+                                        (fractradius / (d ** 2)))) + (((q + 1.0) / 2.0) * (f ** 2) * (fractradius ** 2))
+
+    return omega
 
 
 if __name__ == "__main__":

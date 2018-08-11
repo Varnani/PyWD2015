@@ -90,6 +90,13 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.lc_stardimphase_btn.clicked.connect(self.DimensionWidget.show)
         self.lc_conjunction_btn.clicked.connect(self.ConjunctionWidget.show)
         self.lc_oc_btn.clicked.connect(self.OCWidget.show)
+        self.tool_radii_to_pot_btn.clicked.connect(self.computeOmega)
+        self.tool_bv_calc_btn.clicked.connect(self.bvTempCalibration)
+        self.tool_jhk_calc_btn.clicked.connect(self.jhkTempCalibration)
+        self.tool_jd_convert_btn.clicked.connect(self.fromJDtoUTConvert)
+        self.tool_month_spinbox.valueChanged.connect(self.checkMonthMaxLimit)
+        self.tool_year_spinbox.valueChanged.connect(self.checkMonthMaxLimit)
+        self.tool_date_convert_btn.clicked.connect(self.fromUTtoJDConvert)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -101,6 +108,104 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DimensionWidget.close()
         self.ConjunctionWidget.close()
         self.OCWidget.close()
+
+    def fromUTtoJDConvert(self):
+        year = self.tool_year_spinbox.value()
+        month = self.tool_month_spinbox.value()
+        day = self.tool_day_spinbox.value()
+        hour = self.tool_hour_spinbox.value()
+        minute = self.tool_minute_spinbox.value()
+        second = self.tool_second_spinbox.value()
+
+        jd = 367.0 * year - int(7.0 * (year + int((month + 9.0) / 12.0)) / 4.0) + int(275.0 * month / 9.0) - \
+             int(3.0 * ((year + (month - 9.0) / 7.0) / 100.0 + 1.0) / 4.0) + 1721028.5 + day + hour / 24.0 + \
+             minute / 1440.0 + second / 86400.0
+
+        self.tool_jd_output.setText(str(jd))
+
+    def checkMonthMaxLimit(self):
+        limit_dict = {
+            1: 31,
+            3: 31,
+            4: 30,
+            5: 31,
+            6: 30,
+            7: 31,
+            8: 31,
+            9: 30,
+            10: 31,
+            11: 30,
+            12: 31
+        }
+
+        month = self.tool_month_spinbox.value()
+        year = self.tool_year_spinbox.value()
+
+        if month == 2:
+            quotient, remainder = divmod(year, 4)
+            if remainder == 0:
+                self.tool_day_spinbox.setMaximum(29)
+
+            quotient, remainder = divmod(year, 100)
+            if remainder == 0:
+                self.tool_day_spinbox.setMaximum(28)
+                quotient, remainder = divmod(year, 400)
+                if remainder == 0:
+                    self.tool_day_spinbox.setMaximum(29)
+        else:
+            self.tool_day_spinbox.setMaximum(limit_dict[month])
+
+    def computeOmega(self):
+        self.tool_pot_output.setText(str(methods.computeOmegaPotential(self.tool_q_spinbox.value(),
+                                                                       self.tool_fractradii_spinbox.value(),
+                                                                       self.tool_f_spinbox.value(),
+                                                                       self.tool_d_spinbox.value())))
+
+    def bvTempCalibration(self):
+        bv = self.tool_bv_spinbox.value()
+        bv_err = self.tool_bv_err_spinbox.value()
+
+        gray_calibrator = classes.ColorCalibrator("gray")
+        flower_calibrator = classes.ColorCalibrator("flower")
+        drilling_landold_calibrator = classes.ColorCalibrator("drilling_landolt")
+        popper_calibrator = classes.ColorCalibrator("popper")
+
+        gray, gray_err = gray_calibrator.calibrate(bv, bv_err)
+        flower, flower_err = flower_calibrator.calibrate(bv, bv_err)
+        d_l, d_l_err = drilling_landold_calibrator.calibrate(bv, bv_err)
+        popper, popper_err = popper_calibrator.calibrate(bv, bv_err)
+
+        self.tool_gray_output.setText(str(gray))
+        self.tool_gray_err_output.setText(str(gray_err))
+
+        self.tool_flower_output.setText(str(flower))
+        self.tool_flower_err_output.setText(str(flower_err))
+
+        self.tool_drilling_landolt_output.setText(str(d_l))
+        self.tool_drilling_landolt_err_output.setText(str(d_l_err))
+
+        self.tool_popper_output.setText(str(popper))
+        self.tool_popper_err_output.setText(str(popper_err))
+
+    def jhkTempCalibration(self):
+        tokunaga_dict = {
+            "V - K": "tokunaga_vk",
+            "J - H": "tokunaga_jh",
+            "H - K": "tokunaga_hk",
+        }
+
+        tokunaga_calibrator = classes.ColorCalibrator(tokunaga_dict[str(self.tool_jhk_combobox.currentText())])
+        clr = self.tool_jhk_spinbox.value()
+        err = self.tool_jhk_err_spinobx.value()
+        tokunaga, tokunaga_err = tokunaga_calibrator.calibrate(clr, err)
+
+        self.tool_tokunaga_output.setText(str(tokunaga))
+        self.tool_tokunaga_err_output.setText(str(tokunaga_err))
+
+    def fromJDtoUTConvert(self):
+        year, month, day, hour, minute, second = methods.convertJDtoUT(self.tool_jd_spinbox.value(), dontAdd24=True)
+        ut = "{2}/{1}/{0} - {3}:{4}:{5:4.2f}".format(year, month, day, hour, minute, second)
+        self.tool_date_output.setText(ut)
 
     def checkJdphs(self):
         jdphs = str(self.jdphs_combobox.currentText())
@@ -3305,6 +3410,7 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
         self.data_treewidget.header().setResizeMode(3)
         self.data = None
         self.ut_data = []
+        self.outputHasDt = False
         # signal connection
         self.connectSignals()
 
@@ -3317,6 +3423,7 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
         self.radec_container.setEnabled(self.dt_chk.isChecked())
 
     def computeConjunction(self):
+        self.outputHasDt = False
         self.data_treewidget.clear()
         self.ut_data = []
         lcin = classes.lcin(self.MainWindow)
@@ -3334,7 +3441,12 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
             item.setText(0, row[0])
             item.setText(1, (" " * 9) + row[1])
             if self.ut_groupbox.isChecked():
-                year, month, day, hour, minute, second = methods.convertJDtoUT(row[0])
+                jd = row[0]
+                if self.dt_chk.isChecked():
+                    self.outputHasDt = True
+                    jd = methods.convertHJDtoJD(float(jd), self.ra_h_spinbox.value(), self.ra_m_spinbox.value(), self.ra_s_spinbox.value(),
+                                                self.dec_d_spinbox.value(), self.dec_m_spinbox.value(), self.dec_s_spinbox.value())
+                year, month, day, hour, minute, second = methods.convertJDtoUT(jd)
                 ut = "{2}/{1}/{0} - {3}:{4}:{5:4.2f}".format(year, month, day, hour, minute, second)
                 item.setText(2, ut)
                 ut_table.append(ut)
@@ -3355,8 +3467,12 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
                 try:
                     with open(filePath, "w") as f:
                         if len(self.ut_data) > 0:
-                            f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype" +
-                                    "    #Date (D/M/Y) - Time (UTC, H:M:S)" + "\n")
+                            if self.outputHasDt is True:
+                                f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype" +
+                                        "    #Date (D/M/Y) - Time (UTC, H:M:S) (dt EXCLUDED)" + "\n")
+                            else:
+                                f.write("#HJD" + (" " * (len(self.data[0][0]))) + "#Mintype" +
+                                        "    #Date (D/M/Y) - Time (UTC, H:M:S)" + "\n")
                             for i, row in enumerate(self.data):
                                 f.write(row[0] + "    " + row[1] + "           " + self.ut_data[i] + "\n")
                         else:
