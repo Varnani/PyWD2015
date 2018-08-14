@@ -897,7 +897,7 @@ class lcin(WDInput):
                     self.formatInput(MainWindow.jd0_ipt.text(), 15, 6, "F") + \
                     self.formatInput(MainWindow.p0_ipt.text(), 17, 10, "D") + \
                     self.formatInput(MainWindow.dpdt_ipt.text(), 14, 6, "D") + \
-                    self.formatInput(MainWindow.pshift_ipt.text(), 10, 4, "F") + \
+                    self.formatInput(MainWindow.pshift_ipt.text(), 10, 4, "D") + \
                     self.formatInput(MainWindow.delph_ipt.text(), 8, 5, "F") + nga + \
                     self.formatInput(MainWindow.stdev_ipt.text(), 11, 4, "D") + \
                     " " + noiseDict[str(MainWindow.lcnoise_combobox.currentText())] + \

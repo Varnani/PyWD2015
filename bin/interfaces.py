@@ -467,6 +467,9 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.residual_treewidget.clear()
         self.DCWidget.lastBaseSet = None
         self.DCWidget.lastSubSets = None
+        self.DCWidget.residualTable = None
+        self.DCWidget.firstComponentTable = None
+        self.DCWidget.secondComponentTable = None
         self.DCWidget.curvestat_treewidget.clear()
 
         self.StarPositionWidget.plot_starPositionAxis.cla()
@@ -508,7 +511,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.OCWidget.plot_toolbar.update()
 
     def begin(self):  # check for wd.conf
-        wdconf = "wd.conf"
+        wdconf = os.path.dirname(os.path.realpath(__file__)) + "/wd.conf"
         parser = ConfigParser.SafeConfigParser()
         if os.path.isfile(wdconf):
             with open(wdconf, "r") as f:
@@ -1598,6 +1601,9 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         }
         self.lastBaseSet = None
         self.lastSubSets = None
+        self.residualTable = None
+        self.firstComponentTable = None
+        self.secondComponentTable = None
         self.lastiteration = 0
         # variables for plot
         self.obs_x = []
@@ -1637,6 +1643,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.viewlaastdcout_btn.clicked.connect(self.showDcout)
         self.plot_btn.clicked.connect(self.plotData)
         self.popmain_btn.clicked.connect(self.popPlotWindow)
+        self.exportresults_btn.clicked.connect(self.exportData)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -1646,6 +1653,28 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
         self.DcinView.close()
         self.DcoutView.close()
+
+    def exportData(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("txt")
+        dialog.setNameFilter("Plaintext File (*.txt)")
+        dialog.setAcceptMode(1)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        if filePath != "" and returnCode != 0:
+            msg = QtGui.QMessageBox()
+            fi = QtCore.QFileInfo(filePath)
+            try:
+                with open(filePath, "w") as f:
+                    f.write("#Results\n")
+                    for result in self.lastBaseSet:
+                        f.write(self.parameterDict[result[0]] + "   " + result[1] + "   " + result[2] + "   " + result[5]+ "\n")
+                msg.setText("Result data file \"" + fi.fileName() + "\" saved.")
+                msg.setWindowTitle("PyWD - Data Saved")
+                msg.exec_()
+            except:
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
 
     def getXYfromFile(self, filepath):
         curve = classes.Curve(filepath)
@@ -2498,12 +2527,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             # self.iterator.deleteLater()  # dispose iterator
             self.iterator = None
             self.lastBaseSet = methods.getTableFromOutput(self.dcoutpath, "Input-Output in D Format", splitmap=[5, 9, 28, 46, 65, 83], occurence=int(self.niter_spinbox.value()))
-            residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1, occurence=int(self.niter_spinbox.value()))[0]
-            firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
-            secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
+            self.residualTable = methods.getTableFromOutput(self.dcoutpath, "Mean residual for input values", offset=1, occurence=int(self.niter_spinbox.value()))[0]
+            self.firstComponentTable = methods.getTableFromOutput(self.dcoutpath, "  1   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
+            self.secondComponentTable = methods.getTableFromOutput(self.dcoutpath, "  2   pole", offset=0, splitmap=[3, 10, 24, 38, 52, 66], occurence=int(self.niter_spinbox.value()))
             self.updateResultTree(self.lastBaseSet)
-            self.updateComponentTree(firstComponentTable, secondComponentTable)
-            self.updateResidualTree(residualTable)
+            self.updateComponentTree(self.firstComponentTable, self.secondComponentTable)
+            self.updateResidualTree(self.residualTable)
             self.updateCurveInfoTree(methods.getTableFromOutput(self.dcoutpath,
                 "Standard Deviations for Computation of Curve-dependent Weights"))
             self.enableUi()
