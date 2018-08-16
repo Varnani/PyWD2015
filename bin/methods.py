@@ -1362,8 +1362,6 @@ def convertHJDtoJD(hjd, ra_h, ra_m, ra_s, dec_d, dec_m, dec_s):
     rsun = (1. - eccen ** 2) / (1. + eccen * numpy.cos(tanom))
     dt = -0.005770 * rsun * numpy.cos(b) * numpy.cos(l - slong)
 
-    print dt
-
     jd = hjd - dt
     return jd
 

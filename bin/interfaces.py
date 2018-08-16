@@ -2876,7 +2876,6 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     curveProperties = self.MainWindow.LoadObservationWidget.Curves()[index]
                     x_obs = [float(x) for x in curve.timeList]
                     y_obs = [float(y) for y in curve.observationList]
-                    print curveProps.type
                     if curveProperties.type == "vc":
                         idxDict = {
                             1: 1,
