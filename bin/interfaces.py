@@ -17,12 +17,17 @@ import os
 import time
 import io
 
+# globals
+__cwd__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+__icon_path__ = os.path.join(__cwd__, "resources", "pywd.ico")
+__font_path__ = os.path.join(__cwd__, "resources", "PTM55FT.ttf")
+
 
 class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window class
     def __init__(self):  # constructor
         super(MainWindow, self).__init__()
         self.setupUi(self)  # setup ui from mainwindow.py
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))  # set app icon
         self.LoadObservationWidget = LoadObservationWidget()  # get loadwidget
         self.LoadObservationWidget.MainWindow = self
         self.SpotConfigureWidget = SpotConfigureWidget()  # get spotconfigurewidget
@@ -60,9 +65,9 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.checkJdphs()
 
     def connectSignals(self):
-        self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)  # enters what's this mode
-        self.loadwidget_btn.clicked.connect(self.LoadObservationWidget.show)  # opens loadwidget
-        self.spotconfigure_btn.clicked.connect(self.SpotConfigureWidget.show)  # opens spotconfigurewidget
+        self.whatsthis_btn.clicked.connect(QtGui.QWhatsThis.enterWhatsThisMode)
+        self.loadwidget_btn.clicked.connect(self.LoadObservationWidget.show)
+        self.spotconfigure_btn.clicked.connect(self.SpotConfigureWidget.show)
         self.dc_rundc_btn.clicked.connect(partial(self.DCWidget.show))
         self.theme_combobox.currentIndexChanged.connect(self.changeStyle)
         self.eclipsewidget_btn.clicked.connect(self.EclipseWidget.show)
@@ -433,7 +438,6 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.dcoutpath = os.path.join(os.path.dirname(dcpath), "dcout.active")
 
     def clearWidgets(self):
-        # TODO add proper cleaning here (plots, trees, widgets which depend on current project)
         self.DCWidget.data_combobox.clear()
         self.DCWidget.plot_observationAxis.cla()
         self.DCWidget.plot_residualAxis.cla()
@@ -511,7 +515,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.OCWidget.plot_toolbar.update()
 
     def begin(self):  # check for wd.conf
-        wdconf = os.path.dirname(os.path.realpath(__file__)) + "/wd.conf"
+        wdconf = os.path.join(__cwd__, "wd.conf")
         parser = ConfigParser.SafeConfigParser()
         if os.path.isfile(wdconf):
             with open(wdconf, "r") as f:
@@ -647,7 +651,7 @@ class LCDCPickerWidget(QtGui.QDialog, lcdcpickerdialog.Ui_LCDCPickerDialog):
     def __init__(self):
         super(LCDCPickerWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.MainWindow = None
         self.connectSignals()
         self.save_btn.setDisabled(True)
@@ -678,7 +682,7 @@ class EclipseWidget(QtGui.QWidget, eclipsewidget.Ui_EclipseWidget):
     def __init__(self):
         super(EclipseWidget, self).__init__()
         self.setupUi(self)  # setup ui from eclipsewidget.py
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.connectSignals()
 
     def connectSignals(self):
@@ -690,7 +694,7 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
     def __init__(self):
         super(LoadObservationWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         # variables
         self.vcPropertiesList = [0, 0]
         self.lcPropertiesList = []
@@ -717,25 +721,25 @@ class LoadObservationWidget(QtGui.QWidget, loadobservationwidget.Ui_ObservationW
                 i = i + 1
         return i
 
-    def loadCurveDialog(self, type, vcNumber):
+    def loadCurveDialog(self, crv_type, vcNumber):
         dialog = QtGui.QFileDialog(self)
         dialog.setAcceptMode(0)
         returnCode = dialog.exec_()
         filePath = (dialog.selectedFiles())[0]
         if filePath != "" and returnCode != 0:
             try:
-                curvedialog = CurvePropertiesDialog.createCurveDialog(type, self.MainWindow)
+                curvedialog = CurvePropertiesDialog.createCurveDialog(crv_type, self.MainWindow)
                 curvedialog.populateFromFile(filePath)
                 if curvedialog.hasError:
                     pass
                 else:
                     result = curvedialog.exec_()
                     if result == 1:
-                        curveprop = classes.CurveProperties(type)
+                        curveprop = classes.CurveProperties(crv_type)
                         curveprop.populateFromInterface(curvedialog)
-                        if type == "lc":
+                        if crv_type == "lc":
                             self.lcPropertiesList.append(curveprop)
-                        if type == "vc":
+                        if crv_type == "vc":
                             curveprop.star = vcNumber
                             self.vcPropertiesList[vcNumber-1] = curveprop
                         self.updateCurveWidget()
@@ -868,7 +872,7 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
     def __init__(self, MainWindow):
         super(CurvePropertiesDialog, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.type = ""
         self.synthetic = False
         self.hasError = False
@@ -929,11 +933,11 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
             "YMS94 iM": "53",
             "YMS94 in": "54",
             "YMS94 iN": "55",
-            "Sloan DDS u'": "56",
-            "Sloan DDS g'": "57",
-            "Sloan DDS r'": "58",
-            "Sloan DDS i'": "59",
-            "Sloan DDS z'": "60",
+            "Sloan DSS u'": "56",
+            "Sloan DSS g'": "57",
+            "Sloan DSS r'": "58",
+            "Sloan DSS i'": "59",
+            "Sloan DSS z'": "60",
             "HST STIS Ly alpha": "61",
             "HST STIS Fclear": "62",
             "HST STIS Fsrf2": "63",
@@ -1152,17 +1156,17 @@ class CurvePropertiesDialog(QtGui.QDialog, curvepropertiesdialog.Ui_CurvePropert
         yinn.setObjectName("YMS94 iN")
 
         # sloandds
-        sloandds = rootmenu.addMenu("Sloan DDS")
+        sloandds = rootmenu.addMenu("Sloan DSS")
         sdu = sloandds.addAction("u'")
-        sdu.setObjectName("Sloan DDS u'")
+        sdu.setObjectName("Sloan DSS u'")
         sdg = sloandds.addAction("g'")
-        sdg.setObjectName("Sloan DDS g'")
+        sdg.setObjectName("Sloan DSS g'")
         sdr = sloandds.addAction("r'")
-        sdr.setObjectName("Sloan DDS r'")
+        sdr.setObjectName("Sloan DSS r'")
         sdi = sloandds.addAction("i'")
-        sdi.setObjectName("Sloan DDS i'")
+        sdi.setObjectName("Sloan DSS i'")
         sdz = sloandds.addAction("z'")
-        sdz.setObjectName("Sloan DDS z'")
+        sdz.setObjectName("Sloan DSS z'")
 
         # hststis
         hststis = rootmenu.addMenu("HST STIS")
@@ -1374,7 +1378,7 @@ class SpotConfigureWidget(QtGui.QWidget, spotconfigurewidget.Ui_SpotConfigureWid
     def __init__(self):  # constructor
         super(SpotConfigureWidget, self).__init__()
         self.setupUi(self)  # setup ui from spotconfigurewidget.py
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))  # set app icon
         # variables
         self.star1RowCount = 0
         self.star2RowCount = 0
@@ -1436,7 +1440,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
     def __init__(self):
         super(DCWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.result_treewidget.header().setResizeMode(3)
         self.residual_treewidget.header().setResizeMode(3)
         self.component_treewidget.header().setResizeMode(3)
@@ -1475,7 +1479,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             "22": "Alb2",
             "23": "Pot1",
             "24": "Pot2",
-            "25": "Q(M2/M1)",
+            "25": "q (M2/M1)",
             "26": "Ephemeris",
             "27": "Period",
             "28": "dP/dt",
@@ -1501,6 +1505,58 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             "58": "X1",
             "59": "X2",
             "60": "L3"
+        }
+        self.latexDict = {
+            "1": "$Co-Latitude_{Spot1}$ $(^{\circ})$",
+            "2": "$Longitude_{Spot1}$ $(^{\circ})$",
+            "3": "$Radius_{Spot1}$ $(^{\circ})$",
+            "4": "$Temperature~Factor_{Spot1}$",
+            "5": "$Co-Latitude_{Spot2}$ $(^{\circ})$",
+            "6": "$Longitude_{Spot2}$ $(^{\circ})$",
+            "7": "$Radius_{Spot2}$ $(^{\circ})$",
+            "8": "$Temperature~Factor_{Spot2}$",
+            "9": "$a$~({\mbox{$R_{\odot}$}})",
+            "10": "$e$",
+            "11": "$\omega~(^{\circ})$",
+            "12": "$F_{1}$",
+            "13": "$F_{2}$",
+            "14": "$Phase~Shift$",
+            "15": "$V_{\gamma}$",
+            "16": "$i~(^{\circ})$",
+            "17": "$g_{1}$",
+            "18": "$g_{2}$",
+            "19": "$T_{1}(K)$",
+            "20": "$T_{2}(K)$",
+            "21": "$A_{{1}}$",
+            "22": "$A_{{2}}$",
+            "23": "$\Omega_{1}$",
+            "24": "$\Omega_{2}$",
+            "25": "$q~(=M{_2}/M{_1})$",
+            "26": "$HJD_{Min1}$",
+            "27": "$Period$",
+            "28": "$dP/dt$",
+            "29": "$d\omega/dt$",
+            "30": "$a$ ({\mbox{$R_{\odot}$}}) (3B)$",
+            "31": "$P~(3B)$",
+            "32": "$i~(3B)~(^{\circ})$",
+            "33": "$e~(3B)$",
+            "34": "$\omega~(3B)$",
+            "35": "$Ephemeris~(3B)$",
+            "41": "$log(d)$",
+            "42": "$Designated~Extinction$",
+            "43": "nan",
+            "44": "nan",
+            "45": "nan",
+            "46": "nan",
+            "47": "nan",
+            "48": "nan",
+            "49": "nan",
+            "50": "nan",
+            "56": "$L_{{1}}$/$(L_{{1}}+L_{{2}})_{{{band}}}$",
+            "57": "nan",
+            "58": "$x{{_1}}_{{{band}}}$",
+            "59": "$x{{_2}}_{{{band}}}$",
+            "60": "$L_{{3}}$/$(L_{{1}}+L_{{2}}+L_{{3}})_{{{band}}}$"
         }
         self.bandpassDict = {
             "1": "Stromgren u",
@@ -1558,11 +1614,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             "53": "YMS94 iM",
             "54": "YMS94 in",
             "55": "YMS94 iN",
-            "56": "Sloan DDS u'",
-            "57": "Sloan DDS g'",
-            "58": "Sloan DDS r'",
-            "59": "Sloan DDS i'",
-            "60": "Sloan DDS z'",
+            "56": "Sloan DSS u'",
+            "57": "Sloan DSS g'",
+            "58": "Sloan DSS r'",
+            "59": "Sloan DSS i'",
+            "60": "Sloan DSS z'",
             "61": "HST STIS Ly alpha",
             "62": "HST STIS Fclear",
             "63": "HST STIS Fsrf2",
@@ -1655,26 +1711,117 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.DcoutView.close()
 
     def exportData(self):
-        dialog = QtGui.QFileDialog(self)
-        dialog.setDefaultSuffix("txt")
-        dialog.setNameFilter("Plaintext File (*.txt)")
-        dialog.setAcceptMode(1)
-        returnCode = dialog.exec_()
-        filePath = str((dialog.selectedFiles())[0])
-        if filePath != "" and returnCode != 0:
-            msg = QtGui.QMessageBox()
-            fi = QtCore.QFileInfo(filePath)
-            try:
-                with open(filePath, "w") as f:
-                    f.write("#Results\n")
-                    for result in self.lastBaseSet:
-                        f.write(self.parameterDict[result[0]] + "   " + result[1] + "   " + result[2] + "   " + result[5]+ "\n")
-                msg.setText("Result data file \"" + fi.fileName() + "\" saved.")
-                msg.setWindowTitle("PyWD - Data Saved")
-                msg.exec_()
-            except:
-                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
-                msg.exec_()
+        if self.lastBaseSet is not None:
+            menu = QtGui.QMenu(self)
+            plaintext = menu.addAction("Plaintext")
+            plaintext.setObjectName("plaintext")
+            latex = menu.addAction("Latex")
+            latex.setObjectName("latex")
+            selection = menu.exec_(QtGui.QCursor.pos())
+
+            if selection is not None:
+                dialog = QtGui.QFileDialog(self)
+                dialog.setDefaultSuffix("txt")
+                dialog.setNameFilter("Plaintext File (*.txt)")
+                dialog.setAcceptMode(1)
+                returnCode = dialog.exec_()
+                filePath = str((dialog.selectedFiles())[0])
+
+                if filePath != "" and returnCode != 0:
+                    msg = QtGui.QMessageBox()
+                    fi = QtCore.QFileInfo(filePath)
+
+                    try:
+                        with open(filePath, "w") as f:
+                            if selection.objectName() == "plaintext":
+                                f.write("#Parameter                         #Value                             #Sigma\n")
+                            if selection.objectName() == "latex":
+                                f.write("\\begin{table}\n\\begin{center}\n\\begin{tabular}{c|c}\n")
+                                f.write("Parameter & Value" + "\\" + "\\" + "\n")
+                                f.write("\hline")
+
+                            table = methods.getTableFromOutput(self.dcoutpath, "Input-Output in D Format", occurence=int(self.niter_spinbox.value()))
+
+                            for result in table:
+
+                                output = methods.convertFromScientificToGeneric(result[2].replace("D", "e"))
+                                stderr = methods.convertFromScientificToGeneric(result[5].replace("D", "e"))
+
+                                if result[0] in ("19", "20"):
+                                    output = str(int(float(output) * 10000.0))
+                                    stderr = str(int(float(stderr) * 10000.0))
+
+                                if result[0] == "15":
+                                    output = str(float(output) * float(str(self.MainWindow.vunit_ipt.text())))
+                                    stderr = str(float(stderr) * float(str(self.MainWindow.vunit_ipt.text())))
+
+                                if self.parameterDict[result[0]] == "L1":
+                                    output = methods.convertFromScientificToGeneric(result[-2].replace("D", "e"))
+                                    stderr = methods.convertFromScientificToGeneric(result[-1].replace("D", "e"))
+
+                                if selection.objectName() == "plaintext":
+                                    name = self.parameterDict[result[0]]
+                                    if result[1] != "0":
+                                        band = self.bandpassDict[self.MainWindow.LoadObservationWidget.lcPropertiesList[int(result[1]) - 1].band]
+                                        name = name + " (" + band + ")"
+                                    f.write(name + (" " * (35 - len(name))) + output + (" " * (35 - len(output))) + stderr + "\n")
+
+                                if selection.objectName() == "latex":
+                                    name = self.latexDict[result[0]]
+                                    if name != "nan":
+                                        if result[0] in ("1", "2", "3", "5", "6", "7", "11"):
+                                            output = str(float(output) * 180.0 / numpy.pi)
+                                            stderr = str(float(stderr) * 180.0 / numpy.pi)
+                                        if result[1] != "0":
+                                            band = self.bandpassDict[self.MainWindow.LoadObservationWidget.lcPropertiesList[int(result[1]) - 1].band]
+                                            name = name.format(band=band.replace(" ", "~"))
+                                        if result[0] == "23" and self.MainWindow.mode_combobox.currentText() in ("Mode 1", "Mode 3"):
+                                            name = "$\Omega_{1}$ = $\Omega_{2}$"
+                                        f.write(name + " & " + output + " $\pm$ " + stderr + " \\" + "\\" + "\n")
+
+                            f.write("\n")
+                            mean_radii = [1.0, 1.0]
+                            mean_radii_err = [1.0, 1.0]
+                            for i, component in enumerate((self.firstComponentTable, self.secondComponentTable)):
+                                for result in component:
+                                    if selection.objectName() == "plaintext":
+                                        value = "r" + str(i + 1) + "_" + result[1]
+                                        f.write(value + (" " * (12 - len(value))) + result[2] + "   " + result[5] + "\n")
+                                    elif selection.objectName() == "latex":
+                                        value = "$r_{" + str(i + 1) + "~" + result[1] + "}$"
+                                        f.write(value + " & " + result[2] + " $\pm$ " + result[5] + " \\" + "\\" + "\n")
+                                    mean_radii[i] = float(result[2]) * mean_radii[i]
+                                    mean_radii_err[i] = float(result[5]) * mean_radii_err[i]
+
+                            mean_radii[0] = numpy.power(mean_radii[0], 1.0 / len(self.firstComponentTable))
+                            mean_radii[1] = numpy.power(mean_radii[1], 1.0 / len(self.secondComponentTable))
+                            mean_radii_err[0] = numpy.power(mean_radii_err[0], 1.0 / len(self.firstComponentTable))
+                            mean_radii_err[1] = numpy.power(mean_radii_err[1], 1.0 / len(self.secondComponentTable))
+
+                            if selection.objectName() == "plaintext":
+                                f.write("r1 mean" + (" " * (12 - len(str(mean_radii[0])))) + str(mean_radii[0]) + (" " * (12 - len(str(mean_radii_err[0])))) + str(mean_radii_err[0]) + "\n")
+                                f.write("r2 mean" + (" " * (12 - len(str(mean_radii[1])))) + str(mean_radii[1]) + (" " * (12 - len(str(mean_radii_err[1])))) + str(mean_radii_err[1]) + "\n")
+
+                                f.write("\n#Mean Residual for Input Values\n" + methods.convertFromScientificToGeneric(
+                                    self.residualTable[0].replace("D", "e")))
+
+                            elif selection.objectName() == "latex":
+                                f.write("$r_{1~mean}$ & " + str(mean_radii[0]) + " $\pm$ " +
+                                        methods.convertFromScientificToGeneric(str(mean_radii_err[0])) + "\\" + "\\" + "\n")
+                                f.write("$r_{2~mean}$ & " + str(mean_radii[1]) + " $\pm$ " +
+                                        methods.convertFromScientificToGeneric(str(mean_radii_err[1])) + "\\" + "\\" + "\n")
+
+                                f.write("\n$Mean~residual~for~input~values$ & " + methods.convertFromScientificToGeneric(
+                                    self.residualTable[0].replace("D", "e")) + "\\" + "\\" + "\n")
+                                f.write("\\end{tabular}\n\\end{center}\n\\end{table}")
+
+                        msg.setText("Result data file \"" + fi.fileName() + "\" saved.")
+                        msg.setWindowTitle("PyWD - Data Saved")
+                        msg.exec_()
+
+                    except:
+                        msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                        msg.exec_()
 
     def getXYfromFile(self, filepath):
         curve = classes.Curve(filepath)
@@ -1714,8 +1861,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             ocTable = methods.getTableFromOutput(self.dcoutpath, "Unweighted Observational Equations")
             curvestatTable = methods.getTableFromOutput(
                 self.dcoutpath,
-                "Standard Deviations for Computation of Curve-dependent Weights"
-            )
+                "Standard Deviations for Computation of Curve-dependent Weights")
             columnLimit = 20
             baseColumns = 4
             if self.MainWindow.jdphs_combobox.currentText() == "Time":
@@ -2461,7 +2607,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
     def updateCurveInfoTree(self, curveinfoTable):
         self.curvestat_treewidget.clear()
-        frmt = "{:g}"  # TODO add this as a user setting
+        frmt = "{:g}"
         curve = 0
         curvelist = self.MainWindow.LoadObservationWidget.Curves()
         for result in curveinfoTable:
@@ -2553,8 +2699,13 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             else:
                 niter = int(self.lastiteration)
                 self.lastiteration = 0
+                self.lastBaseSet = None
+                self.firstComponentTable = None
+                self.secondComponentTable = None
+                self.residualTable = None
                 raise ValueError("Iteration #{0} resulted in NaN or *** for one "
                                  "or multiple solutions.".format(niter + 1))
+
         except IOError as ex:
             msg = QtGui.QMessageBox(self)
             msg.setWindowTitle("PyWD - IO Error")
@@ -2588,7 +2739,7 @@ class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
         super(OutputView, self).__init__()
         self.setupUi(self)
         db = QtGui.QFontDatabase()
-        db.addApplicationFont(os.path.join(os.getcwd(), "resources", "PTM55FT.ttf"))
+        db.addApplicationFont(__font_path__)
         ptmono = QtGui.QFont(QtCore.QString("PT Mono"), pointSize=11)
         self.output_textedit.setFont(ptmono)
 
@@ -2604,7 +2755,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
     def __init__(self):
         super(SyntheticCurveWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))  # set app icon
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))  # set app icon
         # variables
         self.MainWindow = None
         self.lastEditedIndex = None
@@ -2858,7 +3009,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                         self.plot_observationAxis.invert_yaxis()
                     if self.plot_residualAxis.yaxis_inverted() == True:
                         self.plot_residualAxis.invert_yaxis()
-                    
+
             if self.drawstars_chk.isChecked():
                 self.plot_observationAxis.set_position(self.triple_grid[0, :-1].get_position(self.plot_figure))
                 self.plot_residualAxis.set_position(self.triple_grid[1, :-1].get_position(self.plot_figure))
@@ -3042,7 +3193,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
     def __init__(self):
         super(StarPositionWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.start_btn.setIcon(QtGui.QIcon("resources/play.png"))
         self.skip_btn.setIcon(QtGui.QIcon("resources/jump.png"))
         self.backtostart_btn.setIcon(QtGui.QIcon("resources/start.png"))
@@ -3308,7 +3459,7 @@ class DimensionWidget(QtGui.QWidget, dimensionwidget.Ui_DimensionWidget):
     def __init__(self):
         super(DimensionWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.MainWindow = None
         # set up plot widget for star 1
         self.s1_plot_figure = Figure()
@@ -3434,7 +3585,7 @@ class ConjunctionWidget(QtGui.QWidget, conjunctionwidget.Ui_conjunctionwidget):
     def __init__(self):
         super(ConjunctionWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.MainWindow = None
         self.data_treewidget.header().setResizeMode(3)
         self.data = None
@@ -3520,7 +3671,7 @@ class OCWidget(QtGui.QWidget, ocwidget.Ui_OCWidget):
     def __init__(self):
         super(OCWidget, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon("resources/pywd.ico"))
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
         self.MainWindow = None
         self.data_treewidget.header().setResizeMode(3)
         # set up plots

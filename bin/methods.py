@@ -1324,36 +1324,47 @@ def convertJDtoUT(jd, dontAdd24=False):
 
 
 def convertHJDtoJD(hjd, ra_h, ra_m, ra_s, dec_d, dec_m, dec_s):
+
+    # This calculation is adopted from IRAF setjd package.
+
+    if hjd < 2400000.0:
+        hjd = hjd + 2400000.0
+
     if dec_d < 0:
         dec_m = dec_m * -1.0
         dec_s = dec_s * -1.0
 
-    RA = ra_h + ra_m / 60.0 + ra_s / 3600.0
-    DEC = dec_d + dec_m / 60.0 + dec_s / 3600.0
+    r = ((ra_h + ra_m / 60.0 + ra_s / 3600.0) * 15.0) * numpy.pi / 180.0
+    d = (dec_d + dec_m / 60.0 + dec_s / 3600.0) * numpy.pi / 180.0
 
-    JD_without_day_fraction = int(hjd) + 0.5
+    t = (hjd - 2415020.0) / 36525.0
 
-    T = (JD_without_day_fraction + 0.5 - 2415020.0) / 36525.0
-    epsilon = (((23.0 * 3600.0 + 27.0 * 60.0 + 8.26 - 46.845 * T - 0.0059
-                 * T ** 2 + 0.00181 * T ** 3) / 3600.0) * numpy.pi) / 180.0
-    p = (1.396041 + 0.000308 * (T + 0.5)) * (T - 0.499998)
-    L = (279.696678 + 36000.76892 * (T) + 0.000303 * (T ** 2) - p)
-    G = (358.475833 + 35999.04975 * (T) - 0.00015 * (T ** 2))
+    manom = 358.47583 + t * (35999.04975 - t * (0.000150 + t * 0.000003))
+    lperi = 101.22083 + t * (1.7191733 + t * (0.000453 + t * 0.000003))
+    oblq = 23.452294 - t * (0.0130125 + t * (0.00000164 - t * 0.000000503))
+    eccen = 0.01675104 - t * (0.00004180 + t * 0.000000126)
 
-    X = 0.99986 * numpy.cos(L * numpy.pi / 180.0) - 0.025127 * numpy.cos(((G - L) * numpy.pi) / 180.0) + 0.008374 * numpy.cos(
-        (G + L) * numpy.pi / 180.0) + 0.000105 * numpy.cos((2.0 * G + L) * numpy.pi / 180.0) + 0.000063 * T * numpy.cos(
-        (G - L) * numpy.pi / 180.0) + 0.000035 * numpy.cos((2.0 * G - L) * numpy.pi / 180.0)
+    manom = numpy.mod(manom, 360.0)
+    lperi = numpy.mod(lperi, 360.0)
 
-    Y = 0.917308 * numpy.sin(L * numpy.pi / 180.0) - 0.023053 * numpy.sin(((G - L) * numpy.pi) / 180.0) + 0.007683 * numpy.sin(
-        (G + L) * numpy.pi / 180.0) + 0.000097 * numpy.sin((2.0 * G + L) * numpy.pi / 180.0) - 0.000057 * T * numpy.sin(
-        (G - L) * numpy.pi / 180.0) - 0.000032 * numpy.sin((2.0 * G - L) * numpy.pi / 180.0)
+    manom = numpy.pi * manom / 180.0
+    lperi = numpy.pi * lperi / 180.0
+    oblq = numpy.pi * oblq / 180.0
 
-    dt = -0.0057755 * ((numpy.cos(DEC * numpy.pi / 180.0) * numpy.cos(RA * 15 * numpy.pi / 180.0)) * X + (
-            numpy.tan(epsilon * numpy.pi / 180.0) * numpy.sin(DEC * numpy.pi / 180.0) + numpy.cos(DEC * numpy.pi / 180.0) * numpy.sin(
-            RA * 15 * numpy.pi / 180.0)) * Y)
+    tanom = manom + (2.0 * eccen - 0.25 * eccen ** 3) * numpy.sin(manom) + 1.25 * eccen ** 2 * numpy.sin(
+        2 * manom) + 13.0 / 12.0 * eccen ** 3 * numpy.sin(3.0 * manom)
+
+    slong = lperi + tanom + numpy.pi
+
+    l = (numpy.arctan2((numpy.sin(r) * numpy.cos(oblq) + numpy.tan(d) * numpy.sin(oblq)), numpy.cos(r)))
+    b = (numpy.arcsin(numpy.sin(d) * numpy.cos(oblq) - numpy.cos(d) * numpy.sin(oblq) * numpy.sin(r)))
+
+    rsun = (1. - eccen ** 2) / (1. + eccen * numpy.cos(tanom))
+    dt = -0.005770 * rsun * numpy.cos(b) * numpy.cos(l - slong)
+
+    print dt
 
     jd = hjd - dt
-
     return jd
 
 

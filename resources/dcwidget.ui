@@ -215,7 +215,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S1 LAT</string>
+                    <string>S1 Lat.</string>
                    </property>
                   </widget>
                  </item>
@@ -227,7 +227,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>TC3B</string>
+                    <string>T0 (3B)</string>
                    </property>
                   </widget>
                  </item>
@@ -239,7 +239,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>Q</string>
+                    <string>q (M2/M1)</string>
                    </property>
                   </widget>
                  </item>
@@ -251,7 +251,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>P3B</string>
+                    <string>P (3B)</string>
                    </property>
                   </widget>
                  </item>
@@ -263,7 +263,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>ALB2</string>
+                    <string>Albedo 2</string>
                    </property>
                   </widget>
                  </item>
@@ -275,7 +275,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>INCL</string>
+                    <string>i</string>
                    </property>
                   </widget>
                  </item>
@@ -299,7 +299,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>VGAM</string>
+                    <string>V Gamma</string>
                    </property>
                   </widget>
                  </item>
@@ -311,7 +311,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>ALB1</string>
+                    <string>Albedo 1</string>
                    </property>
                   </widget>
                  </item>
@@ -335,7 +335,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S1 RAD</string>
+                    <string>S1 Rad.</string>
                    </property>
                   </widget>
                  </item>
@@ -347,7 +347,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S2 LON</string>
+                    <string>S2 Lon</string>
                    </property>
                   </widget>
                  </item>
@@ -371,7 +371,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>JD0</string>
+                    <string>T0</string>
                    </property>
                   </widget>
                  </item>
@@ -407,7 +407,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>logD</string>
+                    <string>log(D)</string>
                    </property>
                   </widget>
                  </item>
@@ -443,7 +443,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>E3B</string>
+                    <string>e (3B)</string>
                    </property>
                   </widget>
                  </item>
@@ -455,7 +455,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>A3B</string>
+                    <string>a (3B)</string>
                    </property>
                   </widget>
                  </item>
@@ -467,7 +467,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S1 LON</string>
+                    <string>S1 Lon.</string>
                    </property>
                   </widget>
                  </item>
@@ -520,7 +520,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>P0</string>
+                    <string>P</string>
                    </property>
                   </widget>
                  </item>
@@ -532,7 +532,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S2 LAT</string>
+                    <string>S2 Lat.</string>
                    </property>
                   </widget>
                  </item>
@@ -556,7 +556,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S1 TEMP</string>
+                    <string>S1 Temp.</string>
                    </property>
                   </widget>
                  </item>
@@ -568,7 +568,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>PERR0</string>
+                    <string>ω</string>
                    </property>
                   </widget>
                  </item>
@@ -580,7 +580,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>XINC3B</string>
+                    <string>i (3B)</string>
                    </property>
                   </widget>
                  </item>
@@ -604,7 +604,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S2 RAD</string>
+                    <string>S2 Rad.</string>
                    </property>
                   </widget>
                  </item>
@@ -616,7 +616,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>POT2</string>
+                    <string>Pot2</string>
                    </property>
                   </widget>
                  </item>
@@ -640,7 +640,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>dPERdt</string>
+                    <string>dω/dt</string>
                    </property>
                   </widget>
                  </item>
@@ -664,7 +664,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>PSHIFT</string>
+                    <string>P Shift</string>
                    </property>
                   </widget>
                  </item>
@@ -712,7 +712,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>PERR3B</string>
+                    <string> ω (3B)</string>
                    </property>
                   </widget>
                  </item>
@@ -778,7 +778,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>dPdt</string>
+                    <string>dP/dt</string>
                    </property>
                   </widget>
                  </item>
@@ -790,7 +790,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>S2 TEMP</string>
+                    <string>S2 Temp.</string>
                    </property>
                   </widget>
                  </item>
@@ -836,7 +836,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>POT1</string>
+                    <string>Pot1</string>
                    </property>
                   </widget>
                  </item>
@@ -851,7 +851,7 @@
                     <string/>
                    </property>
                    <property name="text">
-                    <string>EL3</string>
+                    <string>L3</string>
                    </property>
                   </widget>
                  </item>
@@ -866,7 +866,7 @@
                     <string>DESEXTINC</string>
                    </property>
                    <property name="text">
-                    <string>DEXT</string>
+                    <string>Des. Ex.</string>
                    </property>
                   </widget>
                  </item>

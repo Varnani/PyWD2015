@@ -862,7 +862,6 @@ class lcin(WDInput):
             }
             ld1 = ld1_sign + ldDict[str(MainWindow.ld1_combobox.currentText())]
             ld2 = ld2_sign + ldDict[str(MainWindow.ld2_combobox.currentText())]
-            # TODO add KTSTEP
             ktstep = ""
             if mpage == 6:
                 ktstep = "     0"

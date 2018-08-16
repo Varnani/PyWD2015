@@ -4,15 +4,8 @@ from PyQt4 import QtGui
 from bin import interfaces
 
 
-# TODO add red emphasis on selected keeps and dels
-# TODO add tooltips, statustips and whatsthis on every parameter
-# TODO add program input control (mode, ifcgs, maglite/xcalib etc.)
-# TODO add dc subset support
-# TODO add in/out file archiving
-# TODO make windows compatible
-
 def run():
-    if platform.system() is "Windows":  # a quick hack to get app icon show up on taskbar in windows
+    if platform.system() is "Windows":  # used for making app icon visible in windows taskbar
         import ctypes
         appid = u"pywd2015"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appid)
