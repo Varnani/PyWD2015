@@ -3717,24 +3717,6 @@ zero for zero output noise</string>
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="label_27">
-        <property name="geometry">
-         <rect>
-          <x>22</x>
-          <y>180</y>
-          <width>191</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Drilling and Landolt (2000)</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_28">
         <property name="geometry">
          <rect>
@@ -4016,6 +3998,19 @@ zero for zero output noise</string>
         </property>
         <property name="text">
          <string>(mag)</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_37">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>180</y>
+          <width>181</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Drilling and Landolt (2000)</string>
         </property>
        </widget>
       </widget>

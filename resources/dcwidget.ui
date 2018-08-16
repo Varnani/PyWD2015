@@ -263,7 +263,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>Albedo 2</string>
+                    <string>A2</string>
                    </property>
                   </widget>
                  </item>
@@ -299,7 +299,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>V Gamma</string>
+                    <string>Vγ</string>
                    </property>
                   </widget>
                  </item>
@@ -311,7 +311,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>Albedo 1</string>
+                    <string>A1</string>
                    </property>
                   </widget>
                  </item>
@@ -383,7 +383,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>X2</string>
+                    <string>x2</string>
                    </property>
                   </widget>
                  </item>
@@ -395,7 +395,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>G1</string>
+                    <string>g1</string>
                    </property>
                   </widget>
                  </item>
@@ -407,7 +407,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>log(D)</string>
+                    <string>log(d)</string>
                    </property>
                   </widget>
                  </item>
@@ -544,7 +544,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>X1</string>
+                    <string>x1</string>
                    </property>
                   </widget>
                  </item>
@@ -592,7 +592,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>G2</string>
+                    <string>g2</string>
                    </property>
                   </widget>
                  </item>
@@ -616,7 +616,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>Pot2</string>
+                    <string>Ω 2</string>
                    </property>
                   </widget>
                  </item>
@@ -664,7 +664,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>P Shift</string>
+                    <string>PShift</string>
                    </property>
                   </widget>
                  </item>
@@ -836,7 +836,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>Pot1</string>
+                    <string>Ω 1</string>
                    </property>
                   </widget>
                  </item>
