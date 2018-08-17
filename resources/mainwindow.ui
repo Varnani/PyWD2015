@@ -1391,7 +1391,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -1445,7 +1445,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -1640,7 +1640,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -1701,7 +1701,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -2147,7 +2147,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -2182,7 +2182,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -2217,7 +2217,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -2233,7 +2233,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -2265,7 +2265,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -2316,7 +2316,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Binary system inclination</string>
+         <string/>
         </property>
         <property name="text">
          <string>0</string>
@@ -2445,7 +2445,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>40</y>
         <width>721</width>
         <height>20</height>
        </rect>
@@ -2478,12 +2478,12 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>711</width>
+        <width>421</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>LC2015 - Configure LC parameters and compute synthetic data points</string>
+       <string>LC2015 - Configure LC parameters and compute synthetic data</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="tobs_ipt">
@@ -2819,118 +2819,14 @@ zero for zero output noise</string>
      <widget class="Line" name="line_19">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>420</x>
         <y>60</y>
-        <width>71</width>
+        <width>51</width>
         <height>231</height>
        </rect>
       </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="lc_lightcurve_btn">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>60</y>
-        <width>230</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Compute synthetic light or velocity curves and plot them with observations, if any.</string>
-      </property>
-      <property name="statusTip">
-       <string>MPAGE = 1 or 2</string>
-      </property>
-      <property name="text">
-       <string>Synthetic Light/Velocity Curves</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="lc_speclineprof_btn">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>110</y>
-        <width>230</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Generate spectral line profiles.</string>
-      </property>
-      <property name="statusTip">
-       <string>MPAGE = 3</string>
-      </property>
-      <property name="text">
-       <string>Spectral Line Profiles</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="lc_stardimphase_btn">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>160</y>
-        <width>230</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Generate relative star dimensions vs. phase.</string>
-      </property>
-      <property name="statusTip">
-       <string>MPAGE = 4</string>
-      </property>
-      <property name="text">
-       <string>Star Dimensions</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="lc_coordinates_btn">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>210</y>
-        <width>230</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Draw star positions as they appear in the sky.</string>
-      </property>
-      <property name="statusTip">
-       <string>MPAGE = 5</string>
-      </property>
-      <property name="text">
-       <string>Star Positions / Roche Lobes</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="lc_conjunction_btn">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>260</y>
-        <width>105</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Compute conjunction times.</string>
-      </property>
-      <property name="statusTip">
-       <string>MPAGE = 6</string>
-      </property>
-      <property name="text">
-       <string>Conjunction</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="lsp_spinbox">
@@ -3018,14 +2914,14 @@ zero for zero output noise</string>
        <string>Fill...</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="lc_oc_btn">
+     <widget class="QPushButton" name="lcout_btn">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
         <x>605</x>
-        <y>260</y>
+        <y>10</y>
         <width>105</width>
         <height>30</height>
        </rect>
@@ -3037,8 +2933,148 @@ zero for zero output noise</string>
        <string>MPAGE = 6</string>
       </property>
       <property name="text">
-       <string>O - C</string>
+       <string>lcout.active</string>
       </property>
+     </widget>
+     <widget class="QPushButton" name="lcin_btn">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>10</y>
+        <width>105</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Compute conjunction times.</string>
+      </property>
+      <property name="statusTip">
+       <string>MPAGE = 6</string>
+      </property>
+      <property name="text">
+       <string>lcin.active</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_20">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>10</y>
+        <width>31</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QWidget" name="gridLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>50</y>
+        <width>231</width>
+        <height>251</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <item row="4" column="0">
+        <widget class="QPushButton" name="lc_conjunction_btn">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Compute conjunction times.</string>
+         </property>
+         <property name="statusTip">
+          <string>MPAGE = 6</string>
+         </property>
+         <property name="text">
+          <string>Conjunction</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QPushButton" name="lc_oc_btn">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Calculate O - C from input eclipse timings.</string>
+         </property>
+         <property name="statusTip">
+          <string>MPAGE = 6</string>
+         </property>
+         <property name="text">
+          <string>O - C</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QPushButton" name="lc_lightcurve_btn">
+         <property name="toolTip">
+          <string>Compute synthetic light or velocity curves and plot them with observations, if any.</string>
+         </property>
+         <property name="statusTip">
+          <string>MPAGE = 1 or 2</string>
+         </property>
+         <property name="text">
+          <string>Synthetic Light/Velocity Curves</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QPushButton" name="lc_speclineprof_btn">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>Generate spectral line profiles.</string>
+         </property>
+         <property name="statusTip">
+          <string>MPAGE = 3</string>
+         </property>
+         <property name="text">
+          <string>Spectral Line Profiles</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QPushButton" name="lc_stardimphase_btn">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Generate relative star dimensions vs. phase.</string>
+         </property>
+         <property name="statusTip">
+          <string>MPAGE = 4</string>
+         </property>
+         <property name="text">
+          <string>Star Dimensions</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QPushButton" name="lc_coordinates_btn">
+         <property name="toolTip">
+          <string>Draw star positions as they appear in the sky.</string>
+         </property>
+         <property name="statusTip">
+          <string>MPAGE = 5</string>
+         </property>
+         <property name="text">
+          <string>Star Positions / Roche Lobes</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_11">

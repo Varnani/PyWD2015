@@ -57,6 +57,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
             self.gr1_spinbox: self.gr2_spinbox,
             self.alb1_spinbox: self.alb2_spinbox,
         }
+        self.lcinview = None
+        self.lcoutview = None
         #
         self.populateStyles()  # populate theme combobox
         self.connectSignals()  # connect events with method
@@ -436,6 +438,12 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DCWidget.dcpath = dcpath
         self.DCWidget.dcinpath = os.path.join(os.path.dirname(dcpath), "dcin.active")
         self.DCWidget.dcoutpath = os.path.join(os.path.dirname(dcpath), "dcout.active")
+
+        # setup outputviews
+        self.lcinview = OutputView(self.lcinpath, self.lcin_btn)
+        self.lcoutview = OutputView(self.lcoutpath, self.lcout_btn)
+        self.DCWidget.DcinView = OutputView(self.DCWidget.dcinpath, self.DCWidget.viewlastdcin_btn)
+        self.DCWidget.DcoutView = OutputView(self.DCWidget.dcoutpath, self.DCWidget.viewlaastdcout_btn)
 
     def clearWidgets(self):
         self.DCWidget.data_combobox.clear()
@@ -1450,8 +1458,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.dcinpath = None
         self.dcoutpath = None
         self.MainWindow = None  # mainwindow sets itself here
-        self.DcinView = OutputView()
-        self.DcoutView = OutputView()
+        self.DcinView = None
+        self.DcoutView = None
         self.iterator = None
         self.axisInverted = False
         self.parameterDict = {
@@ -1695,8 +1703,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.setdeldefaults_btn.clicked.connect(self.setDelDefaults)
         self.clearbaseset_btn.clicked.connect(self.clearKeeps)
         self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
-        self.viewlastdcin_btn.clicked.connect(self.showDcin)
-        self.viewlaastdcout_btn.clicked.connect(self.showDcout)
         self.plot_btn.clicked.connect(self.plotData)
         self.popmain_btn.clicked.connect(self.popPlotWindow)
         self.exportresults_btn.clicked.connect(self.exportData)
@@ -2219,16 +2225,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 resd.invert_yaxis()
             pyplot.show()
 
-    def showDcin(self):
-        self.DcinView.setWindowTitle("PyWD - " + self.dcinpath)
-        self.DcinView.fill(self.dcinpath)
-        self.DcinView.show()
-
-    def showDcout(self):
-        self.DcoutView.setWindowTitle("PyWD - " + self.dcoutpath)
-        self.DcoutView.fill(self.dcoutpath)
-        self.DcoutView.show()
-
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
         self.del_s1lng_ipt.setText("0.02")
@@ -2338,7 +2334,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         # self.viewlastdcin_btn.setDisabled(True)
         self.rundc2015_btn.clicked.disconnect()
         self.rundc2015_btn.clicked.connect(self.abort)
-        self.DcinView.fill(self.dcinpath)
+        self.DcinView.fill()
         self.DcoutView.hide()
         self.MainWindow.LoadObservationWidget.setDisabled(True)
         self.MainWindow.SpotConfigureWidget.setDisabled(True)
@@ -2735,20 +2731,27 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
 
 class OutputView(QtGui.QWidget, outputview.Ui_OutputView):
-    def __init__(self):  # constructor
+    def __init__(self, path, button):  # constructor
         super(OutputView, self).__init__()
         self.setupUi(self)
+        self.path = path
+        button.clicked.connect(self.open)
         db = QtGui.QFontDatabase()
         db.addApplicationFont(__font_path__)
         ptmono = QtGui.QFont(QtCore.QString("PT Mono"), pointSize=11)
         self.output_textedit.setFont(ptmono)
 
-    def fill(self, filepath):
+    def fill(self):
         text = ""
-        with open(filepath, "r") as f:
+        with open(self.path, "r") as f:
             for line in f:
                 text = text + line
         self.output_textedit.setPlainText(text)
+
+    def open(self):
+        self.setWindowTitle("PyWD - " + self.path)
+        self.fill()
+        self.show()
 
 
 class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurveWidget):
