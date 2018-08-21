@@ -733,7 +733,7 @@ class Ui_MainWindow(object):
         self.lc_lightcurve_btn.setObjectName(_fromUtf8("lc_lightcurve_btn"))
         self.gridLayout.addWidget(self.lc_lightcurve_btn, 0, 0, 1, 2)
         self.lc_speclineprof_btn = QtGui.QPushButton(self.gridLayoutWidget)
-        self.lc_speclineprof_btn.setEnabled(False)
+        self.lc_speclineprof_btn.setEnabled(True)
         self.lc_speclineprof_btn.setObjectName(_fromUtf8("lc_speclineprof_btn"))
         self.gridLayout.addWidget(self.lc_speclineprof_btn, 1, 0, 1, 2)
         self.lc_stardimphase_btn = QtGui.QPushButton(self.gridLayoutWidget)

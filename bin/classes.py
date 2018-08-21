@@ -186,6 +186,8 @@ class WDInput:
             if f_ipt == float(0):
                 return (" " * (width - 2 - precision)) + "0." + ("0" * precision)
             output = "{:{width}.{precision}g}".format(f_ipt, width=width, precision=precision)
+            if "." not in output.split("e")[0].strip(" "):
+                output = output.split("e")[0].strip(" ") + ".0e" + output.split("e")[1].strip(" ")
         elif f_ipt >= float(1) or f_ipt <= float(-1):
             output = "{:{width}.{precision}f}".format(f_ipt, width=width, precision=precision)
         output = output.rstrip("0")

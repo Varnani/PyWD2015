@@ -3032,7 +3032,7 @@ zero for zero output noise</string>
        <item row="1" column="0" colspan="2">
         <widget class="QPushButton" name="lc_speclineprof_btn">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="toolTip">
           <string>Generate spectral line profiles.</string>

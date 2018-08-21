@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, \
-    syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget, ocwidget
+    syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget, ocwidget, lineprofilewidget
 from functools import partial
 from bin import methods, classes
 from itertools import izip
@@ -46,6 +46,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.ConjunctionWidget.MainWindow = self
         self.OCWidget = OCWidget()
         self.OCWidget.MainWindow = self
+        self.LineProfileWidget = LineProfileWidget()
+        self.LineProfileWidget.MainWindow = self
         # variables
         self.lcpath = None
         self.lcinpath = None
@@ -104,6 +106,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.tool_month_spinbox.valueChanged.connect(self.checkMonthMaxLimit)
         self.tool_year_spinbox.valueChanged.connect(self.checkMonthMaxLimit)
         self.tool_date_convert_btn.clicked.connect(self.fromUTtoJDConvert)
+        self.lc_speclineprof_btn.clicked.connect(self.LineProfileWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -115,6 +118,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.DimensionWidget.close()
         self.ConjunctionWidget.close()
         self.OCWidget.close()
+        self.LineProfileWidget.close()
 
     def fromUTtoJDConvert(self):
         year = self.tool_year_spinbox.value()
@@ -521,6 +525,14 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.OCWidget.plotAxis.set_ylabel("Day")
         self.OCWidget.plot_canvas.draw()
         self.OCWidget.plot_toolbar.update()
+
+        self.LineProfileWidget.s1_data = None
+        self.LineProfileWidget.s2_data = None
+        self.LineProfileWidget.plotAxis.cla()
+        self.LineProfileWidget.plotAxis.set_xlabel("Micron")
+        self.LineProfileWidget.plotAxis.set_ylabel("Flux")
+        self.LineProfileWidget.plot_canvas.draw()
+        self.LineProfileWidget.plot_toolbar.update()
 
     def begin(self):  # check for wd.conf
         wdconf = os.path.join(__cwd__, "wd.conf")
@@ -3781,6 +3793,187 @@ class OCWidget(QtGui.QWidget, ocwidget.Ui_OCWidget):
                     msg.setText("Data file \"" + fi.fileName() + "\" saved.")
                     msg.setWindowTitle("PyWD - Data Saved")
                     msg.exec_()
+                except:
+                    msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                    msg.exec_()
+
+
+class LineProfileWidget(QtGui.QWidget, lineprofilewidget.Ui_LineProfileWidget):
+    def __init__(self):
+        super(LineProfileWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
+        self.MainWindow = None
+        self.s1_data = None
+        self.s2_data = None
+        self.s1_treewidget.header().setResizeMode(3)
+        self.s2_treewidget.header().setResizeMode(3)
+        # set up plot
+        self.plot_figure = Figure()
+        self.plot_canvas = FigureCanvas(self.plot_figure)
+        self.plot_toolbar = NavigationToolbar(self.plot_canvas, self.plot_widget)
+        plot_layout = QtGui.QVBoxLayout()
+        plot_layout.addWidget(self.plot_toolbar)
+        plot_layout.addWidget(self.plot_canvas)
+        self.plot_widget.setLayout(plot_layout)
+        self.plotAxis = self.plot_figure.add_subplot(111)
+        self.plotAxis.set_xlabel("Micron")
+        self.plotAxis.set_ylabel("Flux")
+        self.plot_figure.tight_layout()
+        # signal connection
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.s1_add_btn.clicked.connect(partial(self.addWavelenghtToTree, self.s1_treewidget))
+        self.s2_add_btn.clicked.connect(partial(self.addWavelenghtToTree, self.s2_treewidget))
+        self.s1_remove_btn.clicked.connect(partial(self.removeWavelenghtFromTree, self.s1_treewidget))
+        self.s2_remove_btn.clicked.connect(partial(self.removeWavelenghtFromTree, self.s2_treewidget))
+        self.plot_btn.clicked.connect(self.plotData)
+        self.export_btn.clicked.connect(self.exportData)
+
+    def addWavelenghtToTree(self, treewidget):
+        item = QtGui.QTreeWidgetItem(treewidget)
+        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+        item.setText(0, "0.656279")
+        item.setText(1, "0.00001")
+        item.setText(2, "0.5")
+        item.setText(3, "0")
+
+    def removeWavelenghtFromTree(self, treewidget):
+        selectedItem = treewidget.selectedItems()
+        if len(selectedItem) > 0:
+            selectedItem = selectedItem[0]
+            root = treewidget.invisibleRootItem()
+            root.takeChild(root.indexOfChild(selectedItem))
+
+    def plotData(self):
+        lineprofile = ""
+        lcin = classes.lcin(self.MainWindow)
+        s1_root = self.s1_treewidget.invisibleRootItem()
+        s2_root = self.s2_treewidget.invisibleRootItem()
+
+        if self.s1_groupbox.isChecked() and s1_root.childCount() > 0:
+            lineprofile = lineprofile + \
+                          lcin.formatInput(self.s1_binwidth_spinbox.value(), 11, 5, "D") + \
+                          lcin.formatInput(self.s1_contscale_spinbox.value(), 9, 4, "F") + \
+                          lcin.formatInput(self.s1_contslope_spinbox.value(), 9, 2, "F") + \
+                          (" " * (3 - len(str(self.s1_subgrid_spinbox.value()))) + str(self.s1_subgrid_spinbox.value())) + \
+                          "\n"
+
+            for i in range(s1_root.childCount()):
+                item = s1_root.child(i)
+                lineprofile = lineprofile + \
+                              lcin.formatInput(item.text(0), 9, 6, "F") + \
+                              lcin.formatInput(item.text(1), 12, 5, "D") + \
+                              lcin.formatInput(item.text(2), 10, 5, "F") + \
+                              (" " * (5 - len(item.text(3))) + item.text(3)) + \
+                              "\n"
+        else:
+            # it wont matter what we print here if groupbox is not checkedso we'll just use lcin.example default values
+            lineprofile = lineprofile + "0.10000d-03 000.9900 -0005.00 03\n"
+
+        lineprofile = lineprofile + "-1.\n"
+
+        if self.s2_groupbox.isChecked() and s2_root.childCount() > 0:
+            lineprofile = lineprofile + \
+                          lcin.formatInput(self.s2_binwidth_spinbox.value(), 11, 5, "D") + \
+                          lcin.formatInput(self.s2_contscale_spinbox.value(), 9, 4, "F") + \
+                          lcin.formatInput(self.s2_contslope_spinbox.value(), 9, 2, "F") + \
+                          (" " * (3 - len(str(self.s2_subgrid_spinbox.value()))) + str(self.s2_subgrid_spinbox.value())) + \
+                          "\n"
+
+            for i in range(s2_root.childCount()):
+                item = s2_root.child(i)
+                lineprofile = lineprofile + \
+                              lcin.formatInput(item.text(0), 9, 6, "F") + \
+                              lcin.formatInput(item.text(1), 12, 5, "D") + \
+                              lcin.formatInput(item.text(2), 10, 5, "F") + \
+                              (" " * (5 - len(item.text(3))) + item.text(3)) + \
+                              "\n"
+        else:
+            lineprofile = lineprofile + "0.10000d-03 000.9900 -0005.00 03\n"
+
+        lineprofile = lineprofile + "-1."
+
+        if len(lineprofile.split("\n")) > 4:
+            self.s1_data = None
+            self.s2_data = None
+            self.plotAxis.cla()
+            # [jdstart, jdstop, jdincrement, phasestart, phasestop, phaseincrement, phasenorm, phobs, lsp, tobs]
+            line3 = [50000, 51000, 0.001,
+                     self.phase_spinbox.value(), self.phase_spinbox.value(), 0.1,
+                     0.25,
+                     self.MainWindow.phobs_ipt.text(), self.MainWindow.lsp_spinbox.value(), self.MainWindow.tavh_ipt.text()]
+            lcin.starPositions(line3=line3, jdphs="2")
+            lcin.output = "3" + lcin.output[1:]
+            lcin.output = lcin.output.split("\n")
+            lcin.output = lcin.output[:8] + list(lineprofile.split("\n")) + lcin.output[8:]
+            output = ""
+            for line in lcin.output:
+                output = output + line + "\n"
+
+            with open(self.MainWindow.lcinpath, "w") as f:
+                f.write(output)
+            process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
+            process.wait()
+
+            if self.s1_groupbox.isChecked():
+
+                s1_table = methods.getTableFromOutput(self.MainWindow.lcoutpath,
+                                                      "                              star 1", offset=3)
+
+                s1_x = [float(row[2]) for row in s1_table]
+                s1_y = [float(row[3]) for row in s1_table]
+
+                self.plotAxis.plot(s1_x, s1_y, color="#4286f4")
+
+                self.s1_data = s1_x, s1_y
+
+            if self.s2_groupbox.isChecked():
+                s2_table = methods.getTableFromOutput(self.MainWindow.lcoutpath,
+                                                      "                              star 2", offset=3)
+                s2_x = [float(row[2]) for row in s2_table]
+                s2_y = [float(row[3]) for row in s2_table]
+
+                self.plotAxis.plot(s2_x, s2_y, color="#f73131")
+
+                self.s2_data = s2_x, s2_y
+
+            self.plotAxis.set_xlabel("Micron")
+            self.plotAxis.set_ylabel("Flux")
+            self.plot_canvas.draw()
+            self.plot_toolbar.update()
+
+    def exportData(self):
+        def _tabulate(data, star):
+            x = data[0]
+            y = data[1]
+            table = "#Wavelenght  #Flux --- #Star {0}\n".format(star)
+            for wl, fx in izip(x, y):
+                table = table + "{:0.7f}".format(wl) + "    " + "{:0.7f}".format(fx) + "\n"
+            return table
+
+        if self.s1_data is not None and self.s2_data is not None:
+            dialog = QtGui.QFileDialog(self)
+            dialog.setDefaultSuffix("txt")
+            dialog.setNameFilter("Plaintext File (*.txt)")
+            dialog.setAcceptMode(1)
+            returnCode = dialog.exec_()
+            filePath = str((dialog.selectedFiles())[0])
+            if filePath != "" and returnCode != 0:
+                msg = QtGui.QMessageBox()
+                fi = QtCore.QFileInfo(filePath)
+                try:
+                    with open(filePath, "w") as f:
+                        output = ""
+                        if self.s1_data is not None:
+                            output = output + _tabulate(self.s1_data, "1") + "\n"
+                        if self.s2_data is not None:
+                            output = output + _tabulate(self.s1_data, "2")
+                        f.write(output)
+                        msg.setText("Data file \"" + fi.fileName() + "\" saved.")
+                        msg.setWindowTitle("PyWD - Data Saved")
+                        msg.exec_()
                 except:
                     msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
                     msg.exec_()
