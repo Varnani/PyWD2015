@@ -80,6 +80,12 @@
          </item>
          <item row="1" column="1">
           <widget class="QSpinBox" name="niter_spinbox">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="minimum">
             <number>1</number>
            </property>
@@ -88,7 +94,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="toolTip">
-            <string>Itertations performed py PyWD. After each iteration, results will be copied into inputs.</string>
+            <string>Itertations performed by PyWD. After each iteration, results will be copied into inputs.</string>
            </property>
            <property name="text">
             <string>External Iterations</string>

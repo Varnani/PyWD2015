@@ -1961,7 +1961,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
                     process.wait()
                     # get data
-                    lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
+                    lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "      JD      ", offset=1)
                     lc_x_index = 1
                     if self.MainWindow.jdphs_combobox.currentText() == "Time" and self.time_combobox.currentText() == "HJD":
                         lc_x_index = 0
@@ -2139,7 +2139,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
                 process.wait()
                 # get data
-                lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
+                lcoutTable = methods.getTableFromOutput(self.MainWindow.lcoutpath, "      JD      ", offset=1)
                 lc_y_index = 4
                 if magnitude:
                     lc_y_index = 8
@@ -2964,7 +2964,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     f.write(lcin.output)
                 process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
                 process.wait()
-                table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=6)
+                table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "      JD         ", offset=1)
                 # set data indexes
                 x_index = None
                 y_index = None
@@ -3036,7 +3036,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     f.write(lcin.output)
                 process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
                 process.wait()
-                table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+                table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "HJD =  ", offset=3)
                 x = [float(x[0].replace("D", "E")) for x in table]
                 y = [float(y[1].replace("D", "E")) for y in table]
                 self.plot_starposAxis.plot(x, y, 'ko', markersize=0.2, label="Surface Grids")
@@ -3326,7 +3326,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
                 f.write(lcin.output)
             process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
             process.wait()
-            table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+            table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "HJD =  ", offset=3)
             x = [float(x[0].replace("D", "E")) for x in table]
             y = [float(y[1].replace("D", "E")) for y in table]
             self.plot_starPositionAxis.plot(x, y, 'ko', markersize=0.2)
@@ -3393,7 +3393,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
                 f.write(lcin.output)
             process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
             process.wait()
-            table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "grid1/4", offset=9)
+            table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "HJD =  ", offset=3)
             x = [float(x[0].replace("D", "E")) for x in table]
             y = [float(y[1].replace("D", "E")) for y in table]
             self.renderArea.showImage(self.renderFrame(x, y, float(str(self.render_phaseSpinbox.text()))))

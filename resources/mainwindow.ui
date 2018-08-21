@@ -2927,7 +2927,7 @@ zero for zero output noise</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Calculate O - C from input eclipse timings.</string>
+       <string>View last lcout.active</string>
       </property>
       <property name="statusTip">
        <string>MPAGE = 6</string>
@@ -2949,7 +2949,7 @@ zero for zero output noise</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Compute conjunction times.</string>
+       <string>View last lcin.active</string>
       </property>
       <property name="statusTip">
        <string>MPAGE = 6</string>
