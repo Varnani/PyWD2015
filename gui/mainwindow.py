@@ -789,7 +789,7 @@ class Ui_MainWindow(object):
         self.desextinc_ipt.setGeometry(QtCore.QRect(525, 90, 101, 25))
         self.desextinc_ipt.setObjectName(_fromUtf8("desextinc_ipt"))
         self.dchistory_btn = QtGui.QPushButton(self.tab_11)
-        self.dchistory_btn.setEnabled(False)
+        self.dchistory_btn.setEnabled(True)
         self.dchistory_btn.setGeometry(QtCore.QRect(385, 200, 241, 61))
         font = QtGui.QFont()
         font.setBold(False)

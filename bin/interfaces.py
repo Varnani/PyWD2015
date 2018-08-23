@@ -6,7 +6,8 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesdialog, \
     dcwidget, lcdcpickerdialog, outputview, loadobservationwidget, \
-    syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget, ocwidget, lineprofilewidget
+    syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget, \
+    ocwidget, lineprofilewidget, historywidget
 from functools import partial
 from bin import methods, classes
 from itertools import izip
@@ -48,6 +49,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.OCWidget.MainWindow = self
         self.LineProfileWidget = LineProfileWidget()
         self.LineProfileWidget.MainWindow = self
+        self.HistoryWidget = HistoryWidget()
+        self.HistoryWidget.MainWindow = self
         # variables
         self.lcpath = None
         self.lcinpath = None
@@ -107,6 +110,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.tool_year_spinbox.valueChanged.connect(self.checkMonthMaxLimit)
         self.tool_date_convert_btn.clicked.connect(self.fromUTtoJDConvert)
         self.lc_speclineprof_btn.clicked.connect(self.LineProfileWidget.show)
+        self.dchistory_btn.clicked.connect(self.HistoryWidget.show)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -119,6 +123,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.ConjunctionWidget.close()
         self.OCWidget.close()
         self.LineProfileWidget.close()
+        self.HistoryWidget.close()
 
     def fromUTtoJDConvert(self):
         year = self.tool_year_spinbox.value()
@@ -533,6 +538,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.LineProfileWidget.plotAxis.set_ylabel("Flux")
         self.LineProfileWidget.plot_canvas.draw()
         self.LineProfileWidget.plot_toolbar.update()
+
+        self.HistoryWidget.clearHistory()
 
     def begin(self):  # check for wd.conf
         wdconf = os.path.join(__cwd__, "wd.conf")
@@ -2701,6 +2708,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
 
             if sanity is True:
                 self.populatePlotCombobox()
+                self.MainWindow.HistoryWidget.addIterationData(self.lastBaseSet)
                 if self.autoupdate_chk.isChecked():
                     self.plot_btn.click()
                 self.continueIterating()
@@ -3869,7 +3877,7 @@ class LineProfileWidget(QtGui.QWidget, lineprofilewidget.Ui_LineProfileWidget):
                               (" " * (5 - len(item.text(3))) + item.text(3)) + \
                               "\n"
         else:
-            # it wont matter what we print here if groupbox is not checkedso we'll just use lcin.example default values
+            # it wont matter what we print here if groupbox is not checked so we'll just use lcin.example default values
             lineprofile = lineprofile + "0.10000d-03 000.9900 -0005.00 03\n"
 
         lineprofile = lineprofile + "-1.\n"
@@ -3953,7 +3961,7 @@ class LineProfileWidget(QtGui.QWidget, lineprofilewidget.Ui_LineProfileWidget):
                 table = table + "{:0.7f}".format(wl) + "    " + "{:0.7f}".format(fx) + "\n"
             return table
 
-        if self.s1_data is not None and self.s2_data is not None:
+        if self.s1_data is not None or self.s2_data is not None:
             dialog = QtGui.QFileDialog(self)
             dialog.setDefaultSuffix("txt")
             dialog.setNameFilter("Plaintext File (*.txt)")
@@ -3969,7 +3977,7 @@ class LineProfileWidget(QtGui.QWidget, lineprofilewidget.Ui_LineProfileWidget):
                         if self.s1_data is not None:
                             output = output + _tabulate(self.s1_data, "1") + "\n"
                         if self.s2_data is not None:
-                            output = output + _tabulate(self.s1_data, "2")
+                            output = output + _tabulate(self.s2_data, "2")
                         f.write(output)
                         msg.setText("Data file \"" + fi.fileName() + "\" saved.")
                         msg.setWindowTitle("PyWD - Data Saved")
@@ -3977,6 +3985,135 @@ class LineProfileWidget(QtGui.QWidget, lineprofilewidget.Ui_LineProfileWidget):
                 except:
                     msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
                     msg.exec_()
+
+
+class HistoryWidget(QtGui.QWidget, historywidget.Ui_HistoryWidget):
+    def __init__(self):
+        super(HistoryWidget, self).__init__()
+        self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon(__icon_path__))
+        # variables
+        self.MainWindow = None
+        self.parameterList = []
+        self.valueList = []
+        self.stderrList = []
+        self.history_treewidget.header().setResizeMode(3)
+        # plot
+        self.plot_figure = Figure()
+        self.plot_canvas = FigureCanvas(self.plot_figure)
+        self.plot_toolbar = NavigationToolbar(self.plot_canvas, self.plot_widget)
+        plot_layout = QtGui.QVBoxLayout()
+        plot_layout.addWidget(self.plot_toolbar)
+        plot_layout.addWidget(self.plot_canvas)
+        self.plot_widget.setLayout(plot_layout)
+        self.plotAxis = self.plot_figure.add_subplot(111)
+        self.plotAxis.set_xlabel("Iteration Number")
+        self.plotAxis.set_ylabel("")
+        self.plot_figure.tight_layout()
+        # signal connection
+        self.connectSignals()
+
+    def connectSignals(self):
+        self.clear_btn.clicked.connect(self.clearHistory)
+        self.plot_btn.clicked.connect(self.plotSelected)
+
+    def addIterationData(self, table):
+        paramList = []
+        valList = []
+        errList = []
+
+        for row in table:
+            paramList.append(self.MainWindow.DCWidget.parameterDict[row[0]])
+            valList.append(float(row[4].replace("D", "e")))
+            errList.append(float(row[5].replace("D", "e")))
+
+        if self.parameterList != paramList:
+            self.clearHistory()
+            self.parameterList = paramList
+        else:
+            pass
+
+        self.valueList.append(valList)
+        self.stderrList.append(errList)
+
+        self.updateHistory()
+
+        if self.auto_chk.isChecked():
+            self.plot_btn.click()
+
+    def updateHistory(self):
+        idx = None
+        selecteditems = self.history_treewidget.selectedItems()
+        if len(selecteditems) > 0:
+            selecteditem = selecteditems[0]
+            idx = self.history_treewidget.invisibleRootItem().indexOfChild(selecteditem)
+
+        self.history_treewidget.clear()
+        header = QtGui.QTreeWidgetItem()
+        header.setText(0, "Parameter")
+
+        i = 1
+        while i < len(self.valueList) + 1:
+            header.setText(i, "Iteration {0}".format(i))
+            i = i + 1
+
+        for index, parameter in enumerate(self.parameterList):
+            item = QtGui.QTreeWidgetItem(self.history_treewidget)
+            item.setText(0, parameter)
+
+            iteration = 1
+            for value, error in izip(self.valueList, self.stderrList):
+                item.setText(iteration, "{0} +/- {0}".format(value[index], error[index]))
+                iteration = iteration + 1
+
+            # t = 1
+            # for value, error in izip(valueList, errorList):
+            #     item.setText(t, "{0} +/- {1}".format(value, error))
+            #     t = t + 1
+
+        self.history_treewidget.setHeaderItem(header)
+
+        if idx is not None:
+            self.history_treewidget.invisibleRootItem().child(idx).setSelected(True)
+
+    def clearHistory(self):
+        header = QtGui.QTreeWidgetItem()
+        header.setText(0, "Parameter")
+        self.history_treewidget.setHeaderItem(header)
+
+        self.parameterList = []
+        self.valueList = []
+        self.stderrList = []
+
+        self.history_treewidget.clear()
+
+        self.plotAxis.cla()
+        self.plot_toolbar.update()
+        self.plot_canvas.draw()
+
+    def plotSelected(self):
+        self.plotAxis.cla()
+
+        selecteditems = self.history_treewidget.selectedItems()
+        if len(selecteditems) > 0:
+            selecteditem = selecteditems[0]
+            index = self.history_treewidget.invisibleRootItem().indexOfChild(selecteditem)
+
+            y = []
+            y_err = []
+            x = []
+            i = 1
+            for value, stderr in izip(self.valueList, self.stderrList):
+                y.append(value[index])
+                y_err.append(stderr[index])
+                x.append(i)
+                i = i + 1
+
+            self.plotAxis.errorbar(x, y, yerr=y_err, linestyle="-", marker="o", markersize=4, color="#4286f4")
+            self.plotAxis.set_xlabel("Iteration Number")
+            self.plotAxis.set_ylabel("")
+            self.plot_canvas.draw()
+            self.plot_toolbar.update()
 
 
 if __name__ == "__main__":
