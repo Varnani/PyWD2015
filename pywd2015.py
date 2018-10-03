@@ -1,7 +1,7 @@
 import platform
 import sys
 from PyQt4 import QtGui
-from bin import interfaces
+from src import interfaces
 
 
 def run():

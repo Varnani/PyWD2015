@@ -9,7 +9,7 @@ from gui import mainwindow, spotconfigurewidget, eclipsewidget, curvepropertiesd
     syntheticcurvewidget, starpositionswidget, dimensionwidget, conjunctionwidget, \
     ocwidget, lineprofilewidget, historywidget
 from functools import partial
-from bin import methods, classes
+from src import methods, classes
 from itertools import izip
 import subprocess
 import sys

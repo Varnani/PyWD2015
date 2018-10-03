@@ -3,7 +3,7 @@ import StringIO
 from itertools import izip
 from functools import partial
 from PyQt4 import QtGui
-from bin import classes
+from src import classes
 import numpy
 from scipy.optimize import fsolve, newton
 from matplotlib import pyplot, gridspec
