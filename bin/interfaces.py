@@ -3305,7 +3305,10 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
             methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starPositionAxis)
             inner, outer = methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), None, getPotentials=True)
             self.inner_crit_label.setText(str(inner[0]))
-            self.outer_crit_label.setText(str(outer[0]))
+            if float(self.MainWindow.e_ipt.text()) == 0.0:
+                self.outer_crit_label.setText(str(outer[0]))
+            else:
+                self.outer_crit_label.setText("N/A")
         else:
             self.inner_crit_label.setText("N/A")
             self.outer_crit_label.setText("N/A")

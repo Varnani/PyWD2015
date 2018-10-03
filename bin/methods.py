@@ -1055,6 +1055,10 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     f_outer_critical = lambda x: ((1.0 / numpy.abs(x)) + (q * (
         (1.0 / numpy.absolute(separation_at_phase - x)) - (x / (separation_at_phase ** 2)))) + (
                             ((q + 1.0) / 2.0) * (f ** 2) * (x ** 2))) - outer_potential
+    f_inner_critical = lambda x: ((1.0 / numpy.abs(x)) + (q * (
+        (1.0 / numpy.absolute(separation_at_phase - x)) - (x / (separation_at_phase ** 2)))) + (
+                            ((q + 1.0) / 2.0) * (f ** 2) * (x ** 2))) - inner_potential
+
     x_axis_temporary = 0.0
     if q >= 1.0:
         x_axis_temporary = separation_at_phase
@@ -1084,8 +1088,15 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
             lower_limit = upper_limit * -1.0
             break
 
-    left_limit = fsolve(f_outer_critical, -0.5)
-    right_limit = fsolve(f_outer_critical, 1.5)
+    left_limit = None
+    right_limit = None
+
+    if e == 0.0:
+        left_limit = fsolve(f_outer_critical, -0.5)
+        right_limit = fsolve(f_outer_critical, 1.5)
+    else:
+        left_limit = fsolve(f_inner_critical, -0.25)
+        right_limit = fsolve(f_inner_critical, 1.5)
 
     x_axis = numpy.linspace(left_limit, right_limit, 2000)
     z_axis = numpy.linspace(lower_limit, upper_limit, 2000)
@@ -1128,10 +1139,6 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
                                                    float(MainWindow.pcsv_ipt.text()) * 1000], cmap='Dark2', vmin=0, vmax=1)
         plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
                                    markersize=10, color="#ff3a3a")
-
-        print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
-        print "Inner critical potential: {0}".format(inner_potential)
-        print "Outer critical potential: {0}".format(outer_potential)
 
 
 def computeFillOutFactor(MainWindow):
