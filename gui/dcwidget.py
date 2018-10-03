@@ -25,8 +25,8 @@ except AttributeError:
 class Ui_DCWidget(object):
     def setupUi(self, DCWidget):
         DCWidget.setObjectName(_fromUtf8("DCWidget"))
-        DCWidget.resize(1355, 800)
-        DCWidget.setMinimumSize(QtCore.QSize(1355, 800))
+        DCWidget.resize(1355, 615)
+        DCWidget.setMinimumSize(QtCore.QSize(1355, 615))
         self.verticalLayout_9 = QtGui.QVBoxLayout(DCWidget)
         self.verticalLayout_9.setObjectName(_fromUtf8("verticalLayout_9"))
         self.gridLayout = QtGui.QGridLayout()

@@ -15,12 +15,12 @@ import subprocess
 import sys
 import ConfigParser
 import os
-import time
 import io
 
 # globals
 __cwd__ = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 __icon_path__ = os.path.join(__cwd__, "resources", "pywd.ico")
+__resource_path__ = os.path.join(__cwd__, "resources")
 __font_path__ = os.path.join(__cwd__, "resources", "PTM55FT.ttf")
 
 
@@ -111,6 +111,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         self.tool_date_convert_btn.clicked.connect(self.fromUTtoJDConvert)
         self.lc_speclineprof_btn.clicked.connect(self.LineProfileWidget.show)
         self.dchistory_btn.clicked.connect(self.HistoryWidget.show)
+        self.randomizeseed_btn.clicked.connect(self.randomizeSeed)
+        self.defaultseed_btn.clicked.connect(self.setSeedDefault)
 
     def closeEvent(self, *args, **kwargs):  # overriding QMainWindow's closeEvent
         self.LoadObservationWidget.close()
@@ -538,6 +540,19 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
 
         self.HistoryWidget.clearHistory()
 
+        self.StarPositionWidget.plot_starPositionAxis.cla()
+        self.StarPositionWidget.plot_toolbar.update()
+        self.StarPositionWidget.plot_canvas.draw()
+        self.StarPositionWidget.inner_crit_label.setText("N/A")
+        self.StarPositionWidget.outer_crit_label.setText("N/A")
+
+        self.StarPositionWidget.renderArea.showImage(QtGui.QImage())
+        self.StarPositionWidget.progressBar.setValue(0)
+        self.StarPositionWidget.message_label.setText("Ready")
+        self.StarPositionWidget.starRenderData = None
+        self.StarPositionWidget.horizontalSlider.setValue(0)
+        self.StarPositionWidget.singleFrame = None
+
     def begin(self):  # check for wd.conf
         wdconf = os.path.join(__cwd__, "wd.conf")
         parser = ConfigParser.SafeConfigParser()
@@ -669,6 +684,12 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
         style = styleFactory.create(self.theme_combobox.currentText())
         self.app.setStyle(style)
         self.app.setFont(font)
+
+    def randomizeSeed(self):
+        self.seed_spinbox.setValue(float(numpy.random.randint(1, 1000000000)))
+
+    def setSeedDefault(self):
+        self.seed_spinbox.setValue(138472375.0)
 
 
 class LCDCPickerWidget(QtGui.QDialog, lcdcpickerdialog.Ui_LCDCPickerDialog):
@@ -3200,22 +3221,28 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         super(StarPositionWidget, self).__init__()
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon(__icon_path__))
-        self.start_btn.setIcon(QtGui.QIcon("resources/play.png"))
-        self.skip_btn.setIcon(QtGui.QIcon("resources/jump.png"))
-        self.backtostart_btn.setIcon(QtGui.QIcon("resources/start.png"))
+        self.start_btn.setIcon(QtGui.QIcon(os.path.join(__resource_path__, "play.png")))
+        self.pause_btn.setIcon(QtGui.QIcon(os.path.join(__resource_path__, "pause.png")))
+        self.next_btn.setIcon(QtGui.QIcon(os.path.join(__resource_path__, "next.png")))
+        self.prev_btn.setIcon(QtGui.QIcon(os.path.join(__resource_path__, "prev.png")))
         # variables
         self.MainWindow = None
         self.starRenderData = None
         self.starsRendered = False
-        self.stopwatch = None
-        self.lastFrameShown = 0
-        self.iterator = None
+        self.currentFrame = 0
+        self.playing = False
+        self.singleFrame = None
         # animation variables
         self.framesPerSecond = 25.0  # 25 frames per second
         self.frameTime = 1.0 / self.framesPerSecond  # 0.04ms per frame (25fps)
         self.duration = 5.0  # duration of animation in seconds
         self.totalFrames = 5.0 * self.framesPerSecond  # 125 frames total
         self.phaseIncrement = 1.0 / self.totalFrames  # 0.008
+        self.Stopwatch = classes.Stopwatch(self.frameTime)
+        # set up slider
+        self.horizontalSlider.setMinimum(0)
+        self.horizontalSlider.setMaximum(126)
+        self.horizontalSlider.setTickInterval(1)
         # set up canvas
         self.plot_figure = Figure()
         self.plot_canvas = FigureCanvas(self.plot_figure)
@@ -3257,28 +3284,67 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
             self.imageToRender = image
             self.repaint()
 
-    def playRender(self):
-        for image in self.starRenderData:
-            start = time.time()
-            self.renderArea.showImage(image)
-            wait = time.time() - start
-            if wait < 0.0:
-                wait = 0.0
-            time.sleep(self.frameTime - wait)
-
-    def closeEvent(self, QCloseEvent):
-        try:
-            self.iterator.stop()
-        except:
-            pass
-
     def connectSignals(self):
         self.single_chk.stateChanged.connect(self.checkSingle)
         self.render_btn.clicked.connect(self.renderStars)
-        self.start_btn.clicked.connect(self.playRender)
         self.plot_btn.clicked.connect(self.plotSingle)
         self.roche_chk.stateChanged.connect(self.checkRoche)
         self.saveall_btn.clicked.connect(self.saveAll)
+        self.saveframe_btn.clicked.connect(self.saveFrame)
+        self.connect(self.Stopwatch, QtCore.SIGNAL("stopped()"), self.nextImage)
+        self.horizontalSlider.sliderMoved.connect(self.sliderClicked)
+        self.horizontalSlider.sliderPressed.connect(self.sliderClicked)
+        self.start_btn.clicked.connect(self.startPlayback)
+        self.pause_btn.clicked.connect(self.stopPlayback)
+        self.next_btn.clicked.connect(self.nextFrame)
+        self.prev_btn.clicked.connect(self.prevFrame)
+
+    def nextFrame(self):
+        self.stopPlayback()
+        if self.starRenderData is not None:
+            self.currentFrame = self.currentFrame + 1
+            if self.currentFrame == len(self.starRenderData):
+                self.currentFrame = 0
+            self.renderArea.showImage(self.starRenderData[self.currentFrame])
+            self.horizontalSlider.setValue(self.currentFrame)
+
+    def prevFrame(self):
+        self.stopPlayback()
+        if self.starRenderData is not None:
+            self.currentFrame = self.currentFrame - 1
+            if self.currentFrame == -1:
+                self.currentFrame = len(self.starRenderData) - 1
+            self.renderArea.showImage(self.starRenderData[self.currentFrame])
+            self.horizontalSlider.setValue(self.currentFrame)
+
+    def sliderClicked(self):
+        if self.starRenderData is not None:
+            self.stopPlayback()
+            self.renderArea.showImage(self.starRenderData[self.horizontalSlider.value()])
+            self.currentFrame = self.horizontalSlider.value()
+
+    def nextImage(self):
+        self.renderArea.showImage(self.starRenderData[self.currentFrame])
+        self.currentFrame = self.currentFrame + 1
+        self.horizontalSlider.setValue(self.currentFrame)
+        if self.currentFrame == len(self.starRenderData):
+            self.stopPlayback()
+            self.currentFrame = 0
+
+    def closeEvent(self, QCloseEvent):
+        try:
+            self.Stopwatch.terminate()
+        except:
+            pass
+
+    def startPlayback(self):
+        if self.starRenderData is not None:
+            self.Stopwatch.start()
+            self.playing = True
+
+    def stopPlayback(self):
+        self.Stopwatch.isRunning = False
+        self.playing = False
 
     def checkSingle(self):
         if self.single_chk.isChecked():
@@ -3345,6 +3411,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         dpiDict = {
             "64dpi": 64,
             "128dpi": 128,
+            "196dpi": 196,
             "256dpi": 256
         }
         pyplot.savefig(image, dpi=dpiDict[str(self.dpi_combobox.currentText())], format="png")
@@ -3355,25 +3422,48 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         return qimage
 
     def saveAll(self):
-        if self.starsRendered is True:
+        if self.starRenderData is not None:
             dialog = QtGui.QFileDialog()
             dialog.setFileMode(2)
-            dialog.exec_()
-            path = str(dialog.selectedFiles()[0])
-            i = 0
-            saveOk = True
-            for qimage in self.starRenderData:
-                status = qimage.save(os.path.join(path, "{:0>4d}".format(i) + ".png"), "png", 100)
-                i = i + 1
-                if status is False:
-                    saveOk = False
-                    break
-            msg = QtGui.QMessageBox()
-            if saveOk is True:
-                msg.setText("Frames are saved into " + path)
-            else:
-                msg.setText("An error has occured.")
-            msg.exec_()
+            returnCode = dialog.exec_()
+            filePath = str((dialog.selectedFiles())[0])
+            if filePath != "" and returnCode != 0:
+                i = 0
+                saveOk = True
+                for qimage in self.starRenderData:
+                    status = qimage.save(os.path.join(filePath, "{:0>4d}".format(i) + ".png"), "png", 100)
+                    i = i + 1
+                    if status is False:
+                        saveOk = False
+                        break
+                msg = QtGui.QMessageBox()
+                if saveOk is True:
+                    msg.setText("Frames are saved into " + filePath)
+                else:
+                    msg.setText("An error has occured.")
+                msg.exec_()
+
+    def saveFrame(self):
+        if self.starRenderData is not None or self.singleFrame is not None:
+            dialog = QtGui.QFileDialog()
+            dialog.setDefaultSuffix("png")
+            dialog.setNameFilter("PNG File (*png)")
+            dialog.setAcceptMode(1)
+            returnCode = dialog.exec_()
+            filePath = str((dialog.selectedFiles())[0])
+            if filePath != "" and returnCode != 0:
+                qimage = None
+                if self.singleFrame is not None:
+                    qimage = self.singleFrame
+                else:
+                    qimage = self.starRenderData[self.currentFrame]
+                status = qimage.save(filePath, "png", 100)
+                msg = QtGui.QMessageBox()
+                if status is True:
+                    msg.setText("Frame is saved into " + filePath)
+                else:
+                    msg.setText("An error has occured.")
+                msg.exec_()
 
     def renderStars(self):
         if self.single_chk.isChecked():
@@ -3391,8 +3481,11 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
             table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "HJD =  ", offset=3)
             x = [float(x[0].replace("D", "E")) for x in table]
             y = [float(y[1].replace("D", "E")) for y in table]
-            self.renderArea.showImage(self.renderFrame(x, y, float(str(self.render_phaseSpinbox.text()))))
+            qimage = self.renderFrame(x, y, float(str(self.render_phaseSpinbox.text())))
+            self.singleFrame = qimage
+            self.renderArea.showImage(qimage)
         else:
+            self.singleFrame = None
             lcin = classes.lcin(self.MainWindow)
             lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
                                       0, 1, self.phaseIncrement, 0.25, 0.75, 1,
@@ -3420,8 +3513,9 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.saveframe_btn.setDisabled(True)
         self.saveall_btn.setDisabled(True)
         self.start_btn.setDisabled(True)
-        self.skip_btn.setDisabled(True)
-        self.backtostart_btn.setDisabled(True)
+        self.next_btn.setDisabled(True)
+        self.pause_btn.setDisabled(True)
+        self.prev_btn.setDisabled(True)
         self.horizontalSlider.setDisabled(True)
 
     def enableUi(self):
@@ -3434,8 +3528,9 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.saveframe_btn.setDisabled(False)
         self.saveall_btn.setDisabled(False)
         self.start_btn.setDisabled(False)
-        self.skip_btn.setDisabled(False)
-        self.backtostart_btn.setDisabled(False)
+        self.next_btn.setDisabled(False)
+        self.pause_btn.setDisabled(False)
+        self.prev_btn.setDisabled(False)
         self.horizontalSlider.setDisabled(False)
         self.message_label.setText("Ready")
 
@@ -3462,6 +3557,7 @@ class StarPositionWidget(QtGui.QWidget, starpositionswidget.Ui_StarPositionWidge
         self.starsRendered = True
         self.enableUi()
         self.render_btn.setDisabled(False)
+        self.renderArea.showImage(self.starRenderData[0])
 
 
 class DimensionWidget(QtGui.QWidget, dimensionwidget.Ui_DimensionWidget):
@@ -4003,6 +4099,7 @@ class HistoryWidget(QtGui.QWidget, historywidget.Ui_HistoryWidget):
     def connectSignals(self):
         self.clear_btn.clicked.connect(self.clearHistory)
         self.plot_btn.clicked.connect(self.plotSelected)
+        self.export_btn.clicked.connect(self.exportData)
 
     def addIterationData(self, table):
         paramList = []
@@ -4098,9 +4195,42 @@ class HistoryWidget(QtGui.QWidget, historywidget.Ui_HistoryWidget):
 
             self.plotAxis.errorbar(x, y, yerr=y_err, linestyle="-", marker="o", markersize=4, color="#4286f4")
             self.plotAxis.set_xlabel("Iteration Number")
-            self.plotAxis.set_ylabel("")
+            self.plotAxis.set_ylabel("Parameter Value")
+            self.plotAxis.ticklabel_format(useOffset=False)
             self.plot_canvas.draw()
             self.plot_toolbar.update()
+
+    def exportData(self):
+        if len(self.parameterList) > 0:
+            dialog = QtGui.QFileDialog(self)
+            dialog.setDefaultSuffix("txt")
+            dialog.setNameFilter("Plaintext File (*.txt)")
+            dialog.setAcceptMode(1)
+            returnCode = dialog.exec_()
+            filePath = str((dialog.selectedFiles())[0])
+            if filePath != "" and returnCode != 0:
+                msg = QtGui.QMessageBox()
+                fi = QtCore.QFileInfo(filePath)
+                try:
+                    with open(filePath, "w") as f:
+                        output = ""
+                        index = 0
+                        for parameter in self.parameterList:
+                            output = output + " --- " + parameter + " --- \n"
+                            i = 1
+                            for value, stderr in izip(self.valueList, self.stderrList):
+                                output = output + str(i) + " " + str(value[index]) + " +- " + str(stderr[index]) + "\n"
+                                i = i + 1
+                            index = index + 1
+                            output = output + "\n"
+
+                        f.write(output)
+                        msg.setText("Data file \"" + fi.fileName() + "\" saved.")
+                        msg.setWindowTitle("PyWD - Data Saved")
+                        msg.exec_()
+                except:
+                    msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                    msg.exec_()
 
 
 if __name__ == "__main__":

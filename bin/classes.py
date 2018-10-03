@@ -1068,9 +1068,16 @@ class Stopwatch(QtCore.QThread):
     def __init__(self, wait):
         QtCore.QThread.__init__(self)
         self.wait = wait
+        self.isRunning = True
 
     def run(self):
-        time.sleep(self.wait)
+        self.isRunning = True
+        while self.checkRunning() is True:
+            time.sleep(self.wait)
+            self.emit(QtCore.SIGNAL("stopped()"))
+
+    def checkRunning(self):
+        return self.isRunning
 
 
 class ColorCalibrator:

@@ -2427,7 +2427,7 @@
      </widget>
      <widget class="QPushButton" name="defaultseed_btn">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
@@ -2520,7 +2520,7 @@
      </widget>
      <widget class="QPushButton" name="randomizeseed_btn">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
@@ -2547,13 +2547,13 @@
        <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
       <property name="decimals">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="minimum">
-       <double>100000001.000000000000000</double>
+       <double>1.000000000000000</double>
       </property>
       <property name="maximum">
-       <double>200000002.000000000000000</double>
+       <double>999999999.000000000000000</double>
       </property>
       <property name="value">
        <double>138472375.000000000000000</double>
@@ -3135,7 +3135,7 @@ zero for zero output noise</string>
        <rect>
         <x>380</x>
         <y>87</y>
-        <width>141</width>
+        <width>151</width>
         <height>31</height>
        </rect>
       </property>
@@ -3204,7 +3204,7 @@ zero for zero output noise</string>
      <widget class="QSpinBox" name="linkext_spinbox">
       <property name="geometry">
        <rect>
-        <x>525</x>
+        <x>535</x>
         <y>130</y>
         <width>50</width>
         <height>25</height>
@@ -3230,9 +3230,9 @@ zero for zero output noise</string>
      <widget class="QLineEdit" name="desextinc_ipt">
       <property name="geometry">
        <rect>
-        <x>525</x>
+        <x>535</x>
         <y>90</y>
-        <width>101</width>
+        <width>91</width>
         <height>25</height>
        </rect>
       </property>
