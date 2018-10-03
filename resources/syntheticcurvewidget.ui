@@ -6,26 +6,125 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>910</width>
-    <height>700</height>
+    <width>1000</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Plot Synthetic Curves</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="2">
+     <item row="0" column="0">
+      <widget class="QTreeWidget" name="loaded_treewidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>260</height>
+        </size>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>53</number>
+       </attribute>
+       <attribute name="headerMinimumSectionSize">
+        <number>30</number>
+       </attribute>
+       <attribute name="headerStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>File Name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Type</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Band</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>L1</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>L2</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>L3</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>X1</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>X2</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Y1</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Y2</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Opacity</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Extinction</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Calibration</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Factor</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Zero</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="0" column="1">
       <layout class="QGridLayout" name="gridLayout">
-       <item row="8" column="0" colspan="3">
-        <widget class="Line" name="line_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0" colspan="3">
+       <item row="7" column="0" colspan="2">
         <widget class="QCheckBox" name="alias_chk">
          <property name="toolTip">
           <string>Alias with phase start and phase end. Does nothing if working with HJD.</string>
@@ -35,31 +134,20 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="3">
-        <widget class="QPushButton" name="plot_btn">
+       <item row="1" column="0" colspan="2">
+        <widget class="QPushButton" name="pop_btn">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="toolTip">
-          <string>Plot selected item</string>
+          <string>Pop plot window</string>
          </property>
          <property name="text">
-          <string>Plot</string>
+          <string>Pop</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="3">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0" colspan="3">
-        <widget class="Line" name="line_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="3">
+       <item row="4" column="0" colspan="2">
         <widget class="QComboBox" name="time_combobox">
          <property name="toolTip">
           <string>Select x axis unit</string>
@@ -76,60 +164,24 @@
          </item>
         </widget>
        </item>
-       <item row="9" column="0" colspan="3">
-        <widget class="QCheckBox" name="drawstars_chk">
-         <property name="toolTip">
-          <string>Draw star positions in a subplot</string>
-         </property>
-         <property name="text">
-          <string>Star Positions</string>
+       <item row="3" column="0" colspan="2">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="13" column="0" colspan="3">
-        <widget class="QLabel" name="fillout_label">
+       <item row="2" column="0" colspan="2">
+        <widget class="QPushButton" name="export_btn">
          <property name="enabled">
           <bool>true</bool>
          </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="toolTip">
-          <string>Compute fillout factor as defined in BinaryMaker software;
-Bradstreet, D. H. 1993, IAU Commission on Close Binary Stars, 21, 151
-Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomical Society, 34, 75.02  </string>
-         </property>
          <property name="text">
-          <string>Fillout = N/A</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <string>Export</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="2">
-        <widget class="QDoubleSpinBox" name="phase_spinbox">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="decimals">
-          <number>4</number>
-         </property>
-         <property name="maximum">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.100000000000000</double>
-         </property>
-         <property name="value">
-          <double>0.250000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="3">
+       <item row="5" column="0" colspan="2">
         <widget class="QCheckBox" name="plotobs_chk">
          <property name="toolTip">
           <string>Include observation in plot</string>
@@ -142,7 +194,24 @@ Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomica
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="3">
+       <item row="0" column="0" colspan="2">
+        <widget class="QPushButton" name="plot_btn">
+         <property name="toolTip">
+          <string>Plot selected item</string>
+         </property>
+         <property name="text">
+          <string>Plot</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" colspan="2">
+        <widget class="QCheckBox" name="enablegrid_chk">
+         <property name="text">
+          <string>Enable Grid</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2">
         <widget class="QCheckBox" name="plotmodel_chk">
          <property name="toolTip">
           <string>Compute and plot synthetic curve</string>
@@ -155,197 +224,39 @@ Bradstreet, D. H. and Steelman, D. P. 2002, Bulletin of the American Astronomica
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="3">
-        <widget class="QCheckBox" name="roche_chk">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="toolTip">
-          <string>Draw Roche equipotential surfaces onto star positions. This option is only valid when Phase = 0.25</string>
-         </property>
-         <property name="text">
-          <string>Roche Pot.'s</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0" colspan="2">
-        <widget class="QLabel" name="label">
-         <property name="toolTip">
-          <string>Phase of star positions</string>
-         </property>
-         <property name="text">
-          <string>Phase</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="3">
-        <widget class="QPushButton" name="pop_btn">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="toolTip">
-          <string>Pop plot window</string>
-         </property>
-         <property name="text">
-          <string>Pop</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="3">
-        <widget class="QPushButton" name="pushButton">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Export</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
-     <item row="0" column="0">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QTreeWidget" name="loaded_treewidget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>120</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>275</height>
-          </size>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::SingleSelection</enum>
-         </property>
-         <attribute name="headerDefaultSectionSize">
-          <number>53</number>
-         </attribute>
-         <attribute name="headerMinimumSectionSize">
-          <number>30</number>
-         </attribute>
-         <attribute name="headerStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <column>
-          <property name="text">
-           <string>File Name</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Band</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>L1</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>L2</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>L3</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>X1</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>X2</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Y1</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Y2</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Opacity</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Extinction</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Calibration</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Factor</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Zero</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="1">
-      <widget class="Line" name="line_5">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+     <item row="1" column="0" colspan="2">
+      <widget class="QWidget" name="plot_widget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>500</width>
+         <height>300</height>
+        </size>
        </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="plot_widget" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>500</width>
-       <height>300</height>
-      </size>
-     </property>
-    </widget>
-   </item>
   </layout>
+  <zorder>plot_btn</zorder>
+  <zorder>pop_btn</zorder>
+  <zorder>export_btn</zorder>
+  <zorder>time_combobox</zorder>
+  <zorder>plotobs_chk</zorder>
+  <zorder>plotmodel_chk</zorder>
+  <zorder>enablegrid_chk</zorder>
+  <zorder>alias_chk</zorder>
+  <zorder>drawstars_chk</zorder>
+  <zorder>label</zorder>
+  <zorder>phase_spinbox</zorder>
+  <zorder>gridLayoutWidget</zorder>
  </widget>
  <resources/>
  <connections/>

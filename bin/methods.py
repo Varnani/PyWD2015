@@ -5,7 +5,8 @@ from functools import partial
 from PyQt4 import QtGui
 from bin import classes
 import numpy
-from scipy.optimize import fsolve
+from scipy.optimize import fsolve, newton
+from matplotlib import pyplot, gridspec
 
 
 __configver__ = "0.1.0"
@@ -1005,68 +1006,119 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
     separation_at_phase = 1.0 - e * numpy.cos(E)
 
     q = float(MainWindow.rm_ipt.text())
-    qIsInverse = False
-    if q > 1.0:
-        q = 1.0 / q
-        qIsInverse = True
+    qInverse = q
+    if q >= 1.0:
+        qInverse = 1.0 / q
+
     f = 1.0
-    f_critical = lambda x: (-1 / x ** 2) - \
+
+    f_critical_inner = lambda x: (-1.0 / x ** 2) - \
                            (q * ((x - separation_at_phase) / pow(numpy.absolute(separation_at_phase - x), 3))) + \
                            (x * f ** 2 * (q + 1)) - (q / separation_at_phase ** 2)  # Appendix E.12.4
-    inner_critical_x = fsolve(f_critical, separation_at_phase / 2.0)
+
+    inner_critical_x = fsolve(f_critical_inner, separation_at_phase / 2.0)
     inner_potential = (1 / inner_critical_x) + (q * (
-    (1 / numpy.absolute(separation_at_phase - inner_critical_x)) - (inner_critical_x / (separation_at_phase ** 2)))) + (
+        (1 / numpy.absolute(separation_at_phase - inner_critical_x)) -
+        (inner_critical_x / (separation_at_phase ** 2)))) + (
                           ((q + 1) / 2) * (f ** 2) * (inner_critical_x ** 2))  # Appendix E.12.8
 
-    mu = (1.0 / 3.0) * q / (1.0 + q)
+    mu = None
+    if q >= 1.0:
+        mu = (1.0 / 3.0) * (1.0 / q) / (1.0 + (1.0 / q))
+    else:
+        mu = (1.0 / 3.0) * q / (1.0 + q)
+
     outer_critical_estimation = 1.0 + mu ** (1.0 / 3.0) + (1.0 / 3.0) * mu ** (2.0 / 3.0) + (1.0 / 9.0) * mu ** \
-                                (3.0 / 3.0)
-    outer_critical_x = fsolve(f_critical, outer_critical_estimation)
-    outer_potential = (1.0 / outer_critical_x) + (q * (
+                                    (3.0 / 3.0)
+
+    f_critical_outer = lambda x: (-1.0 / x ** 2) - \
+                           (qInverse * ((x - separation_at_phase) / pow(numpy.absolute(separation_at_phase - x), 3))) + \
+                           (x * f ** 2 * (qInverse + 1)) - (qInverse / separation_at_phase ** 2)  # Appendix E.12.4 with inverse q check
+
+    f_critical_outer_deriv = lambda x: (2.0 / x ** 3) + ((2.0 * qInverse) / pow(numpy.abs(separation_at_phase - x), 3)) + \
+                                 f ** 2.0 * (qInverse + 1.0)  # Appendix E.12.5
+
+    outer_critical_x = newton(f_critical_outer, outer_critical_estimation, tol=1e-6, fprime=f_critical_outer_deriv)
+
+    if q >= 1.0:
+        outer_critical_x = 1.0 - outer_critical_x
+
+    outer_potential = (1.0 / numpy.abs(outer_critical_x)) + (q * (
         (1.0 / numpy.absolute(separation_at_phase - outer_critical_x)) - (
-        outer_critical_x / (separation_at_phase ** 2)))) + (
+            outer_critical_x / (separation_at_phase ** 2)))) + (
                             ((q + 1.0) / 2.0) * (f ** 2) * (outer_critical_x ** 2))  # Appendix E.12.8
 
     if getPotentials is True:
         return inner_potential, outer_potential
 
-    f_outer_critical = lambda x: 1.0 / (numpy.sqrt(x ** 2)) + q * (1.0 / (numpy.sqrt(
-        separation_at_phase ** 2 - 2.0 * x * separation_at_phase + x ** 2)) - x / separation_at_phase ** 2) + f ** 2 * (
-    (q + 1.0) / 2.0) * (x ** 2) - outer_potential
-    left_limit = fsolve(f_outer_critical, -1.0 * (separation_at_phase / 2.0))
-    right_limit = outer_critical_x
+    # only  used for calculating left / right limits
+    f_outer_critical = lambda x: ((1.0 / numpy.abs(x)) + (q * (
+        (1.0 / numpy.absolute(separation_at_phase - x)) - (x / (separation_at_phase ** 2)))) + (
+                            ((q + 1.0) / 2.0) * (f ** 2) * (x ** 2))) - outer_potential
+    x_axis_temporary = 0.0
+    if q >= 1.0:
+        x_axis_temporary = separation_at_phase
+    z_axis_temporary = numpy.linspace(0, 5, 5000)
+    (X_temp, Z_temp) = numpy.meshgrid(x_axis_temporary, z_axis_temporary)
+
+    all_pots_temp = ((1 / numpy.sqrt(X_temp ** 2 + Z_temp ** 2)) + (q * (
+            (1 / numpy.sqrt(
+                (separation_at_phase ** 2) - (2 * X_temp * separation_at_phase) + (
+                            numpy.sqrt(X_temp ** 2 + Z_temp ** 2) ** 2))) - (
+                    X_temp / (separation_at_phase ** 2)))) + (
+                                 0.5 * (f ** 2) * (q + 1) * ((X_temp ** 2) + (Z_temp ** 2))))
+
+    critical_limit = None
+    if e == 0.0:
+        critical_limit = outer_potential
+    else:
+        critical_limit = inner_potential
+
+    upper_limit = None
+    lower_limit = None
+
+    for y_val in all_pots_temp:
+        if y_val <= critical_limit:
+            idx = numpy.where(all_pots_temp == y_val)[0]
+            upper_limit = (float(idx) * (5.0 / 5000.0)) + 0.01
+            lower_limit = upper_limit * -1.0
+            break
+
+    left_limit = fsolve(f_outer_critical, -0.5)
+    right_limit = fsolve(f_outer_critical, 1.5)
+
     x_axis = numpy.linspace(left_limit, right_limit, 2000)
-    z_axis = numpy.linspace(-1, 2, 2000)
+    z_axis = numpy.linspace(lower_limit, upper_limit, 2000)
     (X, Z) = numpy.meshgrid(x_axis, z_axis)
+
     all_pots = ((1 / numpy.sqrt(X ** 2 + Z ** 2)) + (q * (
         (1 / numpy.sqrt(
             (separation_at_phase ** 2) - (2 * X * separation_at_phase) + (numpy.sqrt(X ** 2 + Z ** 2) ** 2))) - (
-            X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X ** 2)))
+            X / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * ((X ** 2) + (Z ** 2))))
 
-    if qIsInverse:
-        q = 1 / q
     center_of_mass = (separation_at_phase / (1 + (1 / q)))
 
     x_axis_primary = numpy.linspace(left_limit, inner_critical_x, 2000)
-    z_axis_primary = numpy.linspace(-1, 2, 2000)
+    z_axis_primary = numpy.linspace(-0.6, 0.6, 2000)
     (X_primary, Z_primary) = numpy.meshgrid(x_axis_primary, z_axis_primary)
-    x_axis_secondary = numpy.linspace(inner_critical_x, right_limit  + 0.2, 2000)
-    z_axis_secondary = numpy.linspace(-1, 2, 2000)
+
+    x_axis_secondary = numpy.linspace(inner_critical_x, right_limit, 2000)
+    z_axis_secondary = numpy.linspace(-0.6, 0.6, 2000)
     (X_secondary, Z_secondary) = numpy.meshgrid(x_axis_secondary, z_axis_secondary)
+
     all_pots_primary = ((1 / numpy.sqrt(X_primary ** 2 + Z_primary ** 2)) + (q * (
         (1 / numpy.sqrt(
             (separation_at_phase ** 2) - (2 * X_primary * separation_at_phase) +
             (numpy.sqrt(X_primary ** 2 + Z_primary ** 2) ** 2))) - (
-            X_primary / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X_primary ** 2)))
+            X_primary / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * ((X_primary ** 2) + (Z_primary ** 2))))
+
     all_pots_secondary = ((1 / numpy.sqrt(X_secondary ** 2 + Z_secondary ** 2)) + (q * (
         (1 / numpy.sqrt(
             (separation_at_phase ** 2) - (2 * X_secondary * separation_at_phase) +
             (numpy.sqrt(X_secondary ** 2 + Z_secondary ** 2) ** 2))) - (
-            X_secondary / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * (X_secondary ** 2)))
+            X_secondary / (separation_at_phase ** 2)))) + (0.5 * (f ** 2) * (q + 1) * ((X_secondary ** 2) + (Z_secondary ** 2))))
 
     if plotAxis is not None:
-        if qIsInverse:
-            X = -1.0 * X + separation_at_phase
         plotAxis.contour(X, Z, all_pots, inner_potential, colors="red")
         if e == 0.0:
             plotAxis.contour(X, Z, all_pots, outer_potential, colors="blue")
@@ -1076,6 +1128,7 @@ def computeRochePotentials(MainWindow, phase, plotAxis, getPotentials=False):
                                                    float(MainWindow.pcsv_ipt.text()) * 1000], cmap='Dark2', vmin=0, vmax=1)
         plotAxis.plot([0, separation_at_phase, center_of_mass], [0, 0, 0], linestyle="", marker="+",
                                    markersize=10, color="#ff3a3a")
+
         print "Separation at phase {0}: {1}".format(phase, separation_at_phase)
         print "Inner critical potential: {0}".format(inner_potential)
         print "Outer critical potential: {0}".format(outer_potential)
@@ -1371,6 +1424,63 @@ def computeOmegaPotential(q, fractradius, f, d):
                                         (fractradius / (d ** 2)))) + (((q + 1.0) / 2.0) * (f ** 2) * (fractradius ** 2))
 
     return omega
+
+
+def popPlotWindow(obs_axis, resd_axis, grid_chk):
+    pyplot.cla()
+    grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
+    obs = pyplot.subplot(grid[0])
+    resd = pyplot.subplot(grid[1], sharex=obs)
+    pyplot.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
+    obs.xaxis.get_major_ticks()
+    pyplot.get_current_fig_manager().set_window_title("Matplotlib")
+    resd.axhline(c="r")
+
+    for obs_line in obs_axis.lines:
+        obs.plot(obs_line.get_xdata(), obs_line.get_ydata(),
+                 linestyle=obs_line.get_linestyle(),
+                 marker=obs_line.get_marker(),
+                 markersize=obs_line.get_markersize(),
+                 color=obs_line.get_color())
+
+    for resd_line in resd_axis.lines:
+        resd.plot(resd_line.get_xdata(), resd_line.get_ydata(),
+                  linestyle=resd_line.get_linestyle(),
+                  marker=resd_line.get_marker(),
+                  markersize=resd_line.get_markersize(),
+                  color=resd_line.get_color())
+
+    obs.grid(grid_chk.isChecked())
+    resd.grid(grid_chk.isChecked())
+
+    obs.set_ylabel(obs_axis.get_ylabel())
+    resd.set_ylabel(resd_axis.get_ylabel())
+    resd.set_xlabel(resd_axis.get_xlabel())
+
+    if obs_axis.yaxis_inverted():
+        obs.invert_yaxis()
+    if resd_axis.yaxis_inverted():
+        resd.invert_yaxis()
+
+    pyplot.show()
+
+
+def exportFromPlotData(obs_axis, resd_axis):
+    output = "# --- Observation Axis Data (x, y)\n"
+
+    for line in obs_axis.lines:
+        for x, y in izip(line.get_xdata(), line.get_ydata()):
+            output = output + str(x) + " " + str(y) + "\n"
+        output = output + "\n"
+
+    output = output + "# --- Residual Axis Data (x, y)\n"
+
+    for line in resd_axis.lines:
+        for x, y in izip(line.get_xdata(), line.get_ydata()):
+            output = output + str(x) + " " + str(y) + "\n"
+        output = output + "\n"
+
+    return output
 
 
 if __name__ == "__main__":

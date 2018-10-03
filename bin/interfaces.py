@@ -461,7 +461,6 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
 
         self.SyntheticCurveWidget.plot_observationAxis.cla()
         self.SyntheticCurveWidget.plot_residualAxis.cla()
-        self.SyntheticCurveWidget.plot_starposAxis.cla()
 
         self.DCWidget.obs_x = []
         self.DCWidget.obs_y = []
@@ -474,9 +473,7 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
 
         yticks_resd = self.DCWidget.plot_residualAxis.yaxis.get_major_ticks()
         yticks_resd[-1].label1.set_visible(False)
-        yticks_star = self.SyntheticCurveWidget.plot_starposAxis.yaxis.get_major_ticks()
-        yticks_star[0].label1.set_visible(False)
-        yticks_star[-1].label1.set_visible(False)
+
 
         self.DCWidget.plot_canvas.draw()
         self.SyntheticCurveWidget.plot_canvas.draw()
@@ -1688,15 +1685,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.firstComponentTable = None
         self.secondComponentTable = None
         self.lastiteration = 0
-        # variables for plot
-        self.obs_x = []
-        self.obs_y = []
-        self.model_x = []
-        self.model_y = []
-        self.resd_x = []
-        self.resd_y = []
-        self.obslabel = ""
-        self.timelabel = ""
         # canvas for main
         self.plot_figure = Figure()
         self.plot_canvas = FigureCanvas(self.plot_figure)
@@ -1708,7 +1696,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
         self.plot_observationAxis = self.plot_figure.add_subplot(grid[0])
         self.plot_residualAxis = self.plot_figure.add_subplot(grid[1], sharex=self.plot_observationAxis)
-        self.plot_observationAxis.get_xaxis().set_visible(False)
+        self.plot_observationAxis.get_xaxis().set_visible(True)
         yticks = self.plot_residualAxis.yaxis.get_major_ticks()
         yticks[-1].label1.set_visible(False)
         self.plot_figure.tight_layout()
@@ -1723,8 +1711,13 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.clearbaseset_btn.clicked.connect(self.clearKeeps)
         self.updateinputs_btn.clicked.connect(self.updateInputFromOutput)
         self.plot_btn.clicked.connect(self.plotData)
-        self.popmain_btn.clicked.connect(self.popPlotWindow)
+        self.popmain_btn.clicked.connect(partial(methods.popPlotWindow,
+                                                 self.plot_observationAxis,
+                                                 self.plot_residualAxis,
+                                                 self.enablegrid_chk))
         self.exportresults_btn.clicked.connect(self.exportData)
+        self.enablegrid_chk.stateChanged.connect(self.toggleGrid)
+        self.export_btn.clicked.connect(self.exportAxesData)
 
     def closeEvent(self, *args, **kwargs):
         try:
@@ -1824,8 +1817,10 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                             mean_radii_err[1] = numpy.power(mean_radii_err[1], 1.0 / len(self.secondComponentTable))
 
                             if selection.objectName() == "plaintext":
-                                f.write("r1 mean" + (" " * (12 - len(str(mean_radii[0])))) + str(mean_radii[0]) + (" " * (12 - len(str(mean_radii_err[0])))) + str(mean_radii_err[0]) + "\n")
-                                f.write("r2 mean" + (" " * (12 - len(str(mean_radii[1])))) + str(mean_radii[1]) + (" " * (12 - len(str(mean_radii_err[1])))) + str(mean_radii_err[1]) + "\n")
+                                f.write("r1_mean" + " " + (" " * (12 - len(str(mean_radii[0])))) + str(mean_radii[0]) +
+                                        " +- " + (" " * (12 - len(str(mean_radii_err[0])))) + str(mean_radii_err[0]) + "\n")
+                                f.write("r2_mean" + " " + (" " * (12 - len(str(mean_radii[1])))) + str(mean_radii[1]) +
+                                        " +- " + (" " * (12 - len(str(mean_radii_err[1])))) + str(mean_radii_err[1]) + "\n")
 
                                 f.write("\n#Mean Residual for Input Values\n" + methods.convertFromScientificToGeneric(
                                     self.residualTable[0].replace("D", "e")))
@@ -1999,19 +1994,26 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                         self.plot_observationAxis.plot(lc_x_vr2, lc_y_vr2, linestyle="", marker="o", markersize=4,
                                                        color="red")
                 if vr1_table is not None:
-                    self.plot_observationAxis.plot(x_axis_vr1, obs_vr1, linestyle="", marker="o", markersize=4, color="#4286f4")
-                    self.plot_residualAxis.plot(x_axis_vr1, resd_vr1, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    self.plot_observationAxis.plot(x_axis_vr1, obs_vr1, linestyle="", marker="o", markersize=4,
+                                                   color="#4286f4")
+                    self.plot_residualAxis.plot(x_axis_vr1, resd_vr1, linestyle="", marker="o", markersize=4,
+                                                color="#4286f4")
                 if vr2_table is not None:
-                    self.plot_observationAxis.plot(x_axis_vr2, obs_vr2, linestyle="", marker="o", markersize=4, color="red")
-                    self.plot_residualAxis.plot(x_axis_vr2, resd_vr2, linestyle="", marker="o", markersize=4, color="red")
+                    self.plot_observationAxis.plot(x_axis_vr2, obs_vr2, linestyle="", marker="o", markersize=4,
+                                                   color="red")
+                    self.plot_residualAxis.plot(x_axis_vr2, resd_vr2, linestyle="", marker="o", markersize=4,
+                                                color="red")
             self.plot_residualAxis.axhline(c="r")
             self.plot_observationAxis.set_ylabel("Radial Velocity (km s$^{-1}$)")
             self.plot_residualAxis.set_ylabel("Residuals")
-            if str(self.MainWindow.jdphs_combobox.currentText()) == "Time" and str(self.time_combobox.currentText()) == "HJD":
+            if str(self.MainWindow.jdphs_combobox.currentText()) == "Time" and str(
+                    self.time_combobox.currentText()) == "HJD":
                 self.plot_residualAxis.set_xlabel("HJD")
             else:
                 self.plot_residualAxis.set_xlabel("Phase")
             self.plot_toolbar.update()
+            self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
+            self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_canvas.draw()
         elif str(self.data_combobox.currentText()) == "O - C":
             ocTable = methods.getTableFromOutput(self.dcoutpath, "Unweighted Observational Equations")
@@ -2047,6 +2049,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     self.plot_observationAxis.cla()
                     self.plot_residualAxis.cla()
                     self.plot_observationAxis.plot(x, y, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
+                    self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
                     self.plot_canvas.draw()
                     self.plot_toolbar.update()
 
@@ -2204,45 +2208,34 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 if self.plot_residualAxis.yaxis_inverted() == True:
                     self.plot_residualAxis.invert_yaxis()
             self.plot_observationAxis.ticklabel_format(useOffset=False)
+            self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
+            self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_canvas.draw()
-            # store plot data
-            self.obs_x = x_axis
-            self.obs_y = obs
-            self.model_x = lc_x
-            self.model_y = lc_y
-            self.resd_x = x_axis
-            self.resd_y = resd
-            self.obslabel = ylabel
-            self.timelabel = xlabel
 
-    def popPlotWindow(self):
-        if self.data_combobox.currentText() != "":
-            self.plot_btn.click()
-            pyplot.cla()
-            grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
-            obs = pyplot.subplot(grid[0])
-            resd = pyplot.subplot(grid[1], sharex=obs)
-            pyplot.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
-            obs.xaxis.get_major_ticks()
-            obs.plot(self.obs_x, self.obs_y, linestyle="", marker="o", markersize=4, color="#4286f4")
-            resd.plot(self.resd_x, self.resd_y, linestyle="", marker="o", markersize=4, color="#4286f4")
-            if self.uselc_chk.isChecked():
-                obs.plot(self.model_x, self.model_y, color="red")
-            else:
-                obs.plot(self.model_x, self.model_y, linestyle="", marker="o", markersize=4, color="red")
-            title = "Matplotlib - " + os.path.basename(str(self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].FilePath))
-            resd.axhline(c="r")
-            pyplot.get_current_fig_manager().set_window_title(title)
-            obs.set_ylabel(self.obslabel)
-            resd.set_ylabel("Residuals")
-            resd.set_xlabel(self.timelabel)
-            obs.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
-                                                  labelright=False, labelleft=True, labelsize=11)
+    def exportAxesData(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("txt")
+        dialog.setNameFilter("Plaintext File (*.txt)")
+        dialog.setAcceptMode(1)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        if filePath != "" and returnCode != 0:
+            msg = QtGui.QMessageBox()
+            fi = QtCore.QFileInfo(filePath)
+            try:
+                with open(filePath, "w") as f:
+                    f.write(methods.exportFromPlotData(self.plot_observationAxis, self.plot_residualAxis))
+                msg.setText("Data file \"" + fi.fileName() + "\" saved.")
+                msg.setWindowTitle("PyWD - Data Saved")
+                msg.exec_()
+            except:
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
 
-            if self.plot_observationAxis.yaxis_inverted() == True:
-                obs.invert_yaxis()
-                resd.invert_yaxis()
-            pyplot.show()
+    def toggleGrid(self):
+        self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
+        self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
+        self.plot_canvas.draw()
 
     def setDelDefaults(self):
         self.del_s1lat_ipt.setText("0.02")
@@ -2350,6 +2343,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.updateinputs_btn.setDisabled(True)
         self.exportresults_btn.setDisabled(True)
         self.viewlaastdcout_btn.setDisabled(True)
+        self.export_btn.setDisabled(True)
         # self.viewlastdcin_btn.setDisabled(True)
         self.rundc2015_btn.clicked.disconnect()
         self.rundc2015_btn.clicked.connect(self.abort)
@@ -2361,13 +2355,13 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.MainWindow.setDisabled(True)
         self.tabWidget.setDisabled(True)
         self.plot_btn.setDisabled(True)
-        self.autoupdate_chk.setDisabled(True)
         self.popmain_btn.setDisabled(True)
 
     def enableUi(self):
         self.updateinputs_btn.setDisabled(False)
         self.exportresults_btn.setDisabled(False)
         self.viewlaastdcout_btn.setDisabled(False)
+        self.export_btn.setDisabled(False)
         # self.viewlastdcin_btn.setDisabled(False)
         self.rundc2015_btn.setText("Run DC")
         self.rundc2015_btn.clicked.disconnect()
@@ -2378,7 +2372,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.MainWindow.setDisabled(False)
         self.tabWidget.setDisabled(False)
         self.plot_btn.setDisabled(False)
-        self.autoupdate_chk.setDisabled(False)
         self.popmain_btn.setDisabled(False)
 
     def updateInputFromOutput(self):
@@ -2791,15 +2784,9 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         plot_layout.addWidget(self.plot_toolbar)
         plot_layout.addWidget(self.plot_canvas)
         self.plot_widget.setLayout(plot_layout)
-        self.dual_grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
-        self.triple_grid = gridspec.GridSpec(2, 2, height_ratios=[1.5, 1], width_ratios=[2, 1], wspace=0.1)
-        self.plot_observationAxis = self.plot_figure.add_subplot(self.dual_grid[0])
-        self.plot_residualAxis = self.plot_figure.add_subplot(self.dual_grid[1], sharex=self.plot_observationAxis)
-        self.plot_starposAxis = self.plot_figure.add_subplot(self.triple_grid[0:, -1])
-        self.plot_starposAxis.axis("equal")
-        self.plot_starposAxis.set_visible(False)
-        self.plot_observationAxis.get_xaxis().set_visible(False)
-        # self.plot_figure.tight_layout()
+        grid = gridspec.GridSpec(2, 1, height_ratios=[1.5, 1])
+        self.plot_observationAxis = self.plot_figure.add_subplot(grid[0])
+        self.plot_residualAxis = self.plot_figure.add_subplot(grid[1], sharex=self.plot_observationAxis)
         self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
         self.plot_canvas.draw()
         self.plotIsInverted = False
@@ -2811,10 +2798,12 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         self.connectSignals()
 
     def connectSignals(self):
-        self.roche_chk.stateChanged.connect(self.rocheChanged)
         self.loaded_treewidget.model().dataChanged.connect(self.updateObservations)
         self.loaded_treewidget.itemDoubleClicked.connect(self.checkEditable)
         self.plot_btn.clicked.connect(self.plotSelected)
+        self.pop_btn.clicked.connect(partial(methods.popPlotWindow, self.plot_observationAxis, self.plot_residualAxis, self.enablegrid_chk))
+        self.enablegrid_chk.stateChanged.connect(self.checkGridState)
+        self.export_btn.clicked.connect(self.exportData)
 
     def selectedItem(self):
         selecteditem = self.loaded_treewidget.selectedItems()
@@ -2823,15 +2812,30 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         else:
             return None
 
+    def exportData(self):
+        dialog = QtGui.QFileDialog(self)
+        dialog.setDefaultSuffix("txt")
+        dialog.setNameFilter("Plaintext File (*.txt)")
+        dialog.setAcceptMode(1)
+        returnCode = dialog.exec_()
+        filePath = str((dialog.selectedFiles())[0])
+        if filePath != "" and returnCode != 0:
+            msg = QtGui.QMessageBox()
+            fi = QtCore.QFileInfo(filePath)
+            try:
+                with open(filePath, "w") as f:
+                    f.write(methods.exportFromPlotData(self.plot_observationAxis, self.plot_residualAxis))
+                msg.setText("Data file \"" + fi.fileName() + "\" saved.")
+                msg.setWindowTitle("PyWD - Data Saved")
+                msg.exec_()
+            except:
+                msg.setText("An error has ocurred: \n" + str(sys.exc_info()[1]))
+                msg.exec_()
+
     def plotSelected(self):
-        self.fillout_label.setText("Fillout = " + methods.computeFillOutFactor(self.MainWindow))
         if self.selectedItem() is not None:
             self.plot_observationAxis.cla()
             self.plot_residualAxis.cla()
-            self.plot_starposAxis.cla()
-            self.plot_observationAxis.set_position(self.dual_grid[0].get_position(self.plot_figure))
-            self.plot_residualAxis.set_position(self.dual_grid[1].get_position(self.plot_figure))
-            self.plot_starposAxis.set_visible(False)
             item = self.selectedItem()
             ylabel = None
             type = ""
@@ -3032,38 +3036,18 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     if self.plot_residualAxis.yaxis_inverted() == True:
                         self.plot_residualAxis.invert_yaxis()
 
-            if self.drawstars_chk.isChecked():
-                self.plot_observationAxis.set_position(self.triple_grid[0, :-1].get_position(self.plot_figure))
-                self.plot_residualAxis.set_position(self.triple_grid[1, :-1].get_position(self.plot_figure))
-                self.plot_starposAxis.set_visible(True)
-                lcin = classes.lcin(self.MainWindow)
-                phase = self.phase_spinbox.value()
-                lcin.starPositions(line3=[self.MainWindow.jd0_ipt.text(), float(self.MainWindow.jd0_ipt.text()) + 1, 0.1,
-                             phase, phase, 0.1, 0.25, 0.75, 1, float(self.MainWindow.tavh_ipt.text()) / 10000], jdphs="2")
-                with open(self.MainWindow.lcinpath, "w") as f:
-                    f.write(lcin.output)
-                process = subprocess.Popen(self.MainWindow.lcpath, cwd=os.path.dirname(self.MainWindow.lcpath))
-                process.wait()
-                table = methods.getTableFromOutput(self.MainWindow.lcoutpath, "HJD =  ", offset=3)
-                x = [float(x[0].replace("D", "E")) for x in table]
-                y = [float(y[1].replace("D", "E")) for y in table]
-                self.plot_starposAxis.plot(x, y, 'ko', markersize=0.2, label="Surface Grids")
-                self.plot_starposAxis.plot([0], [0], linestyle="", marker="+", markersize=5, color="#ff3a3a")
-            if self.roche_chk.isChecked():
-                self.plot_observationAxis.set_position(self.triple_grid[0, :-1].get_position(self.plot_figure))
-                self.plot_residualAxis.set_position(self.triple_grid[1, :-1].get_position(self.plot_figure))
-                self.plot_starposAxis.set_visible(True)
-                methods.computeRochePotentials(self.MainWindow, self.phase_spinbox.value(), self.plot_starposAxis)
-                self.plot_starposAxis.set_xlim(-1, 2)
-                self.plot_starposAxis.set_ylim(-1, 1)
-
             self.plot_toolbar.update()
-            self.plot_starposAxis.set_xlabel('x')
-            self.plot_starposAxis.set_ylabel('y')
             yticks_resd = self.plot_residualAxis.yaxis.get_major_ticks()
             yticks_resd[-1].label1.set_visible(False)
+            self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
+            self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_residualAxis.axhline(0, color="red")
             self.plot_canvas.draw()
+
+    def checkGridState(self):
+        self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
+        self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
+        self.plot_canvas.draw()
 
     def updateObservations(self):
         item = self.loaded_treewidget.invisibleRootItem().child(self.lastEditedIndex)
