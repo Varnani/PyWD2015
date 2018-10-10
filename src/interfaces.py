@@ -1722,6 +1722,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         yticks[-1].label1.set_visible(False)
         self.plot_figure.tight_layout()
         self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
+        self.plot_observationAxis.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
+                        labelright=False, labelleft=True, labelsize=11)
         self.plot_canvas.draw()
         # signal connection
         self.connectSignals()
@@ -2072,6 +2074,8 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                     self.plot_observationAxis.plot(x, y, linestyle="", marker="o", markersize=4, color="#4286f4")
                     self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
                     self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
+                    self.plot_residualAxis.ticklabel_format(useOffset=False)
+                    self.plot_observationAxis.ticklabel_format(useOffset=False)
                     self.plot_canvas.draw()
                     self.plot_toolbar.update()
 
@@ -2213,8 +2217,6 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             self.plot_residualAxis.plot(x_axis, resd, linestyle="", marker="o", markersize=4, color=clr)
             self.plot_residualAxis.axhline(c="r")
             self.plot_toolbar.update()
-            self.plot_observationAxis.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
-                                                  labelright=False, labelleft=True, labelsize=11)
             self.plot_residualAxis.set_xlabel(xlabel)
             self.plot_residualAxis.set_ylabel("Residuals")
             self.plot_observationAxis.set_ylabel(ylabel)
@@ -2229,6 +2231,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 if self.plot_residualAxis.yaxis_inverted() == True:
                     self.plot_residualAxis.invert_yaxis()
             self.plot_observationAxis.ticklabel_format(useOffset=False)
+            self.plot_residualAxis.ticklabel_format(useOffset=False)
             self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_canvas.draw()
@@ -2809,6 +2812,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
         self.plot_observationAxis = self.plot_figure.add_subplot(grid[0])
         self.plot_residualAxis = self.plot_figure.add_subplot(grid[1], sharex=self.plot_observationAxis)
         self.plot_figure.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
+        self.plot_observationAxis.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
+                        labelright=False, labelleft=True, labelsize=11)
         self.plot_canvas.draw()
         self.plotIsInverted = False
         # add synthetic curves
@@ -3062,6 +3067,8 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
             yticks_resd[-1].label1.set_visible(False)
             self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
+            self.plot_observationAxis.ticklabel_format(useOffset=False)
+            self.plot_residualAxis.ticklabel_format(useOffset=False)
             self.plot_residualAxis.axhline(0, color="red")
             self.plot_canvas.draw()
 
@@ -3815,7 +3822,7 @@ class OCWidget(QtGui.QWidget, ocwidget.Ui_OCWidget):
             eclipse = []
             formatter = classes.WDInput()
             for jd, min in izip(eclipseCurve.timeList, eclipseCurve.observationList):
-                eclipse.append(formatter.formatInput(jd, 14, 5, "F") + "     " + min)
+                eclipse.append(formatter.formatInput(jd, 14, 5, "D") + "     " + min)
             lcin.output = lcin.output.split("\n")
             lcin.output = lcin.output[:-1] + eclipse
             lcin.output.append("-10000.")
@@ -4032,6 +4039,7 @@ class LineProfileWidget(QtGui.QWidget, lineprofilewidget.Ui_LineProfileWidget):
 
             self.plotAxis.set_xlabel("Micron")
             self.plotAxis.set_ylabel("Flux")
+            self.plotAxis.ticklabel_format(useOffset=False)
             self.plot_canvas.draw()
             self.plot_toolbar.update()
 

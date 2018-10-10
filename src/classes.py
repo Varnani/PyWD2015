@@ -669,9 +669,9 @@ class dcin(WDInput):
                                                                     vc1prop.observationList,
                                                                     vc1prop.weightList):
                         vc1dataline = vc1dataline + \
-                                      self.formatInput(time, 14, 5, "F") + \
-                                      self.formatInput((float(observation) / vunit), 11, 6, "F") + \
-                                      self.formatInput(weight, 8, 3, "F") + "\n"
+                                      self.formatInput(time, 14, 5, "D") + \
+                                      self.formatInput((float(observation) / vunit), 11, 6, "D") + \
+                                      self.formatInput(weight, 8, 3, "D") + "\n"
                 vc1dataline = vc1dataline + "  -10001.00000\n"
             vc2dataline = ""
             if ifvc2 == "1":
@@ -683,9 +683,9 @@ class dcin(WDInput):
                                                                     vc2prop.observationList,
                                                                     vc2prop.weightList):
                         vc2dataline = vc2dataline + \
-                                      self.formatInput(time, 14, 5, "F") + \
-                                      self.formatInput((float(observation) / vunit), 11, 6, "F") + \
-                                      self.formatInput(weight, 8, 3, "F") + "\n"
+                                      self.formatInput(time, 14, 5, "D") + \
+                                      self.formatInput((float(observation) / vunit), 11, 6, "D") + \
+                                      self.formatInput(weight, 8, 3, "D") + "\n"
                 vc2dataline = vc2dataline + "  -10001.00000\n"
 
             lcdataline = ""
@@ -698,9 +698,9 @@ class dcin(WDInput):
                         for time, observation, weight in itertools.izip(curve.timeList,
                                                                         curve.observationList,
                                                                         curve.weightList):
-                            lcdataline = lcdataline + self.formatInput(time, 14, 5, "F") + \
-                                         self.formatInput(observation, 11, 6, "F") + \
-                                         self.formatInput(weight, 8, 3, "F") + "\n"
+                            lcdataline = lcdataline + self.formatInput(time, 14, 5, "D") + \
+                                         self.formatInput(observation, 11, 6, "D") + \
+                                         self.formatInput(weight, 8, 3, "D") + "\n"
                     lcdataline = lcdataline + "  -10001.00000\n"
 
             ecdataline = ""
@@ -714,8 +714,8 @@ class dcin(WDInput):
                                                                 curve.observationList,
                                                                 curve.weightList):
                         ecdataline = ecdataline + \
-                                     self.formatInput(time, 14, 5, "F") + (" " * 5 + mintype) + \
-                                     self.formatInput(weight, 13, 3, "F") + "\n"
+                                     self.formatInput(time, 14, 5, "D") + (" " * 5 + mintype) + \
+                                     self.formatInput(weight, 13, 3, "D") + "\n"
                 ecdataline = ecdataline + "  -10001.00000\n"
 
             self.output = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + line11 + line12 \

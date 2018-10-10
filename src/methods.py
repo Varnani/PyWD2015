@@ -1439,7 +1439,8 @@ def popPlotWindow(obs_axis, resd_axis, grid_chk):
     obs = pyplot.subplot(grid[0])
     resd = pyplot.subplot(grid[1], sharex=obs)
     pyplot.subplots_adjust(top=0.95, bottom=0.1, left=0.1, right=0.95, hspace=0, wspace=0)
-    obs.xaxis.get_major_ticks()
+    obs.tick_params(labeltop=False, labelbottom=False, bottom=True, top=True,
+                                          labelright=False, labelleft=True, labelsize=11)
     pyplot.get_current_fig_manager().set_window_title("Matplotlib")
     resd.axhline(c="r")
 
@@ -1451,11 +1452,15 @@ def popPlotWindow(obs_axis, resd_axis, grid_chk):
                  color=obs_line.get_color())
 
     for resd_line in resd_axis.lines:
-        resd.plot(resd_line.get_xdata(), resd_line.get_ydata(),
-                  linestyle=resd_line.get_linestyle(),
-                  marker=resd_line.get_marker(),
-                  markersize=resd_line.get_markersize(),
-                  color=resd_line.get_color())
+        x = resd_line.get_xdata()
+        y = resd_line.get_ydata()
+
+        if x != [0, 1] and y != [0, 0]:
+            resd.plot(x, y,
+                      linestyle=resd_line.get_linestyle(),
+                      marker=resd_line.get_marker(),
+                      markersize=resd_line.get_markersize(),
+                      color=resd_line.get_color())
 
     obs.grid(grid_chk.isChecked())
     resd.grid(grid_chk.isChecked())
@@ -1468,6 +1473,9 @@ def popPlotWindow(obs_axis, resd_axis, grid_chk):
         obs.invert_yaxis()
     if resd_axis.yaxis_inverted():
         resd.invert_yaxis()
+
+    obs.ticklabel_format(useOffset=False)
+    resd.ticklabel_format(useOffset=False)
 
     pyplot.show()
 
