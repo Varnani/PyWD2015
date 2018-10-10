@@ -443,6 +443,8 @@ class MainWindow(QtGui.QMainWindow, mainwindow.Ui_MainWindow):  # main window cl
             self.apastron_label.setText(": " + "{:0.4f}".format(phase_of_apastron))
 
     def setPaths(self, lcpath, dcpath):
+        lcpath = os.path.abspath(lcpath)
+        dcpath = os.path.abspath(dcpath)
         self.lcpath = lcpath
         self.lcinpath = os.path.join(os.path.dirname(lcpath), "lcin.active")
         self.lcoutpath = os.path.join(os.path.dirname(lcpath), "lcout.active")
