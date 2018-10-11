@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'lcdcpickerdialog.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Thu Oct 11 13:01:32 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -95,9 +96,9 @@ class Ui_LCDCPickerDialog(object):
     def retranslateUi(self, LCDCPickerDialog):
         LCDCPickerDialog.setWindowTitle(_translate("LCDCPickerDialog", "PyWD2015", None))
         self.label.setText(_translate("LCDCPickerDialog", "Welcome to PyWD2015", None))
-        self.label_2.setText(_translate("LCDCPickerDialog", "PyWD2015 is a GUI for LC and DC programs of Wilson - Devinney eclipsing binary modeling software. PyWD2015 needs these programs to function. Please provide their paths below.\n"
+        self.label_2.setText(_translate("LCDCPickerDialog", "PyWD2015 is a GUI for 2015 version of LC and DC programs of Wilson - Devinney (WD) eclipsing binary modeling code. PyWD2015 needs these programs to function. Please provide their paths below.\n"
 "\n"
-"If you got this program from the GitHub release page, you probably have them in /PyWD2015/wd/ path with necessary files. If you don\'t, you can grab them from GitHub or compile the source code from WD Homepage yourself.", None))
+"Precompiled WD binaries and associated limb darkening tables are hosted on GitHub release page with permissions of Dr. Robert E. Wilson and Dr. Walter Van Hamme. You can also obtain source codes and limb darkening tables from the WD Homepage and compile LC and DC codes yourself.", None))
         self.pickdc_btn.setText(_translate("LCDCPickerDialog", "Pick File", None))
         self.label_67.setText(_translate("LCDCPickerDialog", "DC Binary:", None))
         self.label_65.setText(_translate("LCDCPickerDialog", "WD Homepage:", None))

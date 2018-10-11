@@ -68,9 +68,9 @@
     </rect>
    </property>
    <property name="text">
-    <string>PyWD2015 is a GUI for LC and DC programs of Wilson - Devinney eclipsing binary modeling software. PyWD2015 needs these programs to function. Please provide their paths below.
+    <string>PyWD2015 is a GUI for 2015 version of LC and DC programs of Wilson - Devinney (WD) eclipsing binary modeling code. PyWD2015 needs these programs to function. Please provide their paths below.
 
-If you got this program from the GitHub release page, you probably have them in /PyWD2015/wd/ path with necessary files. If you don't, you can grab them from GitHub or compile the source code from WD Homepage yourself.</string>
+Precompiled WD binaries and associated limb darkening tables are hosted on GitHub release page with permissions of Dr. Robert E. Wilson and Dr. Walter Van Hamme. You can also obtain source codes and limb darkening tables from the WD Homepage and compile LC and DC codes yourself.</string>
    </property>
    <property name="textFormat">
     <enum>Qt::PlainText</enum>

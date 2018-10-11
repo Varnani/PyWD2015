@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created by: PyQt4 UI code generator 4.12.1
+# Created: Thu Oct 11 13:20:01 2018
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -718,8 +719,8 @@ class Ui_MainWindow(object):
         self.gridLayoutWidget.setGeometry(QtCore.QRect(480, 50, 231, 251))
         self.gridLayoutWidget.setObjectName(_fromUtf8("gridLayoutWidget"))
         self.gridLayout = QtGui.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout.setMargin(0)
         self.gridLayout.setSpacing(6)
+        self.gridLayout.setMargin(0)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.lc_conjunction_btn = QtGui.QPushButton(self.gridLayoutWidget)
         self.lc_conjunction_btn.setEnabled(True)
@@ -1239,7 +1240,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.maintabwidget.setCurrentIndex(0)
         self.inputtabwidget.setCurrentIndex(0)
-        self.mode_combobox.setCurrentIndex(1)
+        self.mode_combobox.setCurrentIndex(3)
         self.lcnoise_combobox.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -1714,7 +1715,7 @@ class Ui_MainWindow(object):
         self.label_65.setText(_translate("MainWindow", "WD Homepage:", None))
         self.lineEdit.setText(_translate("MainWindow", "github.com/Varnani/PyWD2015", None))
         self.label_66.setText(_translate("MainWindow", "GitHub:", None))
-        self.pywd_about.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">PyWD2015</span> is a graphical user interface wrapping and adding convenience features to Wilson - Devinney\'s DC/LC programs for eclipsing binary system modeling, targeting specifically the 2015 version. </p><p>Manual is available at the GitHub wiki. You can also reach the authors from there.</p><p>For information about DC/LC programs itself, please refer to the WD Homepage.</p></body></html>", None))
+        self.pywd_about.setText(_translate("MainWindow", "<html><head/><body><p align=\"justify\"><span style=\" font-weight:600;\">PyWD2015</span> is a graphical user interface to the Wilson - Devinney\'s (WD) eclipsing binary modeling program with additional user-friendly functionalities and tools.</p><p align=\"justify\">Manual and contact information is available at GitHub wiki page.</p><p align=\"justify\">For information, updates and news about WD program please refer to the WD Homepage.</p><p align=\"justify\">If you are going to use this interface within your research, we kindly ask you to cite relevant papers. Information about references is available on GitHub wiki under &quot;Citation&quot; page.</p></body></html>", None))
         self.label_4.setToolTip(_translate("MainWindow", "You can change theme if current one is causing problems. [?]", None))
         self.label_4.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Possible themes are indexed here automatically. They are dependent on your OS, desktop manager and Qt installation.</p></body></html>", None))
         self.label_4.setText(_translate("MainWindow", "Change Theme:", None))
