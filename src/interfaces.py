@@ -1882,15 +1882,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
         self.data_combobox.clear()
         for curve in self.MainWindow.LoadObservationWidget.Curves():
             self.data_combobox.addItem(os.path.basename(curve.FilePath))
-        try:
-            self.data_combobox.setCurrentIndex(lastindex)
-        except:
-            self.data_combobox.setCurrentIndex(0)
-            self.autoupdate_chk.setChecked(False)
         if self.MainWindow.LoadObservationWidget.vcPropertiesList[0] != 0 and self.MainWindow.LoadObservationWidget.vcPropertiesList[1] != 0:
             self.data_combobox.addItem("Vr1 + Vr2")
         if self.MainWindow.EclipseWidget.iftime_chk.isChecked() and os.path.isfile(str(self.MainWindow.EclipseWidget.filepath_label.text())):
             self.data_combobox.addItem("O - C")
+        self.data_combobox.setCurrentIndex(lastindex)
 
     def plotData(self):
         # TODO this is becoming messy. clean up before doing anything else.
