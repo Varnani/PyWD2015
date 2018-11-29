@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Thu Oct 11 13:20:01 2018
-#      by: PyQt4 UI code generator 4.11.2
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -719,8 +718,8 @@ class Ui_MainWindow(object):
         self.gridLayoutWidget.setGeometry(QtCore.QRect(480, 50, 231, 251))
         self.gridLayoutWidget.setObjectName(_fromUtf8("gridLayoutWidget"))
         self.gridLayout = QtGui.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout.setSpacing(6)
         self.gridLayout.setMargin(0)
+        self.gridLayout.setSpacing(6)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.lc_conjunction_btn = QtGui.QPushButton(self.gridLayoutWidget)
         self.lc_conjunction_btn.setEnabled(True)
@@ -1153,7 +1152,7 @@ class Ui_MainWindow(object):
         self.tab_10 = QtGui.QWidget()
         self.tab_10.setObjectName(_fromUtf8("tab_10"))
         self.pywd_about_title = QtGui.QLabel(self.tab_10)
-        self.pywd_about_title.setGeometry(QtCore.QRect(50, 30, 251, 31))
+        self.pywd_about_title.setGeometry(QtCore.QRect(50, 10, 251, 31))
         self.pywd_about_title.setObjectName(_fromUtf8("pywd_about_title"))
         self.lineEdit_2 = QtGui.QLineEdit(self.tab_10)
         self.lineEdit_2.setGeometry(QtCore.QRect(160, 250, 231, 31))
@@ -1163,7 +1162,7 @@ class Ui_MainWindow(object):
         self.label_65.setGeometry(QtCore.QRect(50, 250, 111, 31))
         self.label_65.setObjectName(_fromUtf8("label_65"))
         self.line_14 = QtGui.QFrame(self.tab_10)
-        self.line_14.setGeometry(QtCore.QRect(50, 50, 631, 21))
+        self.line_14.setGeometry(QtCore.QRect(50, 30, 631, 21))
         self.line_14.setFrameShape(QtGui.QFrame.HLine)
         self.line_14.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_14.setObjectName(_fromUtf8("line_14"))
@@ -1175,7 +1174,10 @@ class Ui_MainWindow(object):
         self.label_66.setGeometry(QtCore.QRect(50, 210, 101, 31))
         self.label_66.setObjectName(_fromUtf8("label_66"))
         self.pywd_about = QtGui.QLabel(self.tab_10)
-        self.pywd_about.setGeometry(QtCore.QRect(50, 70, 631, 131))
+        self.pywd_about.setGeometry(QtCore.QRect(50, 50, 631, 155))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.pywd_about.setFont(font)
         self.pywd_about.setTextFormat(QtCore.Qt.RichText)
         self.pywd_about.setScaledContents(False)
         self.pywd_about.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignTop)

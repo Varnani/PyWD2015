@@ -4428,7 +4428,7 @@ zero for zero output noise</string>
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>30</y>
+        <y>10</y>
         <width>251</width>
         <height>31</height>
        </rect>
@@ -4470,7 +4470,7 @@ zero for zero output noise</string>
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>50</y>
+        <y>30</y>
         <width>631</width>
         <height>21</height>
        </rect>
@@ -4512,10 +4512,15 @@ zero for zero output noise</string>
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>70</y>
+        <y>50</y>
         <width>631</width>
-        <height>131</height>
+        <height>155</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;PyWD2015&lt;/span&gt; is a graphical user interface to the Wilson - Devinney's (WD) eclipsing binary modeling program with additional user-friendly functionalities and tools.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;Manual and contact information is available at GitHub wiki page.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;For information, updates and news about WD program please refer to the WD Homepage.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;If you are going to use this interface within your research, we kindly ask you to cite relevant papers. Information about references is available on GitHub wiki under &amp;quot;Citation&amp;quot; page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
