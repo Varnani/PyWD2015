@@ -1951,11 +1951,11 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 x_axis_vr2 = None
                 if vr1_table is not None:
                     obs_vr1 = [float(x[obsIndex]) * float(self.MainWindow.vunit_ipt.text()) for x in vr1_table]
-                    resd_vr1 = [float(x[-1]) for x in vr1_table]
+                    resd_vr1 = [float(x[-1]) * float(self.MainWindow.vunit_ipt.text()) for x in vr1_table]
                     x_axis_vr1 = [float(x[timeIndex]) for x in vr1_table]
                 if vr2_table is not None:
                     obs_vr2 = [float(x[obsIndex]) * float(self.MainWindow.vunit_ipt.text()) for x in vr2_table]
-                    resd_vr2 = [float(x[-1]) for x in vr2_table]
+                    resd_vr2 = [float(x[-1]) * float(self.MainWindow.vunit_ipt.text()) for x in vr2_table]
                     x_axis_vr2 = [float(x[timeIndex]) for x in vr2_table]
                 if self.uselc_chk.isChecked():
                     # get model
@@ -2118,10 +2118,12 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
             computedIndex = 2
             xlabel = self.time_combobox.currentText()
             ylabel = self.MainWindow.maglite_combobox.currentText()
+            resd_cf = 1.0
             if ylabel == "Flux":
                 ylabel = "Norm. Flux"
             if self.MainWindow.LoadObservationWidget.Curves()[self.data_combobox.currentIndex()].type == "vc":
                 ylabel = "Radial Velocity (km s$^{-1}$)"
+                resd_cf = float(self.MainWindow.vunit_ipt.text())
             if self.MainWindow.jdphs_combobox.currentText() == "Time":  # wd outputs are in HJD
                 obsIndex = 2
                 computedIndex = 3
@@ -2129,7 +2131,7 @@ class DCWidget(QtGui.QWidget, dcwidget.Ui_DCWidget):
                 timeIndex = 1
             x_axis = [float(x[timeIndex]) for x in ocTable]
             obs = [float(x[obsIndex]) for x in ocTable]
-            resd = [float(x[-1]) for x in ocTable]
+            resd = [float(x[-1]) * resd_cf for x in ocTable]
 
             if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude" \
                 and self.data_combobox.currentIndex() + 1 > len(self.MainWindow.LoadObservationWidget.vcPropertiesList):
