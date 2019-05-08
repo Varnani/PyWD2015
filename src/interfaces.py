@@ -3050,6 +3050,7 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                     for o, c in izip(y_obs, interpolated_y_model):
                         y_residuals.append(o - c)
                     self.plot_residualAxis.plot(x_obs, y_residuals, linestyle="", marker="o", markersize=4, color="#4286f4")
+                    self.plot_residualAxis.axhline(0, color="red")
                 self.plot_residualAxis.set_ylabel("Residuals")
                 if str(self.MainWindow.maglite_combobox.currentText()) == "Magnitude" and syntheticCurve.type == "lc":
                     if self.plot_observationAxis.yaxis_inverted() == False:
@@ -3063,13 +3064,13 @@ class SyntheticCurveWidget(QtGui.QWidget, syntheticcurvewidget.Ui_SyntheticCurve
                         self.plot_residualAxis.invert_yaxis()
 
             self.plot_toolbar.update()
+            self.plot_observationAxis.relim()
             yticks_resd = self.plot_residualAxis.yaxis.get_major_ticks()
             yticks_resd[-1].label1.set_visible(False)
             self.plot_residualAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_observationAxis.grid(self.enablegrid_chk.isChecked())
             self.plot_observationAxis.ticklabel_format(useOffset=False)
             self.plot_residualAxis.ticklabel_format(useOffset=False)
-            self.plot_residualAxis.axhline(0, color="red")
             self.plot_canvas.draw()
 
     def checkGridState(self):
