@@ -603,8 +603,8 @@ class dcin(WDInput):
                                                                             "L2 will be set to 1.")
                         lcprop.l2 = "1"
                     iband = (" " * (3 - len(lcprop.band))) + lcprop.band
-                    lcparams = iband + self.formatInput(lcprop.l1, 13, 6, "F") + \
-                               self.formatInput(lcprop.l2, 13, 6, "F") + \
+                    lcparams = iband + self.formatInput(lcprop.l1, 13, 6, "D") + \
+                               self.formatInput(lcprop.l2, 13, 6, "D") + \
                                self.formatInput(lcprop.x1, 7, 3, "F") + \
                                self.formatInput(lcprop.x2, 7, 3, "F") + \
                                self.formatInput(lcprop.y1, 7, 3, "F") + \
