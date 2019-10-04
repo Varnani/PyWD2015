@@ -723,10 +723,8 @@ class dcin(WDInput):
                           star1spotline + "300.00000\n" + star2spotline + "300.00000\n" + \
                           "150.\n" + vc1dataline + vc2dataline + lcdataline + \
                           ecdataline + " 2\n"
-            if vc1dataline == "" and vc2dataline == "":
-                self.addWarning("There aren't any velocity curves loaded.")
-            if lcdataline == "":
-                self.addWarning("There aren't any light curves loaded.")
+            if vc1dataline == "" and vc2dataline == "" and lcdataline == "":
+                self.addWarning("There aren't any light curves or velocity curves loaded.")
             if MainWindow.EclipseWidget.iftime_chk.isChecked() and ecdataline == "":
                 self.addWarning("IFTIME is checked, but eclipse timings are not provided.")
 
