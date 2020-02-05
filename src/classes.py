@@ -191,15 +191,15 @@ class WDInput:
         elif f_ipt >= float(1) or f_ipt <= float(-1):
             output = "{:{width}.{precision}f}".format(f_ipt, width=width, precision=precision)
         output = output.rstrip("0")
-        if output[-1] == ".":
+        if output[-1] == "." or output[-2] in ("+", "-"):
             output = output + "0"
         output = " " * (width - len(output)) + output
         if len(output) > width:
-            raise IndexError("This input can't be formatted into current output file: " + ipt +
-                             "\nMaximum character lenght: " + str(width) +
+            raise IndexError("This input can't be formatted: " + ipt +
+                             "\nMaximum character length: " + str(width) +
                              "\nMaximum decimal precision: " + str(precision) +
                              "\nTried to write: " + output +
-                             "\nLenght: " + str(len(output)) +
+                             "\nLength: " + str(len(output)) +
                              "\nPlease reformat your input parameter.")
         else:
             return output.replace("e", exponent)
