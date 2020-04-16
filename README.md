@@ -42,7 +42,7 @@ You need precompiled PyQt4 binaries. These can be downloaded from [SourceForge](
 
 ## Getting Started
 
-After installing required dependencies, you can get the source code of the program by either cloning this repository, or downloading a release from the Releases page. Extract the source code and issue this command to start the PyWD2015:
+After installing required dependencies, you can get the source code of the program by either cloning this repository, or downloading a release from the [Releases](https://github.com/Varnani/PyWD2015/releases)  page. Extract the source code and issue this command to start the PyWD2015:
 
 ```python pywd2015.py```  
 
